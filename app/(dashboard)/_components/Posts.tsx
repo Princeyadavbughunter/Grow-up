@@ -3,22 +3,7 @@ import Image from "next/image"
 const Posts = () => {
     return (
         <div className="p-4">
-            <div className="bg-white rounded-xl p-4 mb-4 shadow-sm">
-                <div className="flex items-center gap-3 mb-4">
-                    <Image
-                        src="https://randomuser.me/api/portraits/men/1.jpg"
-                        alt="User"
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Create post...."
-                        className="w-full bg-gray-100 rounded-lg px-4 py-2"
-                    />
-                </div>
-            </div>
+
 
             {[1, 2].map((i) => (
                 <PostCard key={i} />
@@ -28,7 +13,7 @@ const Posts = () => {
 }
 
 const PostCard = () => (
-    <div className="bg-white rounded-xl p-4 mb-4 shadow-sm">
+    <div className="bg-white rounded-xl p-4 mb-4 shadow-lg">
         <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
                 <Image

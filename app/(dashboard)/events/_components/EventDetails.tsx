@@ -17,9 +17,16 @@ export function EventDetails() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <Badge className="bg-yellow-100 text-yellow-800">Web, May 08 @ 6:00 PM</Badge>
+        <Badge className="bg-purple-100 text-purple-800">456 Buddy</Badge>
+      </div>
       <h1 className="text-2xl font-bold">Building the Fastest Growing Gaming Tech</h1>
       <p className="text-gray-600">Deploy your first website in minutes</p>
-      
+      <p className="text-gray-600">
+        Lorem ipsum dolor sit amet consectetur. Ut dictum aenean diam eros faucibus consequat risus vel. Libero sit dis feugiat vestibulum. Nisl massa donec diam suscipit. Mattis rhoncus amet leo feugiat eu. Mauris amet proin in mi facilisi. Ut sem id.
+      </p>
+
       <div className="space-y-4">
         <h3 className="font-semibold">Skill you'll be learning</h3>
         <div className="flex gap-2">
@@ -43,9 +50,7 @@ export function EventDetails() {
         </div>
       </div>
 
-      <p className="text-gray-600">
-        Lorem ipsum dolor sit amet consectetur. Ut dictum aenean diam eros faucibus consequat risus vel. Libero sit dis feugiat vestibulum. Nisl massa donec diam suscipit. Mattis rhoncus amet leo feugiat eu. Mauris amet proin in mi facilisi. Ut sem id.
-      </p>
+
     </div>
   );
 }

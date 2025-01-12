@@ -2,6 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { SearchIcon } from "lucide-react";
 
 interface Participant {
   name: string;
@@ -28,6 +29,10 @@ export function EventParticipants() {
 
   return (
     <div className="space-y-4">
+      <div className="border-[1px] flex items-center rounded-full p-2">
+        <SearchIcon size={18} color="gray" />
+        <input className="border-none ms-2 outline-none" placeholder="search" />
+      </div>
       {participants.map((participant, index) => (
         <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
           <div className="flex items-center gap-3">
