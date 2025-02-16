@@ -20,6 +20,10 @@ const ChatInterface = () => {
     { name: 'The Design Buddy', type: 'Startup', buddyCount: '9.56k Buddy' },
     { name: 'The Founder Buddy', type: 'Influencer', buddyCount: '9.56k Buddy' },
     { name: 'Under 25 Dictionary', type: 'Influencer', buddyCount: '9.56k Buddy' },
+    { name: 'The Design Buddy', type: 'Startup', buddyCount: '9.56k Buddy' },
+    { name: 'The Founder Buddy', type: 'Influencer', buddyCount: '9.56k Buddy' },
+    { name: 'Under 25 Dictionary', type: 'Influencer', buddyCount: '9.56k Buddy' },
+    ,
   ];
 
   const myBuddies = [
@@ -28,20 +32,23 @@ const ChatInterface = () => {
   ];
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col justify-between">
       <nav className="border-b bg-white p-4">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-8">
             <h1 className="text-xl font-bold">Recommended</h1>
-            <div className="flex gap-4">
+            <div className="flex gap-8">
               {recommendedBuddies.map((buddy, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={index} className="flex items-center gap-2 border p-6 rounded-xl ">
                   <img
                     src={`https://randomuser.me/api/portraits/thumb/men/${index}.jpg`}
-                    alt={buddy.name}
-                    className="h-8 w-8 rounded-full"
+                    alt={buddy?.name}
+                    className="h-14 w-14 rounded-full"
                   />
-                  <span className="text-sm font-medium">{buddy.name}</span>
+                  <div className="div">
+                    <span className="text-sm font-medium">{buddy?.name}</span>
+                    <div className="text-xs text-gray-400 font-medium">{buddy?.buddyCount}</div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -49,8 +56,8 @@ const ChatInterface = () => {
         </div>
       </nav>
 
-      <div className="flex flex-1">
-        <div className="w-72 border-r bg-white p-4">
+      <div className="flex flex-1 ">
+        <div className=" border-r bg-white p-4">
           <div className="mb-4">
             <div className="relative">
               <BiSearch className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
@@ -64,8 +71,8 @@ const ChatInterface = () => {
             </div>
           </div>
 
-          <h2 className="mb-4 text-lg font-semibold">My Buddies</h2>
-          <div className="space-y-3">
+          <div className="space-y-3 w-[300px]">
+            <h2 className="mb-4 text-lg font-semibold">My Buddies</h2>
             {myBuddies.map((buddy, index) => (
               <div key={index} className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50">
                 <img
@@ -94,7 +101,7 @@ const ChatInterface = () => {
                   <p className="text-sm text-gray-500">Broadcast channel - 2.4k Buddies</p>
                 </div>
               </div>
-              <button 
+              <button
                 className="rounded-lg bg-gray-100 px-4 py-2"
                 onClick={() => setShowProfile(true)}
               >

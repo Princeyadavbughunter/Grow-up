@@ -6,23 +6,28 @@ import { EventTabs } from "./_components/EventTabs";
 import { EventFilters } from "./_components/EventFilters";
 import { EventCard } from "./_components/EventCard";
 import { EventParticipants } from "./_components/EventParticipants";
+import { EventDetails } from "./_components/EventDetails";
 
 export default function EventsPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 pb-40">
       <EventTabs />
       <EventFilters />
-      
+
       <div className="grid grid-cols-12 gap-8">
-        <div className="col-span-7">
+        <div className="col-span-4">
           <EventCard />
         </div>
-        
-        <div className="col-span-5">
+        <div className="col-span-4">
+          <EventDetails />
+        </div>
+
+        <div className="col-span-4">
           <Tabs defaultValue="comments" className="w-full">
-            <TabsList className="w-full mb-4">
-              <TabsTrigger value="comments" className="flex-1">Comments</TabsTrigger>
-              <TabsTrigger value="participants" className="flex-1">Participants</TabsTrigger>
+            <TabsList className="w-full mb-4 rounded-full border-2 border-[#7052FF]
+ ">
+              <TabsTrigger value="comments" className="flex-1 rounded-full text-lg ">Comments</TabsTrigger>
+              <TabsTrigger value="participants" className="flex-1 rounded-full text-lg ">Participants</TabsTrigger>
             </TabsList>
             <TabsContent value="comments">
               <div className="p-4 space-y-4">

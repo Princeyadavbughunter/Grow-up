@@ -27,6 +27,126 @@ const jobs: Job[] = [
       "Professional development opportunities"
     ]
   },
+  {
+    id: 2,
+    title: "Web Developer",
+    company: "Cat Group",
+    location: "India",
+    type: "Internship",
+    posted: "1hr ago",
+    salary: "₹8000/month",
+    duration: "3 Months",
+    workType: "Remote",
+    description: "Seeking a talented UI/UX Designer to spearhead our mobile app's design, creating intuitive and engaging user experiences.Work alongside product managers and engineers in a collaborative environment to translate our vision into a functional and visually appealing app.",
+    responsibilities: [
+      "5+ years of experience as a UI/UX Designer with hands on experience in Crafting wireframes, user stories, journeys, and mockups for a diverse range of devices.",
+      "Solve design challenges with elegant solutions.",
+      "Employ a user-centered approach to design, with a cycle of testing and iteration.",
+      "Engage in collaborative problem-solving and idea generation."
+    ],
+    offers: [
+      "A competitive salary with performance incentives",
+      "Flexible working hours",
+      "Health insurance coverage",
+      "Professional development opportunities"
+    ]
+  },
+  {
+    id: 3,
+    title: "Web Developer",
+    company: "Cat Group",
+    location: "India",
+    type: "Internship",
+    posted: "1hr ago",
+    salary: "₹8000/month",
+    duration: "3 Months",
+    workType: "Remote",
+    description: "Seeking a talented UI/UX Designer to spearhead our mobile app's design, creating intuitive and engaging user experiences.Work alongside product managers and engineers in a collaborative environment to translate our vision into a functional and visually appealing app.",
+    responsibilities: [
+      "5+ years of experience as a UI/UX Designer with hands on experience in Crafting wireframes, user stories, journeys, and mockups for a diverse range of devices.",
+      "Solve design challenges with elegant solutions.",
+      "Employ a user-centered approach to design, with a cycle of testing and iteration.",
+      "Engage in collaborative problem-solving and idea generation."
+    ],
+    offers: [
+      "A competitive salary with performance incentives",
+      "Flexible working hours",
+      "Health insurance coverage",
+      "Professional development opportunities"
+    ]
+  },
+  {
+    id: 4,
+    title: "Web Developer",
+    company: "Cat Group",
+    location: "India",
+    type: "Internship",
+    posted: "1hr ago",
+    salary: "₹8000/month",
+    duration: "3 Months",
+    workType: "Remote",
+    description: "Seeking a talented UI/UX Designer to spearhead our mobile app's design, creating intuitive and engaging user experiences.Work alongside product managers and engineers in a collaborative environment to translate our vision into a functional and visually appealing app.",
+    responsibilities: [
+      "5+ years of experience as a UI/UX Designer with hands on experience in Crafting wireframes, user stories, journeys, and mockups for a diverse range of devices.",
+      "Solve design challenges with elegant solutions.",
+      "Employ a user-centered approach to design, with a cycle of testing and iteration.",
+      "Engage in collaborative problem-solving and idea generation."
+    ],
+    offers: [
+      "A competitive salary with performance incentives",
+      "Flexible working hours",
+      "Health insurance coverage",
+      "Professional development opportunities"
+    ]
+  },
+  {
+    id: 5,
+    title: "Web Developer",
+    company: "Cat Group",
+    location: "India",
+    type: "Internship",
+    posted: "1hr ago",
+    salary: "₹8000/month",
+    duration: "3 Months",
+    workType: "Remote",
+    description: "Seeking a talented UI/UX Designer to spearhead our mobile app's design, creating intuitive and engaging user experiences.Work alongside product managers and engineers in a collaborative environment to translate our vision into a functional and visually appealing app.",
+    responsibilities: [
+      "5+ years of experience as a UI/UX Designer with hands on experience in Crafting wireframes, user stories, journeys, and mockups for a diverse range of devices.",
+      "Solve design challenges with elegant solutions.",
+      "Employ a user-centered approach to design, with a cycle of testing and iteration.",
+      "Engage in collaborative problem-solving and idea generation."
+    ],
+    offers: [
+      "A competitive salary with performance incentives",
+      "Flexible working hours",
+      "Health insurance coverage",
+      "Professional development opportunities"
+    ]
+  },
+  {
+    id: 6,
+    title: "Web Developer",
+    company: "Cat Group",
+    location: "India",
+    type: "Internship",
+    posted: "1hr ago",
+    salary: "₹8000/month",
+    duration: "3 Months",
+    workType: "Remote",
+    description: "Seeking a talented UI/UX Designer to spearhead our mobile app's design, creating intuitive and engaging user experiences.Work alongside product managers and engineers in a collaborative environment to translate our vision into a functional and visually appealing app.",
+    responsibilities: [
+      "5+ years of experience as a UI/UX Designer with hands on experience in Crafting wireframes, user stories, journeys, and mockups for a diverse range of devices.",
+      "Solve design challenges with elegant solutions.",
+      "Employ a user-centered approach to design, with a cycle of testing and iteration.",
+      "Engage in collaborative problem-solving and idea generation."
+    ],
+    offers: [
+      "A competitive salary with performance incentives",
+      "Flexible working hours",
+      "Health insurance coverage",
+      "Professional development opportunities"
+    ]
+  },
   // Add more jobs with similar structure...
 ];
 
@@ -42,9 +162,8 @@ export default function JobList({ onSelectJob, selectedJobId }: JobListProps) {
         <div
           key={job.id}
           onClick={() => onSelectJob(job)}
-          className={`bg-white rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer ${
-            selectedJobId === job.id ? "ring-2 ring-purple-500" : ""
-          }`}
+          className={`bg-white rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer ${selectedJobId === job.id ? "ring-2 ring-purple-500" : ""
+            }`}
         >
           <div className="flex items-start justify-between">
             <div className="flex items-start space-x-4">

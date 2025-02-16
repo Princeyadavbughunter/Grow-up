@@ -9,7 +9,7 @@ interface LayoutProps {
 export default function RootLayout({ children }: LayoutProps) {
     return (
         <AuthProvider>
-            <div className="min-h-screen flex flex-col bg-gray-50">
+            <div className="min-h-screen flex flex-col">
                 <div className="sticky top-0 z-50 bg-white shadow">
                     <Navbar />
                 </div>

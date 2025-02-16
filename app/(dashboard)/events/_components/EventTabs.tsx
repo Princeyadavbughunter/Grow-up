@@ -15,9 +15,8 @@ export function EventTabs() {
         <Button
           key={tab.label}
           variant="ghost"
-          className={`px-0 ${
-            tab.active ? "text-black font-semibold border-b-2 border-black" : "text-gray-500"
-          }`}
+          className={`px-0 ${tab.active ? "text-black font-semibold border-b-2 border-black rounded-none" : "text-gray-500"
+            }`}
         >
           {tab.label}
         </Button>

@@ -11,7 +11,7 @@ export function EventFilters() {
         <Button
           key={filter}
           variant="secondary"
-          className="bg-gray-100 hover:bg-gray-200 text-gray-700"
+          className="bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full"
         >
           {filter}
         </Button>
