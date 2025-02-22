@@ -1,35 +1,47 @@
 "use client";
-import Link from "next/link";
-import { SetStateAction, useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuthenticatedApi } from "@/context/AuthContext";
+
+interface Club {
+    id: string;
+    name: string;
+    description: string;
+    created_at: string;
+    created_by: string;
+    participants_count?: number;
+    members?: string[];
+}
 
 const ClubsList = () => {
-    const [activeTab, setActiveTab] = useState("all"); // "all" or "my"
-    const [joinedClubs, setJoinedClubs] = useState<number[]>([]); // Clubs that the user has joined
+    const [activeTab, setActiveTab] = useState("all");
+    const [allClubs, setAllClubs] = useState<Club[]>([]);
+    const [myClubs, setMyClubs] = useState<Club[]>([]);
+    const { api } = useAuthenticatedApi();
 
-    const handleTabClick = (tab: SetStateAction<string>) => {
-        setActiveTab(tab);
+    const fetchClubs = async () => {
+        try {
+            const [allClubsResponse, myClubsResponse] = await Promise.all([
+                api.get('/freelancer/club/'),
+                api.get('/freelancer/joined-clubs/')
+            ]);
+            setAllClubs(allClubsResponse.data);
+            setMyClubs(myClubsResponse.data);
+        } catch (error) {
+            console.error('Error fetching clubs:', error);
+        }
     };
 
-    const clubs = [
-        { id: 1, name: "Tech Minds", members: 9899 },
-        { id: 2, name: "Design Enthusiasts", members: 1250 },
-        { id: 3, name: "AI Innovators", members: 3400 },
-        { id: 4, name: "Startup Builders", members: 2100 },
-    ];
+    useEffect(() => {
+        fetchClubs();
+    }, []);
 
-    const handleJoinToggle = (clubId: number) => {
-        if (joinedClubs.includes(clubId)) {
-            // Unjoin the club (move back to "All Clubs" tab)
-            setJoinedClubs((prev) => prev.filter((id) => id !== clubId));
-            if (activeTab === "my") {
-                setActiveTab("all"); // Switch to "All Clubs" tab if the user is in "My Clubs"
-            }
-        } else {
-            // Join the club (move to "My Clubs" tab)
-            setJoinedClubs((prev) => [...prev, clubId]);
-            if (activeTab === "all") {
-                setActiveTab("my"); // Switch to "My Clubs" tab when the user joins a club
-            }
+    const handleJoinToggle = async (clubId: string) => {
+        try {
+            await api.post(`/freelancer/club/${clubId}/join/`);
+            fetchClubs();
+            setActiveTab("my");
+        } catch (error) {
+            console.error('Error toggling club membership:', error);
         }
     };
 
@@ -37,22 +49,21 @@ const ClubsList = () => {
         <div className="p-4 max-w-sm">
             <div className="flex items-center gap-4 mb-4 border-b">
                 <button
-                    onClick={() => handleTabClick("all")}
+                    onClick={() => setActiveTab("all")}
                     className={`py-2 px-4 ${activeTab === "all" ? "text-purple-600 border-b-2 border-purple-600 font-semibold" : "text-gray-500"}`}
                 >
                     All Clubs
                 </button>
                 <button
-                    onClick={() => handleTabClick("my")}
+                    onClick={() => setActiveTab("my")}
                     className={`py-2 px-4 ${activeTab === "my" ? "text-purple-600 border-b-2 border-purple-600 font-semibold" : "text-gray-500"}`}
                 >
                     My Clubs
                 </button>
             </div>
 
-            {/* Display clubs based on the active tab */}
-            {activeTab === "all" && clubs.map((club) => (
-                !joinedClubs.includes(club.id) && (
+            {activeTab === "all" && allClubs.map((club) => (
+                !myClubs.some(myClub => myClub.id === club.id) && (
                     <ClubCard
                         key={club.id}
                         club={club}
@@ -62,39 +73,37 @@ const ClubsList = () => {
                 )
             ))}
 
-            {activeTab === "my" && clubs.map((club) => (
-                joinedClubs.includes(club.id) && (
-                    <ClubCard
-                        key={club.id}
-                        club={club}
-                        isMyClub={true}
-                        onJoinToggle={handleJoinToggle}
-                    />
-                )
+            {activeTab === "my" && myClubs.map((club) => (
+                <ClubCard
+                    key={club.id}
+                    club={club}
+                    isMyClub={true}
+                    onJoinToggle={handleJoinToggle}
+                />
             ))}
         </div>
     );
 };
 
-const ClubCard = ({
-    club,
-    isMyClub,
-    onJoinToggle,
-}: {
-    club: { id: number; name: string; members: number };
+interface ClubCardProps {
+    club: Club;
     isMyClub: boolean;
-    onJoinToggle: (clubId: number) => void;
-}) => {
+    onJoinToggle: (clubId: string) => void;
+}
+
+const ClubCard = ({ club, isMyClub, onJoinToggle }: ClubCardProps) => {
     return (
-        <div className="bg-white rounded-xl p-4 mb-4 shadow-sm  w-[350px]">
-            <div className="flex items-center justify-between ">
+        <div className="bg-white rounded-xl p-4 mb-4 shadow-sm w-[350px]">
+            <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                         <span className="text-purple-600 text-xl">{club.name[0]}</span>
                     </div>
                     <div>
                         <h3 className="font-semibold">{club.name}</h3>
-                        <p className="text-sm text-gray-500">{club.members} members</p>
+                        <p className="text-sm text-gray-500">
+                            {isMyClub ? `${club.members?.length || 0} members` : `${club.participants_count || 0} members`}
+                        </p>
                     </div>
                 </div>
 
@@ -108,7 +117,7 @@ const ClubCard = ({
 
             {!isMyClub && (
                 <p className="text-sm text-gray-600 mt-2">
-                    A group for {club.name} enthusiasts. Follow a passion with people
+                    {club.description}
                     <button className="text-purple-600 ml-1">Read More...</button>
                 </p>
             )}

@@ -5,26 +5,23 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CiEdit } from "react-icons/ci";
-// Zod Schema for form validation
-
+import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 
 const formSchema = z.object({
-    projectLink: z.string().url("Enter a valid project link"), // Ensures valid URL format
-    socials: z.array(z.string().min(1, "Username is required")).nonempty("At least one social media link is required"), // Socials validation
-    // cv: z
-    //     .instanceof(File)
-    //     .refine((file) => file.size <= 5 * 1024 * 1024, "File size should be less than 5MB") // Max size 5MB
-    //     .refine((file) => ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"].includes(file.type), "Only PDF and DOCX files are allowed")
-    //     .optional(), // Validate file type and size
+    projectLink: z.string().url("Enter a valid project link"),
+    socials: z.array(z.string().min(1, "Username is required")).nonempty("At least one social media link is required"),
+    coverLetter: z.string().min(1, "Cover letter is required"),
+    cv: z.any()
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-
-export default function ApplicationForm() {
+export default function ApplicationForm({ jobId }: { jobId?: string }) {
     const [formSubmitted, setFormSubmitted] = useState(false);
     const [applicationStatus, setApplicationStatus] = useState("");
     const [cvName, setCvName] = useState<string | null>(null);
+    const { userId } = useAuth();
+    const { api } = useAuthenticatedApi();
 
     const {
         register,
@@ -36,37 +33,40 @@ export default function ApplicationForm() {
     });
 
     const onSubmit = async (data: FormData) => {
-        console.log("Form Data:", data);  // Log the form data to console
-        console.log("Socials:", data.socials);
-        console.log("Project Link:", data.projectLink);
-        if (data.cv) {
-            console.log("CV File:", data.cv.name);  // Logging file name if it exists
-        }
-
         try {
             const formData = new FormData();
-            formData.append("projectLink", data.projectLink);
-            formData.append("socials", data.socials[0]);
+            
+            const applicationData = {
+                job_seeker: userId,
+                job_posting: jobId,
+                cover_letter: data.coverLetter,
+                status: "submitted",
+                project_link: data.projectLink,
+                social_links: data.socials,
+            };
 
             if (data.cv) {
                 formData.append("cv", data.cv);
             }
 
-            setFormSubmitted(true);
-            setApplicationStatus("Application Sent to Recruiter");
+            const response = await api.post('/freelancer/job-application/', applicationData);
+
+            if (response.status === 201 || response.status === 200) {
+                setFormSubmitted(true);
+                setApplicationStatus("Application Sent to Recruiter");
+            }
         } catch (error) {
             console.error("Error submitting the application:", error);
             alert("Something went wrong. Please try again!");
         }
     };
 
-
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setCvName(file.name);  // Set the file name in state
-            setValue("cv", file);   // Manually update React Hook Form with the file
-            e.target.value = "";    // Reset the input value to ensure the UI doesn't ask to reselect the file
+            setCvName(file.name);
+            setValue("cv", file);
+            e.target.value = "";
         }
     };
 
@@ -96,12 +96,6 @@ export default function ApplicationForm() {
                             <button className="bg-[#F6F8FF] font-medium rounded-full px-2 py-1 text-xs">
                                 UX Research
                             </button>
-                            <button className="bg-[#F6F8FF] font-medium rounded-full px-2 py-1 text-xs">
-                                UX Research
-                            </button>
-                            <button className="bg-[#F6F8FF] font-medium rounded-full px-2 py-1 text-xs">
-                                UX Research
-                            </button>
                         </p>
                     </div>
                     <div>
@@ -118,7 +112,6 @@ export default function ApplicationForm() {
             <div className="">
                 {!formSubmitted ? (
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
-
                         <div>
                             <h3 className="font-medium text-lg mb-2">What we offer</h3>
                             <p className="text-gray-600">
@@ -138,7 +131,22 @@ export default function ApplicationForm() {
                                 />
                                 {errors.projectLink && (
                                     <p className="text-red-500 text-sm mt-1">
-                                        {errors.projectLink.message}
+                                        {errors.projectLink.message?.toString()}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div>
+                                <h3 className="text-sm font-medium text-gray-500 mb-1">Cover Letter</h3>
+                                <textarea
+                                    {...register("coverLetter")}
+                                    className={`w-full border ${errors.coverLetter ? "border-red-500" : "border-gray-300"} rounded-md p-2`}
+                                    rows={4}
+                                    placeholder="Write your cover letter here..."
+                                />
+                                {errors.coverLetter && (
+                                    <p className="text-red-500 text-sm mt-1">
+                                        {errors.coverLetter.message?.toString()}
                                     </p>
                                 )}
                             </div>
@@ -157,7 +165,9 @@ export default function ApplicationForm() {
                                     )}
                                 </div>
                                 {errors.cv && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.cv.message}</p>
+                                    <p className="text-red-500 text-sm mt-1">
+                                        {errors.cv.message?.toString()}
+                                    </p>
                                 )}
                             </div>
 
@@ -172,7 +182,9 @@ export default function ApplicationForm() {
                                         className={`w-full border ${errors.socials ? "border-red-500" : "border-gray-300"} rounded-md`}
                                     />
                                     {errors.socials?.[0] && (
-                                        <p className="text-red-500 text-sm mt-1">{errors.socials?.[0]?.message}</p>
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {errors.socials[0].message?.toString()}
+                                        </p>
                                     )}
                                 </div>
                             </div>

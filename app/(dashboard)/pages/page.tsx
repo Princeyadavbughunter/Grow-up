@@ -41,7 +41,7 @@ const ChatInterface = () => {
               {recommendedBuddies.map((buddy, index) => (
                 <div key={index} className="flex items-center gap-2 border p-6 rounded-xl ">
                   <img
-                    src={`https://randomuser.me/api/portraits/thumb/men/${index}.jpg`}
+                    src={`https://randomuser.me/portraits/thumb/men/${index}.jpg`}
                     alt={buddy?.name}
                     className="h-14 w-14 rounded-full"
                   />
@@ -76,7 +76,7 @@ const ChatInterface = () => {
             {myBuddies.map((buddy, index) => (
               <div key={index} className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50">
                 <img
-                  src={`https://randomuser.me/api/portraits/thumb/women/${index}.jpg`}
+                  src={`https://randomuser.me/portraits/thumb/women/${index}.jpg`}
                   alt={buddy.name}
                   className="h-10 w-10 rounded-full"
                 />

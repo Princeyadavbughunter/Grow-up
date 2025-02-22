@@ -1,56 +1,76 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Building2, MapPin, Clock, Badge } from 'lucide-react'
-import React from 'react'
 
-const Description = () => {
+interface DescriptionProps {
+    selectedGig: Gig | null;
+}
+
+const Description = ({ selectedGig }: DescriptionProps) => {
+    if (!selectedGig) {
+        return (
+            <div className="max-w-[450px]">
+                <Card className="h-[600px] flex flex-col justify-center items-center">
+                    <p className="text-gray-500">Select a job to view details</p>
+                </Card>
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-[450px]">
             <Card className="h-[600px] flex flex-col">
-                {/* Header Section */}
                 <CardHeader className="sticky top-0 z-10 bg-white">
-                    <CardTitle>Web Developer</CardTitle>
+                    <CardTitle>{selectedGig.job_title}</CardTitle>
                     <div className="flex items-center space-x-4 text-sm text-gray-500">
                         <div className="flex items-center">
                             <Building2 className="h-4 w-4 mr-1" />
-                            Cat Group India
+                            {selectedGig.about_role}
                         </div>
                         <div className="flex items-center">
                             <MapPin className="h-4 w-4 mr-1" />
-                            Remote
+                            {selectedGig.location}
                         </div>
                         <div className="flex items-center">
                             <Clock className="h-4 w-4 mr-1" />
-                            3 Months
+                            {selectedGig.salary_range}/month
                         </div>
-                        <Badge>Internship</Badge>
+                        <Badge>{selectedGig.employment_type}</Badge>
                     </div>
                 </CardHeader>
 
-                {/* Scrollable Content */}
                 <CardContent className="overflow-y-auto space-y-10 h-[500px]">
                     <div>
                         <h3 className="font-medium mb-2">About Position</h3>
                         <p className="text-gray-600">
-                            Seeking a talented UI/UX Designer to spearhead our mobile app's design, creating intuitive and engaging user experiences. Work alongside product managers and engineers in a collaborative environment to translate our vision into a functional and visually appealing app.
+                            {selectedGig.job_description}
                         </p>
                     </div>
 
                     <div>
-                        <h3 className="font-medium mb-2">Responsibilities</h3>
+                        <h3 className="font-medium mb-2">Role Details</h3>
                         <ul className="list-disc pl-4 space-y-2 text-gray-600">
-                            <li>
-                                5+ years of experience as a UI/UX Designer with hands-on experience in crafting wireframes, user stories, journeys, and mockups for a diverse range of devices.
-                            </li>
-                            <li>Solve design challenges with elegant solutions.</li>
-                            <li>Employ a user-centered approach to design, with a cycle of testing and iteration.</li>
-                            <li>Engage in collaborative problem-solving and idea generation.</li>
+                            <li>Experience Required: {selectedGig.experience}</li>
+                            <li>Required Skills: {selectedGig.required_skills}</li>
+                            <li>Employment Type: {selectedGig.employment_type}</li>
+                            {selectedGig.work_type && (
+                                <li>Work Type: {selectedGig.work_type}</li>
+                            )}
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 className="font-medium mb-2">Additional Information</h3>
+                        <ul className="list-disc pl-4 space-y-2 text-gray-600">
+                            <li>Salary: ₹{selectedGig.salary_range}/month</li>
+                            <li>Location: {selectedGig.location}</li>
+                            <li>Status: {selectedGig.is_active}</li>
                         </ul>
                     </div>
                 </CardContent>
             </Card>
         </div>
-    )
-}
+    );
+};
 
-export default Description
+export default Description;

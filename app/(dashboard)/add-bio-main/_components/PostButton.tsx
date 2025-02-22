@@ -7,7 +7,7 @@ const PostButton = () => {
         <div className="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
                 <Image
-                    src="https://randomuser.me/api/portraits/men/1.jpg"
+                    src="https://randomuser.me/portraits/men/1.jpg"
                     alt="User"
                     width={40}
                     height={40}

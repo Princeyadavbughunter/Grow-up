@@ -14,7 +14,7 @@ const GigsDetails = () => {
         profile: {
             name: "Aryan Trivedi",
             skills: "4 of 10",
-            profileImage: "https://randomuser.me/api/portraits/men/1.jpg", // Random profile image link
+            profileImage: "https://randomuser.me/portraits/men/1.jpg", // Random profile image link
         },
         filters: ["Relevance", "Latest", "Has Proof of Work", "Matching Skill", "Rating"],
         languages: ["javascript", "next.js", "react.js", "Angular", "node.js"],

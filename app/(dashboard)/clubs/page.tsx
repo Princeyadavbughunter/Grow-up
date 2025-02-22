@@ -11,7 +11,7 @@ const page = () => {
   const [isJoined, setIsJoined] = useState(false);
 
   const handleClick = () => {
-    setIsJoined(!isJoined); // Toggle the state
+    setIsJoined(!isJoined);
   };
 
   const myNetwork = [
@@ -82,14 +82,11 @@ const page = () => {
 
   return (
     <div className="flex flex-col md:flex-row">
-      {/* Left Sidebar (Clubs List) */}
       <div className="w-full bg-[#F9FAFF] p-4 md:p-6  fixed md:relative overflow-y-auto top-0 h-[580px]">
         <ClubsList />
       </div>
 
-      {/* Main Content */}
       <div className="w-full p-4 overflow-y-auto scrollbar-[1px] h-[580px]">
-        {/* Sticky section */}
         <div className="sticky top-0 z-10 bg-white">
           <div className="flex items-center justify-between border mx-4 p-4 rounded-xl mt-5">
             <div className="flex items-center gap-3">
@@ -107,7 +104,6 @@ const page = () => {
         <Posts />
       </div>
 
-      {/* Right Sidebar (Network Section) */}
       <div className="w-full bg-[#F9FAFF] p-4 md:p-6  fixed md:relative overflow-y-auto top-0 h-[580px]">
         <div className="border rounded-full flex items-center gap-2 p-2">
           <SearchIcon color='gray' size={18} />

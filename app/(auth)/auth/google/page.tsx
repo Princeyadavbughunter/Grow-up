@@ -28,7 +28,7 @@ const AccountCreation = () => {
     const handleGoogleAuth = async () => {
         setLoading(true)
         try {
-            const response = await axios.get<GoogleAuthResponse>('https://rz5dd1tf-8000.inc1.devtunnels.ms/api/auth/o/google-oauth2/?redirect_uri=http://localhost:3000/auth/google')
+            const response = await axios.get<GoogleAuthResponse>('https://rz5dd1tf-8000.inc1.devtunnels.ms/auth/o/google-oauth2/?redirect_uri=http://localhost:3000/auth/google')
             if (response.data.authorization_url) {
                 window.location.href = response.data.authorization_url
             }
@@ -42,7 +42,7 @@ const AccountCreation = () => {
     const handleGoogleCallback = async (code: string, state: string): Promise<GoogleAuthResponse | undefined> => {
         try {
             const response = await axios.post<GoogleAuthResponse>(
-                `https://rz5dd1tf-8000.inc1.devtunnels.ms/api/auth/o/google-oauth2/?state=${state}&code=${code}`,
+                `https://rz5dd1tf-8000.inc1.devtunnels.ms/auth/o/google-oauth2/?state=${state}&code=${code}`,
                 {},
                 {
                     headers: {

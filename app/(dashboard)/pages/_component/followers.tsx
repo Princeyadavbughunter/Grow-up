@@ -4,22 +4,22 @@ import { BiLink } from 'react-icons/bi';
 const Followers = () => {
     const followers = [
         {
-            avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+            avatar: 'https://randomuser.me/portraits/men/1.jpg',
             name: 'John Doe',
             location: 'New York, USA',
         },
         {
-            avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
+            avatar: 'https://randomuser.me/portraits/women/2.jpg',
             name: 'Jane Smith',
             location: 'London, UK',
         },
         {
-            avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
+            avatar: 'https://randomuser.me/portraits/men/3.jpg',
             name: 'Mike Johnson',
             location: 'Sydney, Australia',
         },
         {
-            avatar: 'https://randomuser.me/api/portraits/women/4.jpg',
+            avatar: 'https://randomuser.me/portraits/women/4.jpg',
             name: 'Emily Davis',
             location: 'Toronto, Canada',
         },

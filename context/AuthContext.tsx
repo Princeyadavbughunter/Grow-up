@@ -6,6 +6,7 @@ import axios, { AxiosInstance } from 'axios';
 interface AuthContextType {
   isAuthenticated: boolean;
   authToken: string | null;
+  userId: string;
   loading: boolean;
   setIsAuthenticated: Dispatch<SetStateAction<boolean>>;
   apiCaller: AxiosInstance;
@@ -23,7 +24,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
   const [authToken, setAuthToken] = useState<string | null>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUwNzM2MzYzLCJpYXQiOjE3MzQ5NjgzNjMsImp0aSI6IjI1ZDE5NjkwMWE0ZjRlNjA4YzQxYjQ4MWRmMWI2NDRkIiwidXNlcl9pZCI6ImVjNzY5YzUyLTMxNzgtNDU4Ny1hMWY2LTRjODIyOGNjZDdjYiJ9.qHy0jEum5VS1ifW-nUhCu1M5Bo4rUNoB8K9szpq295E');
   const [loading, setLoading] = useState<boolean>(true);
-
+  const [userId, setuserId] = useState('cf4a03a6-cf6d-4595-a836-9e6981be4887')
 
   const apiCaller = axios.create({
     baseURL,
@@ -45,6 +46,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading,
     setIsAuthenticated,
     apiCaller,
+    userId
   };
 
   return (

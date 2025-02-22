@@ -13,7 +13,6 @@ const Home = () => {
         <ProgressProfile />
       </div>
       <div className="overflow-y-auto h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent md:col-span-3">
-        {/* Updated PostButton */}
         <PostButton />
         <Posts />
       </div>

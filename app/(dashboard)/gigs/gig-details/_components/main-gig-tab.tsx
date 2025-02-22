@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react'
-import Sidebar from '../../components/Sidebar'
+import Sidebar from '../../components/AllGigs'
 
 const MyGigs = () => {
     return <div>My Gigs Content</div>
