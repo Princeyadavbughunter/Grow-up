@@ -1,6 +1,6 @@
 "use client";
 
-import { NetworkCard } from "./NetworkCard";
+import React from "react";
 
 interface NetworkSectionProps {
   title: string;

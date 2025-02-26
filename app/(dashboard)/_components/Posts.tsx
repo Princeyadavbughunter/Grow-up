@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Image from "next/image";
-import { useAuthenticatedApi } from "@/context/AuthContext";
+import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 
 interface ImageData {
     id: string;
@@ -34,6 +34,7 @@ interface Post {
 const Posts = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const { api } = useAuthenticatedApi();
+    const { authToken } = useAuth();
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -45,8 +46,10 @@ const Posts = () => {
             }
         };
 
-        fetchPosts();
-    }, [api]);
+        if (authToken) {
+            fetchPosts();
+        }
+    }, [authToken]);
 
     return (
         <div className="p-4">

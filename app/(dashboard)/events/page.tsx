@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SearchIcon } from "lucide-react";
-import { useAuthenticatedApi } from "@/context/AuthContext";
+import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 
 interface Event {
   id: string;
@@ -25,6 +25,9 @@ interface Event {
   event_by?: string;
   event_title?: string;
   event_host_profession?: string;
+  freelancer_profile_picture?: string | null;
+  freelancer_first_name?: string;
+  freelancer_first_last?: string;
 }
 
 interface Attendee {
@@ -43,8 +46,9 @@ const filters: string[] = ["Tech", "Product", "Design", "Web & Mobile Dev"];
 
 export default function EventsPage() {
   const { api } = useAuthenticatedApi();
+  const { authToken } = useAuth();
   const [events, setEvents] = useState<EventsData>({ upcoming_events: [], past_events: [], todays_events: [] });
-  const [activeTab, setActiveTab] = useState<string>("upcoming");
+  const [activeTab, setActiveTab] = useState<string>("past");
   const [selectedFilter, setSelectedFilter] = useState<string>("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
@@ -60,25 +64,30 @@ export default function EventsPage() {
         console.error("Error fetching events:", error);
       }
     };
-    fetchEvents();
-  }, [api, selectedFilter]);
+    if (authToken) {
+      fetchEvents();
+    }
+  }, [authToken, selectedFilter]);
 
   const EventTabs = () => (
     <div className="flex gap-8 mb-6">
-      {["Upcoming", "My Events", "Past Events"].map((tab) => (
-        <Button
-          key={tab}
-          variant="ghost"
-          onClick={() => setActiveTab(tab.toLowerCase().replace(" ", "_"))}
-          className={`px-0 ${
-            activeTab === tab.toLowerCase().replace(" ", "_")
-              ? "text-black font-semibold border-b-2 border-black rounded-none"
-              : "text-gray-500"
-          }`}
-        >
-          {tab}
-        </Button>
-      ))}
+      {["Upcoming", "My Events", "Past Events"].map((tab) => {
+        const tabKey = tab.toLowerCase().replace(" ", "_").replace("_events", "");
+        return (
+          <Button
+            key={tab}
+            variant="ghost"
+            onClick={() => setActiveTab(tabKey)}
+            className={`px-0 ${
+              activeTab === tabKey
+                ? "text-black font-semibold border-b-2 border-black rounded-none"
+                : "text-gray-500"
+            }`}
+          >
+            {tab}
+          </Button>
+        );
+      })}
     </div>
   );
 
@@ -103,7 +112,7 @@ export default function EventsPage() {
 
   const EventCard: React.FC<{ event: Event }> = ({ event }) => (
     <Card 
-      className="p-6 border-2 border-purple-100 rounded-3xl bg-[#F9FAFF] cursor-pointer"
+      className="p-6 border-2 border-purple-100 rounded-3xl bg-[#F9FAFF] cursor-pointer mb-4"
       onClick={() => setSelectedEvent(event)}
     >
       <Badge className="bg-purple-100 text-purple-800 mb-2">{event.category_name || "Uncategorized"}</Badge>
@@ -114,7 +123,7 @@ export default function EventsPage() {
             <p className="text-gray-600 text-sm">{event.description}</p>
           </div>
           <img
-            src="/api/placeholder/400/320"
+            src={event.freelancer_profile_picture || "/api/placeholder/400/320"}
             alt="Event cover"
             className="w-28 h-44 object-cover"
           />
@@ -197,9 +206,13 @@ export default function EventsPage() {
 
       <div className="grid grid-cols-12 gap-8">
         <div className="col-span-4">
-          {currentEvents.map(event => (
-            <EventCard key={event.id} event={event} />
-          ))}
+          {currentEvents && currentEvents.length > 0 ? (
+            currentEvents.map(event => (
+              <EventCard key={event.id} event={event} />
+            ))
+          ) : (
+            <p>No events found</p>
+          )}
         </div>
 
         {selectedEvent && (

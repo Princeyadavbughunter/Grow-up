@@ -6,12 +6,12 @@ import Description from './components/Description';
 import ApplicationForm from './components/ApplicationForm';
 
 
-
 const GigsPage = () => {
     const [gigs, setGigs] = useState<Gig[]>([]);
     const [selectedGig, setSelectedGig] = useState<Gig | null>(null);
 
     const { api } = useAuthenticatedApi();
+    const { authToken } = useAuth();
  
     useEffect(() => {
         const fetchGigs = async () => {
@@ -23,8 +23,11 @@ const GigsPage = () => {
             }
         };
 
-        fetchGigs();
-    }, [api]);
+        if (authToken) {
+            fetchGigs();
+        }
+
+    }, [authToken]);
 
     const handleGigSelect = (gig: Gig) => {
         setSelectedGig(gig);

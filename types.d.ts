@@ -37,3 +37,42 @@ interface Job {
       recruiter: string;
       user: string;
   }
+
+  interface ProfileData {
+    id: string;
+    first_name: string;
+    last_name: string;
+    date_of_birth: string;
+    bio: string;
+    university_name: string;
+    graduation_year_from: string;
+    profile_picture: string;
+    address: string;
+    lat: number | null;
+    long: number | null;
+    city: string;
+    district: string;
+    pincode: number;
+    state: string;
+    interest_in: string;
+    hobbies: string;
+    highest_qualification: string;
+    passing_year: string;
+    created_at: string;
+    degree_name: string;
+    is_degree: boolean;
+    is_diploma: boolean;
+    diploma_name: string | null;
+    is_disabled: boolean;
+    resume: string | null;
+    skills: string;
+    gender: string;
+    saved_jobs_count: number;
+    follower_count: number;
+    dribble_account: string | null;
+    github_account: string | null;
+    figma_account: string | null;
+    youtube_account: string | null;
+    medium_account: string | null;
+    user: string;
+  }

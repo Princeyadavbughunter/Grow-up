@@ -10,26 +10,54 @@ import { Button } from "@/components/ui/button";
 import { ImUsers } from "react-icons/im";
 import { FaMessage } from "react-icons/fa6";
 
+interface ProfileDataProps {
+  profileData: {
+    first_name: string;
+    last_name: string;
+    bio: string;
+    profile_picture: string;
+    address: string;
+    city: string;
+    state: string;
+    skills: string;
+    follower_count: number;
+    github_account: string | null;
+    dribble_account: string | null;
+    figma_account: string | null;
+    youtube_account: string | null;
+    medium_account: string | null;
+  } | null;
+}
 
-const ProfileData = () => {
+const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
+    if (!profileData) {
+        return <div>Loading profile data...</div>;
+    }
+
+    const { first_name, last_name, bio, profile_picture, address, city, state, skills, follower_count } = profileData;
+    const skillsArray = skills ? skills.split(',') : [];
+    const fullName = `${first_name} ${last_name}`;
+    const location = `${address ? address + ', ' : ''}${city ? city + ', ' : ''}${state || ''}`;
+    const profileImageUrl = profile_picture || "https://via.placeholder.com/80";
+
     return (
         <div className="py-4 ">
             <div className="flex flex-wrap items-center gap-5 py-6">
                 <img
-                    src="https://via.placeholder.com/80"
+                    src={profileImageUrl}
                     alt="Profile"
                     className="w-20 h-20 rounded-full border border-gray-300"
                 />
                 <div className="flex-1">
                     <div className="flex flex-wrap sm:flex-nowrap items-center gap-10">
-                        <h3 className="font-medium text-lg sm:text-xl">Anshi Gupta</h3>
+                        <h3 className="font-medium text-lg sm:text-xl">{fullName}</h3>
                         <HiDotsVertical className="text-gray-500" />
                     </div>
                     <p className="text-gray-500 text-sm sm:text-base">
-                        Founder - Finzie | Ex Groww | BITS Pilani
+                        {bio || "Founder - Finzie | Ex Groww | BITS Pilani"}
                     </p>
                     <p className="text-gray-500 text-sm sm:text-base flex items-center gap-1">
-                        <IoLocationSharp /> Lakshman Puri, Delhi
+                        <IoLocationSharp /> {location || "Lakshman Puri, Delhi"}
                     </p>
                 </div>
             </div>
@@ -37,13 +65,23 @@ const ProfileData = () => {
             <div className="flex flex-wrap items-center gap-6">
                 <div className="flex-1 text-center sm:text-left">
                     <div>
-                        <p className="flex flex-wrap  gap-2 font-semibold">
-                            <button className=" font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
-                                Ui/Ux Designer
-                            </button>
-                            <button className=" font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
-                                Graphic Designing
-                            </button>
+                        <p className="flex flex-wrap gap-2 font-semibold">
+                            {skillsArray.length > 0 ? (
+                                skillsArray.map((skill, index) => (
+                                    <button key={index} className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
+                                        {skill.trim()}
+                                    </button>
+                                ))
+                            ) : (
+                                <>
+                                    <button className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
+                                        Ui/Ux Designer
+                                    </button>
+                                    <button className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
+                                        Graphic Designing
+                                    </button>
+                                </>
+                            )}
                         </p>
                     </div>
 
@@ -57,7 +95,7 @@ const ProfileData = () => {
                     <div>
                         <p className="flex flex-wrap gap-2 font-semibold">
                             <Button className="bg-[#7052FF] text-white font-medium flex items-center gap-1 px-4 py-2 rounded">
-                                <ImUsers /> 1k Followers
+                                <ImUsers /> {follower_count || 0}k Followers
                             </Button>
                             <Button className="bg-white font-medium border border-[#7052FF] text-[#7052FF] flex items-center gap-1 px-4 py-2 rounded">
                                 <FaMessage /> Open Inbox

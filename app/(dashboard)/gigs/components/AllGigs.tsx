@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Search, Building2 } from 'lucide-react';
+import { Search, Building2, Bookmark, BookmarkCheck } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
+import { useAuthenticatedApi } from "@/context/AuthContext";
 interface AllGigsProps {
     gigs: Gig[];
     onSelectGig: (gig: Gig) => void;
@@ -15,8 +15,10 @@ const AllGigs = ({ gigs, onSelectGig }: AllGigsProps) => {
     const [activeJobTypeTab, setActiveJobTypeTab] = useState<string>("All");
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [selectedGigId, setSelectedGigId] = useState<string | null>(null);
+    const [localGigs, setLocalGigs] = useState<Gig[]>(gigs);
+    const { api } = useAuthenticatedApi();
 
-    const filteredGigs = gigs.filter(gig => {
+    const filteredGigs = localGigs.filter(gig => {
         const searchLower = searchQuery.toLowerCase();
         return (
             gig.job_title.toLowerCase().includes(searchLower) ||
@@ -27,6 +29,20 @@ const AllGigs = ({ gigs, onSelectGig }: AllGigsProps) => {
     const handleGigClick = (gig: Gig) => {
         setSelectedGigId(gig.id);
         onSelectGig(gig);
+    };
+
+    const handleBookmark = async (e: React.MouseEvent, gig: Gig) => {
+        e.stopPropagation();
+        try {
+            await api.post('/freelancer/saving-jobs/', { job_id: gig.id });
+            setLocalGigs(prevGigs =>
+                prevGigs.map(g =>
+                    g.id === gig.id ? { ...g, is_bookmark: !g.is_bookmark } : g
+                )
+            );
+        } catch (error) {
+            console.error('Error toggling bookmark:', error);
+        }
     };
 
     return (
@@ -71,7 +87,7 @@ const AllGigs = ({ gigs, onSelectGig }: AllGigsProps) => {
                 </div>
 
                 <div className="overflow-y-auto h-[400px] space-y-4">
-                    {filteredGigs.map((gig) => (
+                    {gigs.map((gig) => (
                         <Card 
                             key={gig.id} 
                             className={`cursor-pointer transition-all ${
@@ -87,7 +103,19 @@ const AllGigs = ({ gigs, onSelectGig }: AllGigsProps) => {
                                         <Building2 className="h-6 w-6 text-orange-500" />
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="font-medium">{gig.job_title}</h3>
+                                        <div className="flex justify-between items-start">
+                                            <h3 className="font-medium">{gig.job_title}</h3>
+                                            <button 
+                                                onClick={(e) => handleBookmark(e, gig)}
+                                                className="text-violet-600 hover:text-violet-800"
+                                            >
+                                                {gig.is_bookmark ? (
+                                                    <BookmarkCheck className="h-5 w-5" />
+                                                ) : (
+                                                    <Bookmark className="h-5 w-5" />
+                                                )}
+                                            </button>
+                                        </div>
                                         <p className="text-sm text-gray-500">
                                             {gig.about_role} | {gig.location}
                                         </p>

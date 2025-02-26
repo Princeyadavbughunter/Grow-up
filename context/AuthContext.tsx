@@ -16,7 +16,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-const baseURL = process.env.EXPO_PUBLIC_URL as string;
+const baseURL = process.env.NEXT_PUBLIC_URL as string;
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
