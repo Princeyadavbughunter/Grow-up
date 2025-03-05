@@ -147,7 +147,6 @@ const jobs: Job[] = [
       "Professional development opportunities"
     ]
   },
-  // Add more jobs with similar structure...
 ];
 
 interface JobListProps {

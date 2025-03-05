@@ -1,12 +1,42 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { useAuthenticatedApi } from '@/context/AuthContext'
 import Posts from '../../_components/Posts'
 
-const PostTab = () => {
-    return (
-        <div className='max-w-xl flex flex-col justify-center mx-auto'>
-            <Posts />
-        </div>
-    )
+interface PostTabProps {
+  pageId: string;
+}
+
+const PostTab: React.FC<PostTabProps> = ({ pageId }) => {
+  const [pagePosts, setPagePosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { api } = useAuthenticatedApi();
+
+  useEffect(() => {
+    const fetchPagePosts = async () => {
+      try {
+        const response = await api.get(`/post/app/page-posts/?page=${pageId}`);
+        setPagePosts(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching page posts:', error);
+        setLoading(false);
+      }
+    };
+
+    if (pageId) {
+      fetchPagePosts();
+    }
+  }, [pageId]);
+
+  if (loading) {
+    return <div className="text-center py-10">Loading...</div>;
+  }
+
+  return (
+    <div className='max-w-xl flex flex-col justify-center mx-auto'>
+      <Posts posts={pagePosts} />
+    </div>
+  )
 }
 
 export default PostTab

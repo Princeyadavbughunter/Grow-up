@@ -1,8 +1,10 @@
-import React from 'react';
+"use client";
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { X, Plus } from 'lucide-react';
+import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   pageName: z.string().min(1, 'Page name is required'),
@@ -34,10 +37,13 @@ type FormData = z.infer<typeof formSchema>;
 interface CreatePageModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: FormData) => void;
 }
 
-const CreatePageModal: React.FC<CreatePageModalProps> = ({ open, onClose, onSubmit }) => {
+const CreatePageModal: React.FC<CreatePageModalProps> = ({ open, onClose }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { api } = useAuthenticatedApi();
+  const { authToken } = useAuth();
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,9 +55,41 @@ const CreatePageModal: React.FC<CreatePageModalProps> = ({ open, onClose, onSubm
     },
   });
 
-  const handleSubmit = (data: FormData) => {
-    onSubmit(data);
-    form.reset();
+  const handleSubmit = async (data: FormData) => {
+    if (!authToken) {
+      toast("Error", {
+        description: "You must be logged in to create a page",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await api.post('/post/app/page/', {
+        name: data.pageName,
+        description: data.about,
+        is_active: true,
+        category: data.category,
+        website: data.website,
+        location: data.location,
+        cover_photo: null,
+        profile_picture: null
+      });
+
+      toast('Success', {
+        description: "Page created successfully",
+      });
+
+      form.reset();
+      onClose();
+    } catch (error) {
+      console.error('Error creating page:', error);
+      toast("Error", {
+        description: "Failed to create page. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -66,9 +104,9 @@ const CreatePageModal: React.FC<CreatePageModalProps> = ({ open, onClose, onSubm
             <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center">
               <Plus className="w-6 h-6 text-gray-400" />
             </div>
-            <Button 
-              size="icon" 
-              variant="outline" 
+            <Button
+              size="icon"
+              variant="outline"
               className="absolute bottom-0 right-0 h-6 w-6 rounded-full"
             >
               <Plus className="h-4 w-4" />
@@ -148,9 +186,9 @@ const CreatePageModal: React.FC<CreatePageModalProps> = ({ open, onClose, onSubm
                     <Input {...field} placeholder="Current location" />
                   </FormControl>
                   <FormMessage />
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
+                  <Button
+                    type="button"
+                    variant="ghost"
                     className="text-purple-600 p-0 h-auto font-normal"
                   >
                     <div className="w-4 h-4 rounded-full border border-purple-600 flex items-center justify-center mr-2">
@@ -162,7 +200,13 @@ const CreatePageModal: React.FC<CreatePageModalProps> = ({ open, onClose, onSubm
               )}
             />
 
-            <Button type="submit" className="w-full">Create</Button>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating..." : "Create"}
+            </Button>
           </form>
         </Form>
       </DialogContent>
