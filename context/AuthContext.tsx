@@ -22,7 +22,7 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
-  const [authToken, setAuthToken] = useState<string | null>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUwNzM2MzYzLCJpYXQiOjE3MzQ5NjgzNjMsImp0aSI6IjI1ZDE5NjkwMWE0ZjRlNjA4YzQxYjQ4MWRmMWI2NDRkIiwidXNlcl9pZCI6ImVjNzY5YzUyLTMxNzgtNDU4Ny1hMWY2LTRjODIyOGNjZDdjYiJ9.qHy0jEum5VS1ifW-nUhCu1M5Bo4rUNoB8K9szpq295E');
+  const [authToken, setAuthToken] = useState<string | null>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU2NjYyNTQzLCJpYXQiOjE3NDA4OTQ1NDMsImp0aSI6ImFmNzYyY2RlMTZjYTQ3YzNiM2YxMzk2OGU5ZDNiNTc3IiwidXNlcl9pZCI6ImU3ZTRhZGFiLWNiZTYtNGMzYy04MDU3LWQ2ZjIyYzhkYmNjMyJ9.5PRWdu3JvOI8p5-GmSJYy_Fys8c_GSZawBPF7uJA0rU');
   const [loading, setLoading] = useState<boolean>(true);
   const [userId, setuserId] = useState('cf4a03a6-cf6d-4595-a836-9e6981be4887')
 

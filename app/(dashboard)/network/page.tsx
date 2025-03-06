@@ -51,26 +51,21 @@ export default function NetworkPage() {
       try {
         setLoading(true);
         
-        // Fetch followers
         const followersResponse = await api.get('/freelancer/follow/');
         
-        // Fetch follow requests
         const requestsResponse = await api.get('/freelancer/follow-request/');
         
-        // Fetch freelancers and their followers
         const freelancersResponse = await api.get('/freelancer/freelancer-and-followers/');
         
-        // Process data for my network (followers)
         const processedFollowers = followersResponse.data.map((follower: Follower) => ({
           id: follower.follower_id,
           name: follower.follower_username,
           title: "Freelancer",
           location: "Unknown",
           imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-          isOnline: Math.random() > 0.5, // Random online status for demonstration
+          isOnline: Math.random() > 0.5,
         }));
         
-        // Process data for invites (follow requests)
         const processedRequests = requestsResponse.data.map((request: FollowRequest) => ({
           id: request.request_id,
           name: request.requester_username,
@@ -81,7 +76,6 @@ export default function NetworkPage() {
           summary: "Wants to connect with you"
         }));
         
-        // Process data for near network (other freelancers)
         const processedFreelancers = freelancersResponse.data
           .filter((freelancer: Freelancer) => !processedFollowers.some((f:any) => f.id === freelancer.freelancer_id))
           .map((freelancer: Freelancer) => ({
@@ -105,16 +99,14 @@ export default function NetworkPage() {
     };
 
     fetchNetworkData();
-  }, [authToken, api]);
+  }, [authToken]);
 
   const handleAcceptRequest = async (requestId: string) => {
     try {
       await api.patch(`/freelancer/follow/?request_id=${requestId}&action=accept`);
       
-      // Update the UI by removing the accepted request from invites
       setInvites(prevInvites => prevInvites.filter(invite => invite.id !== requestId));
       
-      // Refresh the network data
       const followersResponse = await api.get('/freelancer/follow/');
       const processedFollowers = followersResponse.data.map((follower: Follower) => ({
         id: follower.follower_id,
@@ -135,7 +127,6 @@ export default function NetworkPage() {
     try {
       await api.patch(`/freelancer/follow/?request_id=${requestId}&action=reject`);
       
-      // Update the UI by removing the rejected request from invites
       setInvites(prevInvites => prevInvites.filter(invite => invite.id !== requestId));
     } catch (error) {
       console.error('Error rejecting follow request:', error);
@@ -146,7 +137,6 @@ export default function NetworkPage() {
     try {
       await api.post(`/freelancer/follow/?freelancer_id=${freelancerId}`);
       
-      // Update near network to show the follow request has been sent
       setNearNetwork(prevNetwork => 
         prevNetwork.map(user => 
           user.id === freelancerId 

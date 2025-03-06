@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { HiOutlineUserCircle } from 'react-icons/hi';
 import { IoSendSharp } from 'react-icons/io5';
 import { BiSearch } from 'react-icons/bi';
@@ -18,7 +18,7 @@ interface Message {
   id: string;
   content: string;
   created_at: string;
-  author: {
+  sender: {
     first_name: string;
     last_name: string;
     profile_picture: string;
@@ -29,11 +29,11 @@ const ChatInterface = () => {
   const [searchInput, setSearchInput] = useState('');
   const [messageInput, setMessageInput] = useState('');
   const [showProfile, setShowProfile] = useState(false);
-  const [recommendedBuddies, setRecommendedBuddies] = useState<Buddy[]>([]);
   const [myBuddies, setMyBuddies] = useState<Buddy[]>([]);
   const [selectedBuddy, setSelectedBuddy] = useState<Buddy | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const websocketRef = useRef<WebSocket | null>(null);
 
   const { userId, authToken } = useAuth();
   const { api } = useAuthenticatedApi();
@@ -59,17 +59,46 @@ const ChatInterface = () => {
     }
   }, [authToken]);
 
-  // Send Message
+  const connectWebSocket = (buddyId: string) => {
+    if (websocketRef.current) {
+      websocketRef.current.close();
+    }
+
+    const wsUrl = `ws://your-domain.com/ws/chat/${buddyId}/?token=${authToken}`;
+    const ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+      console.log('WebSocket connection established');
+    };
+
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      setMessages(prevMessages => [...prevMessages, message]);
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    websocketRef.current = ws;
+  };
+
   const sendMessage = async () => {
     if (!selectedBuddy || !messageInput.trim()) return;
 
     try {
+      if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
+        websocketRef.current.send(JSON.stringify({
+          buddy_id: selectedBuddy.id,
+          content: messageInput
+        }));
+      }
+
       await api.post('/post/app/page-comments/', {
         post: selectedBuddy.id,
         content: messageInput
       });
 
-      // Refresh messages after sending
       fetchMessages(selectedBuddy.id);
       setMessageInput('');
     } catch (error) {
@@ -77,17 +106,16 @@ const ChatInterface = () => {
     }
   };
 
-  // Fetch Messages for a Page
   const fetchMessages = async (pageId: string) => {
     try {
       const response = await api.get(`/post/app/page-comments/?post_id=${pageId}`);
       setMessages(response.data.response);
+      connectWebSocket(pageId);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
   };
 
-  // Select a Buddy and Load Messages
   const handleBuddySelect = (buddy: Buddy) => {
     setSelectedBuddy(buddy);
     fetchMessages(buddy.id);
@@ -167,7 +195,7 @@ const ChatInterface = () => {
               <div className="flex items-center justify-between border-b bg-white p-4">
                 <div className="flex items-center gap-3">
                   <img 
-                    src={selectedBuddy.profile_picture || <HiOutlineUserCircle className="h-8 w-8" />} 
+                    src={selectedBuddy.profile_picture || 'https://randomuser.me/portraits/thumb/men/1.jpg'} 
                     alt={selectedBuddy.name} 
                     className="h-8 w-8 rounded-full"
                   />
@@ -188,13 +216,9 @@ const ChatInterface = () => {
             <div className="flex-1 overflow-y-auto p-4">
               {messages.map((message) => (
                 <div key={message.id} className="mb-4 flex items-start gap-3">
-                  <img 
-                    src={message.author.profile_picture || <HiOutlineUserCircle className="h-8 w-8" />} 
-                    alt={`${message.author.first_name} ${message.author.last_name}`} 
-                    className="h-8 w-8 rounded-full"
-                  />
+                  <HiOutlineUserCircle className="h-8 w-8 text-gray-400" />
                   <div>
-                    <div className="font-medium">{`${message.author.first_name} ${message.author.last_name}`}</div>
+                    <div className="font-medium">{`${message.sender.first_name} ${message.sender.last_name}`}</div>
                     <div className="bg-gray-100 p-2 rounded-lg">{message.content}</div>
                     <div className="text-xs text-gray-500">{new Date(message.created_at).toLocaleString()}</div>
                   </div>

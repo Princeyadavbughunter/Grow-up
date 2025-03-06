@@ -2,7 +2,8 @@
 import { useState, ChangeEvent, FormEvent, JSX } from 'react';
 import { useAuthenticatedApi } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { FaImage, FaLink, FaPoll } from "react-icons/fa";
+import { FaBackward, FaImage, FaLink, FaPoll } from "react-icons/fa";
+import { IoArrowBack } from 'react-icons/io5';
 
 interface PostResponse {
     id: string;
@@ -87,7 +88,7 @@ const CreatePost = (): JSX.Element => {
                     onClick={() => router.back()}
                     className="text-gray-500 flex items-center gap-2 mb-4 hover:text-black"
                 >
-                    <span className="text-lg">←</span>
+                    <span className="text-lg"><IoArrowBack /></span>
                 </button>
 
                 <h1 className="text-gray-700 font-medium mb-4">
@@ -163,13 +164,6 @@ const CreatePost = (): JSX.Element => {
                         />
                     </label>
 
-                    <button
-                        type="button"
-                        className="flex items-center gap-2 text-gray-500 hover:text-purple-500"
-                    >
-                        <FaPoll size={20} />
-                        <span>Poll</span>
-                    </button>
                 </div>
 
                 <button
