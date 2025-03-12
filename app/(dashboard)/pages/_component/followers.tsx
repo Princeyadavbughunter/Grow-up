@@ -23,11 +23,9 @@ const Followers: React.FC<FollowersProps> = ({ pageId }) => {
   useEffect(() => {
     const fetchFollowersAndPageDetails = async () => {
       try {
-        // Fetch page followers
-        const followersResponse = await api.get(`/post/app/page-followers/?page=${pageId}`);
+        const followersResponse = await api.get(`/post/app/pages-followers/?page_id=${pageId}`);
         setFollowers(followersResponse.data);
 
-        // Fetch page details
         const pageResponse = await api.get(`/post/app/page/?page_id=${pageId}`);
         setPageDetails(pageResponse.data);
 

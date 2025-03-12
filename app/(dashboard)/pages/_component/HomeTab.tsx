@@ -20,24 +20,22 @@ const HomeTab: React.FC<HomeTabProps> = ({ pageId }) => {
   const [pagePosts, setPagePosts] = useState<PagePost[]>([]);
   const [loading, setLoading] = useState(true);
 
+  console.log(pageId);
+  
+
   const { api } = useAuthenticatedApi();
 
   useEffect(() => {
     const fetchPageDetails = async () => {
       try {
-        // Fetch page details
         const pageResponse = await api.get(`/post/app/page/?page_id=${pageId}`);
         const pageData = pageResponse.data;
         
-        // Set page description
         setPageDescription(pageData.description || 'No description available');
         
-        // Fetch page posts
         const postsResponse = await api.get(`/post/app/page-posts/?page=${pageId}`);
         setPagePosts(postsResponse.data);
 
-        // You might want to fetch additional details like website and phone from another endpoint
-        // This is a placeholder - adjust according to your actual API
         setWebsite(pageData.website || 'Not provided');
         setPhoneNumber(pageData.phone_number || 'Not provided');
       } catch (error) {
@@ -58,7 +56,6 @@ const HomeTab: React.FC<HomeTabProps> = ({ pageId }) => {
 
   return (
     <div className='flex flex-col justify-center px-20'>
-      {/* Page Description */}
       <div className="rounded-xl bg-slate-50 text-gray-600 border p-4 mb-5">
         <p>{pageDescription}</p>
         {pageDescription.length > 200 && (
@@ -66,7 +63,6 @@ const HomeTab: React.FC<HomeTabProps> = ({ pageId }) => {
         )}
       </div>
 
-      {/* Contact Information */}
       <div className="rounded-xl border p-4 mb-5">
         <div className="mb-3">
           <p className="font-medium text-gray-700">Website</p>
@@ -79,7 +75,6 @@ const HomeTab: React.FC<HomeTabProps> = ({ pageId }) => {
         </div>
       </div>
 
-      {/* Page Posts */}
       <div>
         <h2 className="text-xl font-bold mb-4">Recent Posts</h2>
         {pagePosts.length === 0 ? (

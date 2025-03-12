@@ -38,12 +38,10 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
   const { api } = useAuthenticatedApi();
   const { authToken } = useAuth();
 
-  // Fetch Page Details
   useEffect(() => {
     const fetchPageDetails = async () => {
       try {
         setLoading(true);
-        // Fetch specific page details if pageId is provided, otherwise fetch all pages
         const endpoint = pageId 
           ? `/post/app/page/?page_id=${pageId}` 
           : '/post/app/page/';
@@ -51,11 +49,11 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
         const response = await api.get(endpoint);
         const pageData = pageId 
           ? response.data 
-          : response.data[0]; // Take first page if no specific ID
+          : response.data[0]; 
 
-        setPageDetails(pageData);
+
+        setPageDetails(pageData[0]);
         
-        // Check if user is following the page
         const followResponse = await api.get('/post/app/pages-follow/');
         const isCurrentlyFollowing = followResponse.data.pages.some(
           (page: any) => page.id === pageData.id
@@ -73,14 +71,13 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
     }
   }, [authToken, pageId]);
 
-  // Follow/Unfollow Page
   const handleFollowToggle = async () => {
     if (!pageDetails) return;
 
     try {
       const payload = {
         page_id: pageDetails.id,
-        is_admin: false // Adjust based on user's role if needed
+        is_admin: false
       };
 
       await api.post('/post/app/pages-follow/', payload);
@@ -171,7 +168,6 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           </button>
         </div>
 
-        {/* Tabs */}
         <div className="mb-6 flex gap-4 justify-center">
           {['Home', 'About', 'Post', 'Job', 'People'].map((tab) => (
             <button
@@ -186,7 +182,6 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           ))}
         </div>
 
-        {/* Tab Content */}
         <div className="mb-6 overflow-y-auto h-96">
           {renderTabContent()}
         </div>
