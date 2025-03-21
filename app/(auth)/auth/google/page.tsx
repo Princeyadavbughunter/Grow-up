@@ -4,45 +4,61 @@ import { FcGoogle } from 'react-icons/fc'
 import { FaApple, FaLinkedin } from 'react-icons/fa'
 import axios from 'axios'
 import { useState, useEffect } from 'react'
-import { redirect, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Cookies from 'js-cookie'
+import { useAuth } from '@/context/AuthContext'
 
 interface GoogleAuthResponse {
     authorization_url?: string;
-    access_token?: string;
-    refresh_token?: string;
+    access?: string;
+    refresh?: string;
+    user?: string;
 }
 
 const AccountCreation = () => {
     const [loading, setLoading] = useState(false)
     const searchParams = useSearchParams()
+    const router = useRouter()
+    const { setIsAuthenticated } = useAuth()
+    
+    const COOKIE_OPTIONS = {
+        expires: 7,
+        secure: process.env.NODE_ENV === 'production', 
+        sameSite: 'strict' as const,
+        path: '/'
+    };
 
     useEffect(() => {
         const code = searchParams.get('code')
         const state = searchParams.get('state')
+        
         if (code && state) {
-            // handleGoogleCallback(code, state)
-            redirect('/')
+            handleGoogleCallback(code, state)
         }
     }, [searchParams])
 
     const handleGoogleAuth = async () => {
         setLoading(true)
         try {
-            const response = await axios.get<GoogleAuthResponse>('https://rz5dd1tf-8000.inc1.devtunnels.ms/auth/o/google-oauth2/?redirect_uri=http://localhost:3000/auth/google')
+            const response = await axios.get<GoogleAuthResponse>('https://backend.growupbuddy.in/api/auth/o/google-oauth2/?redirect_uri=http://localhost:3000/auth/google')
+            
             if (response.data.authorization_url) {
                 window.location.href = response.data.authorization_url
             }
         } catch (error) {
-            console.error(error)
+            console.error("Google auth error:", error)
         } finally {
             setLoading(false)
         }
     }
 
-    const handleGoogleCallback = async (code: string, state: string): Promise<GoogleAuthResponse | undefined> => {
+    const handleGoogleCallback = async (code: string, state: string) => {
+        setLoading(true)
         try {
+            const encodedCode = encodeURIComponent(code);
+
             const response = await axios.post<GoogleAuthResponse>(
-                `https://rz5dd1tf-8000.inc1.devtunnels.ms/auth/o/google-oauth2/?state=${state}&code=${code}`,
+                `https://backend.growupbuddy.in/api/auth/o/google-oauth2/?state=${state}&code=${encodedCode}`,
                 {},
                 {
                     headers: {
@@ -50,18 +66,45 @@ const AccountCreation = () => {
                     }
                 }
             )
-            // Handle successful authentication
-            if (response.data.access_token) {
-                // Store token or redirect user
-                localStorage.setItem('access_token', response.data.access_token)
-                // Redirect to dashboard or home page
-                window.location.href = '/dashboard'
+            
+            if (response.data.access && response.data.refresh) {
+                // Store tokens in cookies
+                Cookies.set('access_token', response.data.access, COOKIE_OPTIONS);
+                Cookies.set('refresh_token', response.data.refresh, COOKIE_OPTIONS);
+                
+                // Store user info if available
+                if (response.data.user) {
+                    Cookies.set('user_id', response.data.user, COOKIE_OPTIONS);
+                    
+                    // Extract and store user ID separately if needed
+                    const idMatch = response.data.user.match(/id - ([0-9a-f-]+)/)
+                    if (idMatch && idMatch[1]) {
+                        Cookies.set('user_id_value', idMatch[1], COOKIE_OPTIONS);
+                    }
+                }
+                
+                // Update authentication state
+                setIsAuthenticated(true)
+                
+                // Redirect to dashboard
+                router.push('/dashboard')
+            } else {
+                console.error("Authentication response missing tokens:", response.data)
             }
-            return response.data
         } catch (error) {
-            console.error(error)
-            return undefined
+            console.error("Google callback error:", error)
+        } finally {
+            setLoading(false)
         }
+    }
+
+    // Apple and LinkedIn handlers would be implemented similarly
+    const handleAppleAuth = () => {
+        alert("Apple authentication not implemented yet")
+    }
+    
+    const handleLinkedInAuth = () => {
+        alert("LinkedIn authentication not implemented yet")
     }
 
     return (
@@ -91,7 +134,7 @@ const AccountCreation = () => {
                         />
                         <div>
                             <h2 className="text-2xl font-bold mt-6 mb-3 text-center">
-                                Explore Oppurtunities
+                                Explore Opportunities
                             </h2>
                             <p className="text-gray-600 text-center max-w-md mx-auto">
                                 Welcome to a world of opportunities, where every corner holds the potential for growth and discovery.
@@ -104,7 +147,7 @@ const AccountCreation = () => {
                         <div className="text-center">
                             <h1 className="text-2xl font-bold mb-3">Create Your Account</h1>
                             <p className="text-gray-600 mb-8">
-                                Connect with top student and freelancers and project driven recruiters
+                                Connect with top students, freelancers, and project-driven recruiters
                             </p>
 
                             {/* Social Login Buttons */}
@@ -118,12 +161,20 @@ const AccountCreation = () => {
                                     <span>{loading ? 'Loading...' : 'Continue with Google'}</span>
                                 </button>
 
-                                <button className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-colors">
+                                <button 
+                                    className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-colors"
+                                    onClick={handleAppleAuth}
+                                    disabled={loading}
+                                >
                                     <FaApple className="text-xl" />
                                     <span>Continue with Apple ID</span>
                                 </button>
 
-                                <button className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#0A66C2] text-white rounded-xl hover:bg-[#004182] transition-colors">
+                                <button 
+                                    className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#0A66C2] text-white rounded-xl hover:bg-[#004182] transition-colors"
+                                    onClick={handleLinkedInAuth}
+                                    disabled={loading}
+                                >
                                     <FaLinkedin className="text-xl" />
                                     <span>Continue with LinkedIn</span>
                                 </button>

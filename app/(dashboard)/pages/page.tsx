@@ -1,7 +1,5 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
-import { HiOutlineUserCircle } from 'react-icons/hi';
-import { IoSendSharp } from 'react-icons/io5';
 import { BiSearch } from 'react-icons/bi';
 import { RiBroadcastFill } from 'react-icons/ri';
 import ProfileView from './_component/profile';
