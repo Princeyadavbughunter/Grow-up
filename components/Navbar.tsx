@@ -1,21 +1,28 @@
 'use client'
 import Image from 'next/image';
 import { FiSearch } from 'react-icons/fi';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 import { LuPlus } from 'react-icons/lu';
 
 const NavBar: React.FC = () => {
   const pathname = usePathname();
+  const router = useRouter();
 
-  const buttonLabels: Record<string, string> = {
-    '/pages': 'Create Pages',
-    '/clubs': 'Create Clubs',
-    '/events': 'Create Events',
-    '/gigs': 'Post Gigs',
+  const buttonConfig: Record<string, { label: string; route: string }> = {
+    '/pages': { label: 'Create Pages', route: '/pages/create' },
+    '/clubs': { label: 'Create Clubs', route: '/clubs/create' },
+    '/events': { label: 'Create Events', route: '/events/create' },
+    '/gigs': { label: 'Post Gigs', route: '/gigs/post-gig' },
   };
 
-  const buttonText = buttonLabels[pathname]
+  const buttonInfo = buttonConfig[pathname];
+
+  const handleCreateClick = () => {
+    if (buttonInfo) {
+      router.push(buttonInfo.route);
+    }
+  };
 
   return (
     <div className="relative">
@@ -25,12 +32,15 @@ const NavBar: React.FC = () => {
           <span className="text-xl font-semibold">GrowUp Buddy</span>
         </div>
         <div className="flex items-center gap-4">
-          {buttonText &&
-            <Button className="border bg-white hover:bg-[#7052FF] hover:text-white border-[#7052FF] text-[#7052FF] px-4 py-1">
-              <LuPlus />
-              {buttonText}
+          {buttonInfo && (
+            <Button 
+              onClick={handleCreateClick}
+              className="border bg-white hover:bg-[#7052FF] hover:text-white border-[#7052FF] text-[#7052FF] px-4 py-1"
+            >
+              <LuPlus className="mr-2" />
+              {buttonInfo.label}
             </Button>
-          }
+          )}
           <span className="text-gray-600"><FiSearch size={30} /></span>
           <Image
             src="https://randomuser.me/portraits/men/5.jpg"

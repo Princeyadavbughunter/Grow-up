@@ -20,10 +20,10 @@ const AccountCreation = () => {
     const searchParams = useSearchParams()
     const router = useRouter()
     const { setIsAuthenticated } = useAuth()
-    
+
     const COOKIE_OPTIONS = {
         expires: 7,
-        secure: process.env.NODE_ENV === 'production', 
+        secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict' as const,
         path: '/'
     };
@@ -31,7 +31,7 @@ const AccountCreation = () => {
     useEffect(() => {
         const code = searchParams.get('code')
         const state = searchParams.get('state')
-        
+
         if (code && state) {
             handleGoogleCallback(code, state)
         }
@@ -41,7 +41,7 @@ const AccountCreation = () => {
         setLoading(true)
         try {
             const response = await axios.get<GoogleAuthResponse>('https://backend.growupbuddy.in/api/auth/o/google-oauth2/?redirect_uri=http://localhost:3000/auth/google')
-            
+
             if (response.data.authorization_url) {
                 window.location.href = response.data.authorization_url
             }
@@ -52,8 +52,33 @@ const AccountCreation = () => {
         }
     }
 
+    // Function to update user role
+    const updateUserRole = async (email: string, token:string) => {
+        try {
+            const response = await axios.patch(
+                'https://backend.growupbuddy.in/api/auth/update-user-role/?pk=' + encodeURIComponent(email),
+                {
+                    role: "freelancer",
+                    verify: true
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+
+            console.log("Role updated successfully:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("Error updating user role:", error);
+            throw error;
+        }
+    };
+
     const handleGoogleCallback = async (code: string, state: string) => {
-        setLoading(true)
+        setLoading(true);
         try {
             const encodedCode = encodeURIComponent(code);
 
@@ -65,44 +90,53 @@ const AccountCreation = () => {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 }
-            )
-            
+            );
+
             if (response.data.access && response.data.refresh) {
                 // Store tokens in cookies
                 Cookies.set('access_token', response.data.access, COOKIE_OPTIONS);
                 Cookies.set('refresh_token', response.data.refresh, COOKIE_OPTIONS);
-                
+
                 // Store user info if available
                 if (response.data.user) {
                     Cookies.set('user_id', response.data.user, COOKIE_OPTIONS);
-                    
+
+                    // Extract user email if available in the response
+                    const emailMatch = response.data.user.match(/email - ([^\s]+)/) || [];
+                    const userEmail = emailMatch[1];
+
+                    if (userEmail) {
+                        // Update user role
+                        await updateUserRole(userEmail, response.data.access);
+                    }
+
                     // Extract and store user ID separately if needed
-                    const idMatch = response.data.user.match(/id - ([0-9a-f-]+)/)
+                    const idMatch = response.data.user.match(/id - ([0-9a-f-]+)/);
                     if (idMatch && idMatch[1]) {
                         Cookies.set('user_id_value', idMatch[1], COOKIE_OPTIONS);
                     }
                 }
-                
+
                 // Update authentication state
-                setIsAuthenticated(true)
-                
+                // setIsAuthenticated(true);
+
                 // Redirect to dashboard
-                router.push('/dashboard')
+                router.push('/dashboard');
             } else {
-                console.error("Authentication response missing tokens:", response.data)
+                console.error("Authentication response missing tokens:", response.data);
             }
         } catch (error) {
-            console.error("Google callback error:", error)
+            console.error("Google callback error:", error);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     // Apple and LinkedIn handlers would be implemented similarly
     const handleAppleAuth = () => {
         alert("Apple authentication not implemented yet")
     }
-    
+
     const handleLinkedInAuth = () => {
         alert("LinkedIn authentication not implemented yet")
     }
@@ -152,7 +186,7 @@ const AccountCreation = () => {
 
                             {/* Social Login Buttons */}
                             <div className="space-y-4 bg-[#F1F1F1] p-8 rounded-2xl shadow-lg">
-                                <button 
+                                <button
                                     className="w-full flex items-center bg-white justify-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors"
                                     onClick={handleGoogleAuth}
                                     disabled={loading}
@@ -161,7 +195,7 @@ const AccountCreation = () => {
                                     <span>{loading ? 'Loading...' : 'Continue with Google'}</span>
                                 </button>
 
-                                <button 
+                                <button
                                     className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-colors"
                                     onClick={handleAppleAuth}
                                     disabled={loading}
@@ -170,7 +204,7 @@ const AccountCreation = () => {
                                     <span>Continue with Apple ID</span>
                                 </button>
 
-                                <button 
+                                <button
                                     className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#0A66C2] text-white rounded-xl hover:bg-[#004182] transition-colors"
                                     onClick={handleLinkedInAuth}
                                     disabled={loading}

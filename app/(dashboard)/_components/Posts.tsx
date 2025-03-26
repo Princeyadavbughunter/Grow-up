@@ -39,8 +39,10 @@ const Posts = () => {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await api.get('/post/app/posts/');
-                setPosts(response.data.response);
+                const response = await api.get('/post/app/post-creation/');
+                console.log(response.data.response);
+                
+                setPosts(response.data);
             } catch (error) {
                 console.error('Error fetching posts:', error);
             }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useAuthenticatedApi } from "@/context/AuthContext";
+import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 
 interface Club {
     id: string;
@@ -11,6 +11,7 @@ interface Club {
 
 const Clubs = () => {
     const [clubs, setClubs] = useState<Club[]>([]);
+    const {authToken} = useAuth()
     const { api } = useAuthenticatedApi();
 
     useEffect(() => {
@@ -22,8 +23,10 @@ const Clubs = () => {
                 console.error('Error fetching clubs:', error);
             }
         };
-        fetchClubs();
-    }, []);
+        if (authToken) {
+            fetchClubs();
+        }
+    }, [authToken]);
 
     return (
         <div className="p-4">
@@ -51,7 +54,7 @@ const ClubCard = ({ club }: ClubCardProps) => {
 
     const handleClick = async () => {
         try {
-            await api.post(`/freelancer/club/${club.id}/join/`);
+            await api.post(`/freelancer/join-club/?id=${club.id}`);
             setIsJoined(!isJoined);
         } catch (error) {
             console.error('Error toggling club membership:', error);
