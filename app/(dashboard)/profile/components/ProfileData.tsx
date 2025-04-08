@@ -30,6 +30,7 @@ interface ProfileDataProps {
 }
 
 const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
+    
     if (!profileData) {
         return <div>Loading profile data...</div>;
     }

@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,12 +16,35 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+type CompanyData = {
+    id: string;
+    full_name: string;
+    company_name: string;
+    company_website: string;
+    company_description: string;
+    company_logo: string;
+    company_location: string;
+    company_size: string;
+    company_industry: string;
+    company_phone: string;
+    company_email: string;
+    created_at: string;
+    lat: number | null;
+    long: number | null;
+    no_website: boolean;
+    company_project_name: string;
+    user: string;
+}
+
 export default function ApplicationForm({ jobId }: { jobId?: string }) {
     const [formSubmitted, setFormSubmitted] = useState(false);
     const [applicationStatus, setApplicationStatus] = useState("");
     const [cvName, setCvName] = useState<string | null>(null);
+    const [companyData, setCompanyData] = useState<CompanyData | null>(null);
+    const [loading, setLoading] = useState(true);
     const { userId } = useAuth();
     const { api } = useAuthenticatedApi();
+    const {authToken} = useAuth()
 
     const {
         register,
@@ -31,6 +54,25 @@ export default function ApplicationForm({ jobId }: { jobId?: string }) {
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
     });
+
+    useEffect(() => {
+        const fetchCompanyData = async () => {
+            try {
+                const response = await api.get('/company/app/company-profile/');
+                if (response.data && response.data.length > 0) {
+                    setCompanyData(response.data[0]);
+                }
+            } catch (error) {
+                console.error("Error fetching company data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (authToken) {
+            fetchCompanyData();
+        }
+    }, [authToken]);
 
     const onSubmit = async (data: FormData) => {
         try {
@@ -70,44 +112,50 @@ export default function ApplicationForm({ jobId }: { jobId?: string }) {
         }
     };
 
+    if (loading) {
+        return <div className="p-4 text-center">Loading company profile...</div>;
+    }
+
     return (
         <div className="p-4 sm:p-8 rounded-lg max-w-full sm:max-w-lg mx-auto shadow-lg bg-white">
-            <div className="flex flex-col sm:flex-row items-center space-x-0 sm:space-x-4 space-y-2 sm:space-y-0">
-                <img
-                    src="https://via.placeholder.com/80"
-                    alt="Profile"
-                    className="w-20 h-20 rounded-full border border-gray-300"
-                />
-                <div className="text-center sm:text-left">
-                    <div className="flex flex-col sm:flex-row items-center gap-4">
-                        <h3 className="font-medium text-lg">Aryan Trivedi</h3>
-                        <Button className="bg-[#313E53] flex items-center gap-2 rounded-full">
-                            <CiEdit />
-                            Edit
-                        </Button>
-                    </div>
-                    <p className="text-gray-500 text-sm">Frontend Developer</p>
-                    <p className="text-gray-600 text-sm">
-                        Join our team and showcase your skills!
-                    </p>
-                    <div>
-                        <p className="flex flex-wrap items-center gap-2 font-semibold mt-2">
-                            Skills
-                            <button className="bg-[#F6F8FF] font-medium rounded-full px-2 py-1 text-xs">
-                                UX Research
-                            </button>
+            {companyData && (
+                <div className="flex flex-col sm:flex-row items-center space-x-0 sm:space-x-4 space-y-2 sm:space-y-0">
+                    <img
+                        src={companyData.company_logo || "https://via.placeholder.com/80"}
+                        alt={`${companyData.company_name} Logo`}
+                        className="w-20 h-20 rounded-full border border-gray-300"
+                    />
+                    <div className="text-center sm:text-left">
+                        <div className="flex flex-col sm:flex-row items-center gap-4">
+                            <h3 className="font-medium text-lg">{companyData.full_name}</h3>
+                            <Button className="bg-[#313E53] flex items-center gap-2 rounded-full">
+                                <CiEdit />
+                                Edit
+                            </Button>
+                        </div>
+                        <p className="text-gray-500 text-sm">{companyData.company_name}</p>
+                        <p className="text-gray-600 text-sm">
+                            {companyData.company_description}
                         </p>
-                    </div>
-                    <div>
-                        <p className="flex flex-wrap items-center gap-2 font-semibold mt-2">
-                            Professional
-                            <button className="bg-[#F6F8FF] font-medium rounded-full px-2 py-1 text-xs">
-                                UI/UX Designer
-                            </button>
-                        </p>
+                        <div>
+                            <p className="flex flex-wrap items-center gap-2 font-semibold mt-2">
+                                Industry
+                                <button className="bg-[#F6F8FF] font-medium rounded-full px-2 py-1 text-xs">
+                                    {companyData.company_industry}
+                                </button>
+                            </p>
+                        </div>
+                        <div>
+                            <p className="flex flex-wrap items-center gap-2 font-semibold mt-2">
+                                Size
+                                <button className="bg-[#F6F8FF] font-medium rounded-full px-2 py-1 text-xs">
+                                    {companyData.company_size}
+                                </button>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             <div className="">
                 {!formSubmitted ? (

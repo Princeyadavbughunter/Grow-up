@@ -7,6 +7,7 @@ interface Club {
     name: string;
     description: string;
     participants_count: number;
+    is_user_member:boolean;
 }
 
 const Clubs = () => {
@@ -14,15 +15,16 @@ const Clubs = () => {
     const {authToken} = useAuth()
     const { api } = useAuthenticatedApi();
 
+    const fetchClubs = async () => {
+        try {
+            const response = await api.get('/freelancer/club/');
+            setClubs(response.data.slice(0, 4));
+        } catch (error) {
+            console.error('Error fetching clubs:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchClubs = async () => {
-            try {
-                const response = await api.get('/freelancer/club/');
-                setClubs(response.data.slice(0, 4));
-            } catch (error) {
-                console.error('Error fetching clubs:', error);
-            }
-        };
         if (authToken) {
             fetchClubs();
         }
@@ -38,7 +40,7 @@ const Clubs = () => {
             </div>
 
             {clubs.map((club) => (
-                <ClubCard key={club.id} club={club} />
+                <ClubCard key={club.id} club={club} refresh={fetchClubs} />
             ))}
         </div>
     );
@@ -46,9 +48,10 @@ const Clubs = () => {
 
 interface ClubCardProps {
     club: Club;
+    refresh: any
 }
 
-const ClubCard = ({ club }: ClubCardProps) => {
+const ClubCard = ({ club, refresh }: ClubCardProps) => {
     const [isJoined, setIsJoined] = useState(false);
     const { api } = useAuthenticatedApi();
 
@@ -56,6 +59,7 @@ const ClubCard = ({ club }: ClubCardProps) => {
         try {
             await api.post(`/freelancer/join-club/?id=${club.id}`);
             setIsJoined(!isJoined);
+            refresh()
         } catch (error) {
             console.error('Error toggling club membership:', error);
         }
@@ -74,10 +78,11 @@ const ClubCard = ({ club }: ClubCardProps) => {
                     </div>
                 </div>
                 <button
-                    className={`text-purple-600 hover:text-purple-800 ${isJoined ? "font-bold" : ""}`}
+                    className={`text-purple-600 hover:text-purple-800 ${ club.is_user_member ? "font-bold" : ""}`}
                     onClick={handleClick}
+                    disabled={club.is_user_member}
                 >
-                    {isJoined ? "Joined" : "Join"}
+                    { club.is_user_member ? "Joined" : "Join"}
                 </button>
             </div>
             <p className="text-sm text-gray-600 mt-2">

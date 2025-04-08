@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useAuthenticatedApi } from "@/context/AuthContext";
+import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 
 interface Club {
     id: string;
@@ -17,6 +17,7 @@ const ClubsList = () => {
     const [allClubs, setAllClubs] = useState<Club[]>([]);
     const [myClubs, setMyClubs] = useState<Club[]>([]);
     const { api } = useAuthenticatedApi();
+    const {authToken} = useAuth()
 
     const fetchClubs = async () => {
         try {
@@ -32,8 +33,10 @@ const ClubsList = () => {
     };
 
     useEffect(() => {
-        fetchClubs();
-    }, []);
+        if (authToken) {
+            fetchClubs();
+        }
+    }, [authToken]);
 
     const handleJoinToggle = async (clubId: string) => {
         try {
