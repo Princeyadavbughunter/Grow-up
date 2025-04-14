@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Endorsement from "./summrytabs/Endorsement";
 import Summry from "./summrytabs/Summry";
 
 interface SummryTabProps {
@@ -30,7 +29,6 @@ const SummryTab: React.FC<SummryTabProps> = ({ profileData }) => {
             </div>
             <div className="mt-4 w-full flex justify-between">
                 {activeTab === 1 && <Summry profileData={profileData} />}
-                {activeTab === 2 && <Endorsement />}
             </div>
         </>
     );

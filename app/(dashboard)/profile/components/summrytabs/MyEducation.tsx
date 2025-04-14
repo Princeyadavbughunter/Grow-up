@@ -5,7 +5,6 @@ import { IoMdAdd } from 'react-icons/io'
 const MyEducation = () => {
     return (
         <div>
-            {/* My Education */}
             <div className="mb-8">
                 <div className="flex items-center gap-4  mb-4">
                     <h2 className="text-lg font-bold">My Education</h2>

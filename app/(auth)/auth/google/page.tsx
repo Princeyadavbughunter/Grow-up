@@ -93,35 +93,27 @@ const AccountCreation = () => {
             );
 
             if (response.data.access && response.data.refresh) {
-                // Store tokens in cookies
                 Cookies.set('access_token', response.data.access, COOKIE_OPTIONS);
                 Cookies.set('refresh_token', response.data.refresh, COOKIE_OPTIONS);
 
-                // Store user info if available
                 if (response.data.user) {
                     Cookies.set('user_id', response.data.user, COOKIE_OPTIONS);
 
-                    // Extract user email if available in the response
                     const emailMatch = response.data.user.match(/email - ([^\s]+)/) || [];
                     const userEmail = emailMatch[1];
 
                     if (userEmail) {
-                        // Update user role
                         await updateUserRole(userEmail, response.data.access);
                     }
 
-                    // Extract and store user ID separately if needed
                     const idMatch = response.data.user.match(/id - ([0-9a-f-]+)/);
                     if (idMatch && idMatch[1]) {
                         Cookies.set('user_id_value', idMatch[1], COOKIE_OPTIONS);
                     }
                 }
 
-                // Update authentication state
-                // setIsAuthenticated(true);
-
-                // Redirect to dashboard
-                router.push('/dashboard');
+                setIsAuthenticated(true);
+                router.push('/');
             } else {
                 console.error("Authentication response missing tokens:", response.data);
             }

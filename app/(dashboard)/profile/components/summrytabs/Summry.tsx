@@ -7,6 +7,7 @@ import OtherSimilerPorfile from './OtherSimilerPorfile'
 import Clubs from './Clubs'
 import Posts from './Posts'
 import Portfolios from './Portfolios'
+import MyExperience from './MyExperience'
 interface SummryProps {
   profileData: ProfileData | null;
 }
@@ -46,16 +47,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                                                 {skill}
                                             </button>
                                         ))
-                                    ) : (
-                                        <>
-                                            <button className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
-                                                Ui/Ux Designer
-                                            </button>
-                                            <button className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
-                                                Graphic Designing
-                                            </button>
-                                        </>
-                                    )}
+                                    ) : null}
                                 </p>
                             </div>
 
@@ -64,45 +56,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                     </div>
 
                     <div className="py-10">
-                        <div className="flex items-center gap-4 mb-4">
-                            <h2 className="text-lg font-bold">My Experience</h2>
-                            <div className="flex items-center gap-2">
-                                <IoMdAdd className="text-xl cursor-pointer" />
-                                <CiEdit className="text-xl cursor-pointer" />
-                            </div>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="flex gap-2">
-                                <img src='./images/ex1.png' className='h-10' alt="Company logo" />
-                                <div className="div">
-                                    <h3 className="font-semibold">Founder & CEO</h3>
-                                    <p className="text-sm text-gray-500">Memorisely - Full-time</p>
-                                    <p className="text-sm text-gray-400">Oct 2020 – Present · 3 yrs 8 mos</p>
-                                    <p className="text-sm text-gray-400">London</p>
-                                    <p className="text-sm text-gray-600 mt-2">Memorisely is a remote UX/UI Bootcamp...</p>
-                                    <div className="flex items-center gap-2 py-4">
-                                        <img src='./images/p.png' className='h-10' alt="Person" />
-                                        <img src='./images/p.png' className='h-10' alt="Person" />
-                                        <img src='./images/p.png' className='h-10' alt="Person" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <img src='./images/p1.png' className='h-10' alt="Company logo" />
-                                <div className="div">
-                                    <h3 className="font-semibold">UX Designer & Product Manager</h3>
-                                    <p className="text-sm text-gray-500">Figma - Part-time</p>
-                                    <p className="text-sm text-gray-400">Nov 2021 – Present · 2 yrs 7 mos</p>
-                                    <p className="text-sm text-gray-400">London, England, United Kingdom</p>
-                                    <p className="text-sm text-gray-600 mt-2">Founding member of the Figma Educator...</p>
-                                    <div className="flex items-center gap-2 py-4">
-                                        <img src='./images/p.png' className='h-10' alt="Person" />
-                                        <img src='./images/p2.png' className='h-10' alt="Person" />
-                                        <img src='./images/p.png' className='h-10' alt="Person" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <MyExperience />
                     </div>
 
                     <div className="mb-8">
@@ -114,12 +68,23 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                             </div>
                         </div>
                         <div className="space-y-4">
-                            <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4">
-                                <h3 className="font-semibold">{profileData?.highest_qualification || 'Bachelor in Science'}</h3>
-                                <p className="text-sm text-gray-500">{profileData?.university_name || 'University of Florida'}</p>
-                                <p className="text-sm text-gray-400">{`${profileData?.graduation_year_from || 'Apr 2010'} – ${profileData?.passing_year || 'Apr 2023'}`}</p>
-                            </div>
-                            {!profileData && (
+                            {profileData ? (
+                                <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4">
+                                    <h3 className="font-semibold">
+                                        {profileData.is_degree ? 
+                                            `${profileData.degree_name || profileData.highest_qualification}` : 
+                                            profileData.is_diploma ? 
+                                                `${profileData.diploma_name || profileData.highest_qualification}` : 
+                                                profileData.highest_qualification}
+                                    </h3>
+                                    <p className="text-sm text-gray-500">{profileData.university_name || 'N/A'}</p>
+                                    <p className="text-sm text-gray-400">
+                                        {profileData.graduation_year_from ? 
+                                            `${profileData.graduation_year_from} – ${profileData.passing_year || 'Present'}` : 
+                                            profileData.passing_year ? `Graduated ${profileData.passing_year}` : 'N/A'}
+                                    </p>
+                                </div>
+                            ) : (
                                 <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4">
                                     <h3 className="font-semibold">Bachelor in Science</h3>
                                     <p className="text-sm text-gray-500">University of Florida</p>

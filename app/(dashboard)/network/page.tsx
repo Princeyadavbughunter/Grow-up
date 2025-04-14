@@ -16,6 +16,16 @@ interface FollowRequest {
   requester_username: string;
 }
 
+interface FollowResponse {
+  follower_count: number;
+  approved_followers?: Follower[];
+}
+
+interface RequestsResponse {
+  approved_followers: Follower[];
+  pending_follow_requests: FollowRequest[];
+}
+
 interface Freelancer {
   freelancer_id: string;
   freelancer_username: string;
@@ -51,33 +61,45 @@ export default function NetworkPage() {
       try {
         setLoading(true);
         
+        // Get followers data
         const followersResponse = await api.get('/freelancer/follow/');
+        const followersData: FollowResponse = followersResponse.data;
         
+        // Get follow requests
         const requestsResponse = await api.get('/freelancer/follow-request/');
+        const requestsData: RequestsResponse = requestsResponse.data;
         
+        // Get all freelancers
         const freelancersResponse = await api.get('/freelancer/freelancer-and-followers/');
         
-        const processedFollowers = followersResponse.data.map((follower: Follower) => ({
-          id: follower.follower_id,
-          name: follower.follower_username,
-          title: "Freelancer",
-          location: "Unknown",
-          imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-          isOnline: Math.random() > 0.5,
-        }));
+        // Process approved followers (if they exist)
+        const processedFollowers = followersData.approved_followers 
+          ? followersData.approved_followers.map((follower: Follower) => ({
+              id: follower.follower_id,
+              name: follower.follower_username,
+              title: "Freelancer",
+              location: "Unknown",
+              imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+              isOnline: Math.random() > 0.5,
+            }))
+          : [];
         
-        const processedRequests = requestsResponse.data.map((request: FollowRequest) => ({
-          id: request.request_id,
-          name: request.requester_username,
-          title: "Freelancer",
-          location: "Unknown",
-          imageUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=48&h=48&fit=crop&crop=faces",
-          isOnline: Math.random() > 0.5,
-          summary: "Wants to connect with you"
-        }));
+        // Process pending follow requests
+        const processedRequests = requestsData.pending_follow_requests
+          ? requestsData.pending_follow_requests.map((request: FollowRequest) => ({
+              id: request.request_id,
+              name: request.requester_username,
+              title: "Freelancer",
+              location: "Unknown",
+              imageUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=48&h=48&fit=crop&crop=faces",
+              isOnline: Math.random() > 0.5,
+              summary: "Wants to connect with you"
+            }))
+          : [];
         
+        // Process other freelancers
         const processedFreelancers = freelancersResponse.data
-          .filter((freelancer: Freelancer) => !processedFollowers.some((f:any) => f.id === freelancer.freelancer_id))
+          .filter((freelancer: Freelancer) => !processedFollowers.some((f: any) => f.id === freelancer.freelancer_id))
           .map((freelancer: Freelancer) => ({
             id: freelancer.freelancer_id,
             name: freelancer.freelancer_username,
@@ -107,15 +129,21 @@ export default function NetworkPage() {
       
       setInvites(prevInvites => prevInvites.filter(invite => invite.id !== requestId));
       
+      // Refresh followers list
       const followersResponse = await api.get('/freelancer/follow/');
-      const processedFollowers = followersResponse.data.map((follower: Follower) => ({
-        id: follower.follower_id,
-        name: follower.follower_username,
-        title: "Freelancer",
-        location: "Unknown",
-        imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-        isOnline: Math.random() > 0.5,
-      }));
+      const followersData: FollowResponse = followersResponse.data;
+      
+      // Process approved followers (if they exist)
+      const processedFollowers = followersData.approved_followers 
+        ? followersData.approved_followers.map((follower: Follower) => ({
+            id: follower.follower_id,
+            name: follower.follower_username,
+            title: "Freelancer",
+            location: "Unknown",
+            imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+            isOnline: Math.random() > 0.5,
+          }))
+        : [];
       
       setMyNetwork(processedFollowers);
     } catch (error) {

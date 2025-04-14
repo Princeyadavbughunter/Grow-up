@@ -3,14 +3,71 @@ import React, { createContext, useState, useContext, useEffect, ReactNode, Dispa
 import axios, { AxiosInstance } from 'axios';
 import Cookies from 'js-cookie';
 
+// Define interfaces for the profile data
+interface WorkExperience {
+  id: string;
+  company_name?: string;
+  position?: string;
+  start_date?: string;
+  end_date?: string;
+  current?: boolean;
+  description?: string;
+}
+
+interface FreelancerProfile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  date_of_birth: string;
+  bio: string;
+  university_name: string;
+  graduation_year_from: string;
+  profile_picture: string;
+  address: string;
+  lat: number | null;
+  long: number | null;
+  city: string;
+  district: string;
+  pincode: number;
+  state: string;
+  interest_in: string;
+  hobbies: string;
+  highest_qualification: string;
+  passing_year: string;
+  created_at: string;
+  degree_name: string;
+  is_degree: boolean;
+  is_diploma: boolean;
+  diploma_name: string;
+  is_disabled: boolean;
+  resume: string | null;
+  skills: string;
+  gender: string;
+  saved_jobs_count: number;
+  follower_count: number;
+  dribble_account: string | null;
+  github_account: string | null;
+  figma_account: string | null;
+  youtube_account: string | null;
+  medium_account: string | null;
+  soft_skills: string;
+  position: string;
+  user: string;
+  work_experience: WorkExperience[];
+}
+
 interface AuthContextType {
   isAuthenticated: boolean;
   authToken: string | null;
   userId: string | null;
   loading: boolean;
+  profileData: FreelancerProfile | null;
+  profileLoading: boolean;
+  profileError: string | null;
   setIsAuthenticated: Dispatch<SetStateAction<boolean>>;
   apiCaller: AxiosInstance;
   logout: () => void;
+  refreshProfile: () => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -39,6 +96,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  
+  // Add profile state
+  const [profileData, setProfileData] = useState<FreelancerProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState<boolean>(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadAuthState = () => {
@@ -119,12 +181,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   );
 
+  // Add function to fetch profile data
+  const fetchProfileData = async (): Promise<void> => {
+    if (!isAuthenticated) return;
+    
+    setProfileLoading(true);
+    setProfileError(null);
+    
+    try {
+      const response = await apiCaller.get('/freelancer/freelancer-profile/');
+      
+      if (response.data && response.data.length > 0) {
+        setProfileData(response.data[0]);
+      } else {
+        setProfileData(null);
+        setProfileError('No profile data found');
+      }
+    } catch (err: any) {
+      console.error('Error fetching freelancer profile:', err);
+      setProfileError(err.response?.data?.message || 'Failed to fetch profile data');
+      setProfileData(null);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  // Fetch profile data when authenticated
+  useEffect(() => {
+    if (isAuthenticated && !loading) {
+      fetchProfileData();
+    }
+  }, [isAuthenticated, loading]);
+
   // Logout function
   const logout = () => {
     setAuthToken(null);
     setRefreshToken(null);
     setUserId(null);
     setIsAuthenticated(false);
+    setProfileData(null);
     
     // Remove cookies
     Cookies.remove('access_token', { path: '/' });
@@ -137,9 +232,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authToken,
     userId,
     loading,
+    profileData,
+    profileLoading,
+    profileError,
     setIsAuthenticated,
     apiCaller,
-    logout
+    logout,
+    refreshProfile: fetchProfileData
   };
 
   return (

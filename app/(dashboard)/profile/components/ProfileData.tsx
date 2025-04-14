@@ -73,16 +73,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                                         {skill.trim()}
                                     </button>
                                 ))
-                            ) : (
-                                <>
-                                    <button className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
-                                        Ui/Ux Designer
-                                    </button>
-                                    <button className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
-                                        Graphic Designing
-                                    </button>
-                                </>
-                            )}
+                            ) : null}
                         </p>
                     </div>
 

@@ -4,10 +4,12 @@ import { FiSearch } from 'react-icons/fi';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 import { LuPlus } from 'react-icons/lu';
+import { useAuth } from '@/context/AuthContext';
 
 const NavBar: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const { profileData } = useAuth();
 
   const buttonConfig: Record<string, { label: string; route: string }> = {
     '/pages': { label: 'Create Pages', route: '/pages/create' },
@@ -23,6 +25,8 @@ const NavBar: React.FC = () => {
       router.push(buttonInfo.route);
     }
   };
+
+  const profilePicture = profileData?.profile_picture || 'https://randomuser.me/portraits/men/5.jpg';
 
   return (
     <div className="relative">
@@ -41,9 +45,8 @@ const NavBar: React.FC = () => {
               {buttonInfo.label}
             </Button>
           )}
-          <span className="text-gray-600"><FiSearch size={30} /></span>
           <Image
-            src="https://randomuser.me/portraits/men/5.jpg"
+            src={profilePicture}
             alt="Profile"
             width={40}
             height={40}

@@ -1,0 +1,256 @@
+"use client";
+import React, { useState, useRef } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Camera, MapPin, Plus } from 'lucide-react';
+import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
+
+const formSchema = z.object({
+  pageName: z.string().min(1, 'Page name is required'),
+  category: z.string().min(1, 'Category is required'),
+  website: z.string().url('Please enter a valid URL'),
+  about: z.string().min(10, 'About section must be at least 10 characters'),
+  location: z.string().min(1, 'Location is required'),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+const CreatePage = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { api } = useAuthenticatedApi();
+  const { authToken } = useAuth();
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      pageName: '',
+      category: '',
+      website: 'https://',
+      about: '',
+      location: '',
+    },
+  });
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setProfileImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (data: FormData) => {
+    if (!authToken) {
+      toast("Error", {
+        description: "You must be logged in to create a page",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await api.post('/post/app/page/', {
+        name: data.pageName,
+        description: data.about,
+        is_active: true,
+        category: data.category,
+        website: data.website,
+        location: data.location,
+        cover_photo: null,
+        profile_picture: profileImage
+      });
+
+      toast('Success', {
+        description: "Page created successfully",
+      });
+
+      form.reset();
+      setProfileImage(null);
+    } catch (error) {
+      console.error('Error creating page:', error);
+      toast("Error", {
+        description: "Failed to create page. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-sm">
+      <h1 className="text-2xl font-bold mb-6">Create Page</h1>
+      
+      <div className="flex justify-center mb-8">
+        <div className="relative">
+          <div 
+            className="w-28 h-28 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-blue-300 transition-colors"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {profileImage ? (
+              <img 
+                src={profileImage} 
+                alt="Profile" 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Camera className="w-10 h-10 text-gray-400" />
+            )}
+          </div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleImageUpload}
+            accept="image/*"
+            className="hidden"
+          />
+          <button
+            type="button"
+            className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-white shadow border border-gray-200 flex items-center justify-center hover:bg-gray-50"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
+          <FormField
+            control={form.control}
+            name="pageName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-medium">Page name</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    placeholder="Enter your page name"
+                    className="w-full"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-medium">Category</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    placeholder="e.g. Startup, Restaurant, Education"
+                    className="w-full"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="website"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-medium">Website</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    type="url" 
+                    placeholder="https://yourwebsite.com"
+                    className="w-full"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="about"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-medium">About</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="Write about your organization to help people understand what you do"
+                    rows={4}
+                    className="w-full resize-none"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-medium">Location</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input 
+                      {...field} 
+                      placeholder="Current location" 
+                      className="pl-9 w-full"
+                    />
+                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  </div>
+                </FormControl>
+                <FormMessage />
+                <button
+                  type="button"
+                  className="text-blue-600 p-0 h-auto font-normal flex items-center mt-1 text-sm hover:text-blue-700"
+                  onClick={() => form.setValue('location', 'San Francisco, CA')}
+                >
+                  <div className="w-4 h-4 rounded-full border border-blue-600 flex items-center justify-center mr-2">
+                    <div className="w-2 h-2 rounded-full bg-blue-600" />
+                  </div>
+                  Auto-detect my city
+                </button>
+              </FormItem>
+            )}
+          />
+
+          <div className="pt-6">
+            <Button
+              type="submit"
+              className="w-full py-2  mb-32 bg-blue-600 text-white hover:bg-blue-700"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating..." : "Create Page"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+};
+
+export default CreatePage;

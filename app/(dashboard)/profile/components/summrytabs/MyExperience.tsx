@@ -41,7 +41,7 @@ const MyExperience: React.FC = () => {
     if (authToken) {
       fetchExperiences();
     }
-  }, [authToken, api]);
+  }, [authToken]);
 
   // Function to format date
   const formatDate = (dateString: string): string => {
