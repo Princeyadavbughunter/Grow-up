@@ -13,7 +13,8 @@ interface Follower {
 
 interface FollowRequest {
   request_id: string;
-  requester_username: string;
+  requester_username?: string;
+  follower_username?: string;  // Added this field based on API response
 }
 
 interface FollowResponse {
@@ -27,10 +28,16 @@ interface RequestsResponse {
 }
 
 interface Freelancer {
-  freelancer_id: string;
-  freelancer_username: string;
+  id: string;
+  first_name: string;
+  last_name: string;
+  bio: string;
+  profile_picture: string;
+  address: string;
+  city: string;
+  state: string;
+  position: string;
   follower_count: number;
-  followers: Follower[];
 }
 
 interface NetworkUser {
@@ -70,13 +77,14 @@ export default function NetworkPage() {
         const requestsData: RequestsResponse = requestsResponse.data;
         
         // Get all freelancers
-        const freelancersResponse = await api.get('/freelancer/freelancer-and-followers/');
+        const freelancersResponse = await api.get('/freelancer/freelancer-profile/');
+        const freelancersData: Freelancer[] = freelancersResponse.data;
         
         // Process approved followers (if they exist)
         const processedFollowers = followersData.approved_followers 
           ? followersData.approved_followers.map((follower: Follower) => ({
               id: follower.follower_id,
-              name: follower.follower_username,
+              name: follower.follower_username || "User", // Fallback if username is undefined
               title: "Freelancer",
               location: "Unknown",
               imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
@@ -88,7 +96,7 @@ export default function NetworkPage() {
         const processedRequests = requestsData.pending_follow_requests
           ? requestsData.pending_follow_requests.map((request: FollowRequest) => ({
               id: request.request_id,
-              name: request.requester_username,
+              name: request.follower_username || request.requester_username || "User", // Use appropriate field with fallback
               title: "Freelancer",
               location: "Unknown",
               imageUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=48&h=48&fit=crop&crop=faces",
@@ -98,16 +106,19 @@ export default function NetworkPage() {
           : [];
         
         // Process other freelancers
-        const processedFreelancers = freelancersResponse.data
-          .filter((freelancer: Freelancer) => !processedFollowers.some((f: any) => f.id === freelancer.freelancer_id))
+        const processedFreelancers = freelancersData
+          .filter((freelancer: Freelancer) => 
+            !processedFollowers.some((f: NetworkUser) => f.id === freelancer.id)
+          )
           .map((freelancer: Freelancer) => ({
-            id: freelancer.freelancer_id,
-            name: freelancer.freelancer_username,
-            title: "Freelancer",
-            location: "Unknown",
-            imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+            id: freelancer.id,
+            name: `${freelancer.first_name || ""} ${freelancer.last_name || ""}`.trim() || "User", // Handle empty names
+            title: freelancer.position || "Freelancer",
+            location: [freelancer.city, freelancer.state].filter(Boolean).join(", ") || "Unknown",
+            imageUrl: freelancer.profile_picture || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
             isOnline: Math.random() > 0.5,
-            followerCount: freelancer.follower_count
+            followerCount: freelancer.follower_count,
+            summary: freelancer.bio || undefined
           }));
         
         setMyNetwork(processedFollowers);
@@ -137,7 +148,7 @@ export default function NetworkPage() {
       const processedFollowers = followersData.approved_followers 
         ? followersData.approved_followers.map((follower: Follower) => ({
             id: follower.follower_id,
-            name: follower.follower_username,
+            name: follower.follower_username || "User", // Fallback if username is undefined
             title: "Freelancer",
             location: "Unknown",
             imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",

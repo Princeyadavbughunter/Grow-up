@@ -8,7 +8,6 @@ import { CiEdit } from "react-icons/ci";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 
 const formSchema = z.object({
-    projectLink: z.string().url("Enter a valid project link"),
     socials: z.array(z.string().min(1, "Username is required")).nonempty("At least one social media link is required"),
     coverLetter: z.string().min(1, "Cover letter is required"),
     cv: z.any()
@@ -83,7 +82,6 @@ export default function ApplicationForm({ jobId }: { jobId?: string }) {
                 job_posting: jobId,
                 cover_letter: data.coverLetter,
                 status: "submitted",
-                project_link: data.projectLink,
                 social_links: data.socials,
             };
 
@@ -117,7 +115,7 @@ export default function ApplicationForm({ jobId }: { jobId?: string }) {
     }
 
     return (
-        <div className="p-4 sm:p-8 rounded-lg max-w-full sm:max-w-lg mx-auto shadow-lg bg-white">
+        <div className="p-4 sm:p-8 mb-20 rounded-lg max-w-full sm:max-w-lg mx-auto shadow-lg bg-white">
             {companyData && (
                 <div className="flex flex-col sm:flex-row items-center space-x-0 sm:space-x-4 space-y-2 sm:space-y-0">
                     <img
@@ -168,21 +166,6 @@ export default function ApplicationForm({ jobId }: { jobId?: string }) {
                         </div>
 
                         <div className="space-y-4">
-                            <div>
-                                <h3 className="text-sm font-medium text-gray-500 mb-1">
-                                    Add Project Link
-                                </h3>
-                                <Input
-                                    placeholder="https://uxofbhi.com/"
-                                    {...register("projectLink")}
-                                    className={`w-full border ${errors.projectLink ? "border-red-500" : "border-gray-300"} rounded-md`}
-                                />
-                                {errors.projectLink && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors.projectLink.message?.toString()}
-                                    </p>
-                                )}
-                            </div>
 
                             <div>
                                 <h3 className="text-sm font-medium text-gray-500 mb-1">Cover Letter</h3>

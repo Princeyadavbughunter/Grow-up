@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 import { LuPlus } from 'react-icons/lu';
 import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
 
 const NavBar: React.FC = () => {
   const pathname = usePathname();
@@ -12,9 +13,8 @@ const NavBar: React.FC = () => {
   const { profileData } = useAuth();
 
   const buttonConfig: Record<string, { label: string; route: string }> = {
-    '/pages': { label: 'Create Pages', route: '/pages/create' },
+    '/pages': { label: 'Create Pages', route: '/pages/create-page' },
     '/clubs': { label: 'Create Clubs', route: '/clubs/create' },
-    '/events': { label: 'Create Events', route: '/events/create' },
     '/gigs': { label: 'Post Gigs', route: '/gigs/post-gig' },
   };
 
@@ -45,6 +45,7 @@ const NavBar: React.FC = () => {
               {buttonInfo.label}
             </Button>
           )}
+          <Link href='/profile' >
           <Image
             src={profilePicture}
             alt="Profile"
@@ -52,6 +53,7 @@ const NavBar: React.FC = () => {
             height={40}
             className="rounded-full"
           />
+          </Link>
         </div>
       </div>
     </div>

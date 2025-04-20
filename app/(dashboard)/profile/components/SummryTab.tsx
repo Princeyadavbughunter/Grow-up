@@ -19,12 +19,12 @@ const SummryTab: React.FC<SummryTabProps> = ({ profileData }) => {
                     >
                         {userName}
                     </button>
-                    <button
+                    {/* <button
                         className={`flex-1 text-center py-2 font-medium ${activeTab === 2 ? "text-black border-b-2 border-black" : "text-gray-600"}`}
                         onClick={() => setActiveTab(2)}
                     >
                         Endorsement
-                    </button>
+                    </button> */}
                 </div>
             </div>
             <div className="mt-4 w-full flex justify-between">

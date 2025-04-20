@@ -12,12 +12,17 @@ interface Club {
     members?: string[];
 }
 
-const ClubsList = () => {
+interface ClubsListProps {
+    selectedClubId: string;
+    setSelectedClubId: (id: string) => void;
+}
+
+const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
     const [activeTab, setActiveTab] = useState("all");
     const [allClubs, setAllClubs] = useState<Club[]>([]);
     const [myClubs, setMyClubs] = useState<Club[]>([]);
     const { api } = useAuthenticatedApi();
-    const {authToken} = useAuth()
+    const { authToken } = useAuth();
 
     const fetchClubs = async () => {
         try {
@@ -27,6 +32,11 @@ const ClubsList = () => {
             ]);
             setAllClubs(allClubsResponse.data);
             setMyClubs(myClubsResponse.data);
+            
+            // Set default selected club if none is selected yet
+            if (!selectedClubId && allClubsResponse.data.length > 0) {
+                setSelectedClubId(allClubsResponse.data[0].id);
+            }
         } catch (error) {
             console.error('Error fetching clubs:', error);
         }
@@ -43,9 +53,14 @@ const ClubsList = () => {
             await api.post(`/freelancer/club/${clubId}/join/`);
             fetchClubs();
             setActiveTab("my");
+            setSelectedClubId(clubId);
         } catch (error) {
             console.error('Error toggling club membership:', error);
         }
+    };
+
+    const handleClubSelect = (clubId: string) => {
+        setSelectedClubId(clubId);
     };
 
     return (
@@ -71,7 +86,9 @@ const ClubsList = () => {
                         key={club.id}
                         club={club}
                         isMyClub={false}
+                        isSelected={club.id === selectedClubId}
                         onJoinToggle={handleJoinToggle}
+                        onSelect={handleClubSelect}
                     />
                 )
             ))}
@@ -81,7 +98,9 @@ const ClubsList = () => {
                     key={club.id}
                     club={club}
                     isMyClub={true}
+                    isSelected={club.id === selectedClubId}
                     onJoinToggle={handleJoinToggle}
+                    onSelect={handleClubSelect}
                 />
             ))}
         </div>
@@ -91,12 +110,17 @@ const ClubsList = () => {
 interface ClubCardProps {
     club: Club;
     isMyClub: boolean;
+    isSelected: boolean;
     onJoinToggle: (clubId: string) => void;
+    onSelect: (clubId: string) => void;
 }
 
-const ClubCard = ({ club, isMyClub, onJoinToggle }: ClubCardProps) => {
+const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCardProps) => {
     return (
-        <div className="bg-white rounded-xl p-4 mb-4 shadow-sm w-[350px]">
+        <div 
+            className={`bg-white rounded-xl p-4 mb-4 shadow-sm w-[350px] cursor-pointer ${isSelected ? 'border-2 border-purple-500' : ''}`}
+            onClick={() => onSelect(club.id)}
+        >
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -111,7 +135,10 @@ const ClubCard = ({ club, isMyClub, onJoinToggle }: ClubCardProps) => {
                 </div>
 
                 <button
-                    onClick={() => onJoinToggle(club.id)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onJoinToggle(club.id);
+                    }}
                     className={`text-purple-600 hover:text-purple-800 ${isMyClub ? "font-bold" : ""}`}
                 >
                     {isMyClub ? "Joined" : "Join"}
@@ -121,7 +148,12 @@ const ClubCard = ({ club, isMyClub, onJoinToggle }: ClubCardProps) => {
             {!isMyClub && (
                 <p className="text-sm text-gray-600 mt-2">
                     {club.description}
-                    <button className="text-purple-600 ml-1">Read More...</button>
+                    <button 
+                        className="text-purple-600 ml-1"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        Read More...
+                    </button>
                 </p>
             )}
         </div>

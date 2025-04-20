@@ -1,9 +1,33 @@
 "use client";
-
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Mail, UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useAuthenticatedApi } from "@/context/AuthContext";
+
+interface Participant {
+  user_id: string;
+  email: string;
+  username: string;
+  joined_at: string;
+  is_admin: boolean;
+  profile_picture: string | null;
+  address: string | null;
+  position: string | null;
+  soft_skills: string | null;
+  bio: string | null;
+  city: string | null;
+  district: string | null;
+  state: string | null;
+}
+
+interface ClubData {
+  club: string;
+  description: string;
+  created_at: string;
+  participants: Participant[];
+}
 
 interface NetworkCardProps {
   id: string;
@@ -20,6 +44,59 @@ interface NetworkCardProps {
   onAccept?: () => void;
   onReject?: () => void;
   onFollow?: () => void;
+}
+
+interface NetworkSectionProps {
+  title: string;
+  children?: React.ReactNode;
+  clubId?: string;
+}
+
+export function NetworkSection({ title, children, clubId }: NetworkSectionProps) {
+  const [clubData, setClubData] = useState<ClubData | null>(null);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const { api } = useAuthenticatedApi();
+
+  useEffect(() => {
+    const fetchClubParticipants = async () => {
+      if (!clubId) return;
+      
+      try {
+        const response = await api.get(`/freelancer/clubs-participants/?id=${clubId}`);
+        setClubData(response.data);
+        setParticipants(response.data.participants);
+      } catch (error) {
+        console.error('Error fetching club participants:', error);
+      }
+    };
+
+    fetchClubParticipants();
+  }, [clubId, api]);
+
+  return (
+    <div className="mt-6">
+      <h2 className="text-lg font-semibold mb-4">
+        {clubData?.club ? `${clubData.club} Members` : title}
+      </h2>
+      <div className="space-y-6">
+        {participants.length > 0 ? 
+          participants.map((participant) => (
+            <NetworkCard
+              key={participant.user_id}
+              id={participant.user_id}
+              name={participant.username || "User"}
+              title={participant.position || "Member"}
+              location={participant.city && participant.state ? `${participant.city}, ${participant.state}` : ""}
+              imageUrl={participant.profile_picture || ""}
+              isOnline={false}
+              summary={participant.bio || ""}
+              showFollow={true}
+            />
+          ))
+        : children}
+      </div>
+    </div>
+  );
 }
 
 export function NetworkCard({ 

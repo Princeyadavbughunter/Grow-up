@@ -95,7 +95,7 @@ const CreatePost = (): JSX.Element => {
 
             images.forEach((image) => {
                 formData.append('images', image);
-            });
+            }); 
 
             if (link) {
                 formData.append('link', link);

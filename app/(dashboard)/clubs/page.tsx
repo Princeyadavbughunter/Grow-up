@@ -1,89 +1,23 @@
 "use client";
 import React, { useState } from 'react';
 import ClubsList from './_components/Clubs-list';
-import Posts from '../_components/Posts';
-import { NetworkCard } from '../network/_components/NetworkCard';
 import Link from 'next/link';
-import { NetworkSection } from '../network/_components/NetworkSection';
+import { NetworkSection } from './_components/club-network';
 import { SearchIcon } from 'lucide-react';
+import Posts from './_components/club-posts';
 
 const page = () => {
   const [isJoined, setIsJoined] = useState(false);
+  const [selectedClubId, setSelectedClubId] = useState("");
 
   const handleClick = () => {
     setIsJoined(!isJoined);
   };
 
-  const myNetwork = [
-    {
-      name: "Aryan Trivedi",
-      title: "Founder - Finzie | Ex Groww | BITS Pilani",
-      location: "Bengaluru",
-      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-      isOnline: true,
-    },
-    {
-      name: "Aryan Trivedi",
-      title: "Founder - Finzie | Ex Groww | BITS Pilani",
-      location: "Bengaluru",
-      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-      isOnline: true,
-    },
-    {
-      name: "Aryan Trivedi",
-      title: "Founder - Finzie | Ex Groww | BITS Pilani",
-      location: "Bengaluru",
-      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-      isOnline: true,
-    },
-    {
-      name: "Aryan Trivedi",
-      title: "Founder - Finzie | Ex Groww | BITS Pilani",
-      location: "Bengaluru",
-      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-      isOnline: true,
-    },
-    {
-      name: "Aryan Trivedi",
-      title: "Founder - Finzie | Ex Groww | BITS Pilani",
-      location: "Bengaluru",
-      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-      isOnline: true,
-    },
-    {
-      name: "Aryan Trivedi",
-      title: "Founder - Finzie | Ex Groww | BITS Pilani",
-      location: "Bengaluru",
-      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-      isOnline: true,
-    },
-    {
-      name: "Aryan Trivedi",
-      title: "Founder - Finzie | Ex Groww | BITS Pilani",
-      location: "Bengaluru",
-      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-      isOnline: true,
-    },
-    {
-      name: "Aryan Trivedi",
-      title: "Founder - Finzie | Ex Groww | BITS Pilani",
-      location: "Bengaluru",
-      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-      isOnline: true,
-    },
-    {
-      name: "Aryan Trivedi",
-      title: "Founder - Finzie | Ex Groww | BITS Pilani",
-      location: "Bengaluru",
-      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-      isOnline: true,
-    },
-  ];
-
   return (
     <div className="flex flex-col md:flex-row">
-      <div className="w-full bg-[#F9FAFF] p-4 md:p-6  fixed md:relative overflow-y-auto top-0 h-[580px]">
-        <ClubsList />
+      <div className="w-full bg-[#F9FAFF] p-4 md:p-6 fixed md:relative overflow-y-auto top-0 h-[580px]">
+        <ClubsList selectedClubId={selectedClubId} setSelectedClubId={setSelectedClubId} />
       </div>
 
       <div className="w-full p-4 overflow-y-auto scrollbar-[1px] h-[580px]">
@@ -101,19 +35,15 @@ const page = () => {
             <Link className="text-purple-600 text-sm font-medium" href="/create-post">Create Post</Link>
           </div>
         </div>
-        <Posts />
+        <Posts clubId={selectedClubId} />
       </div>
 
-      <div className="w-full bg-[#F9FAFF] p-4 md:p-6  fixed md:relative overflow-y-auto top-0 h-[580px]">
+      <div className="w-full bg-[#F9FAFF] p-4 md:p-6 fixed md:relative overflow-y-auto top-0 h-[580px]">
         <div className="border rounded-full flex items-center gap-2 p-2">
           <SearchIcon color='gray' size={18} />
           <input placeholder='search members' className='outline-none border-none' />
         </div>
-        <NetworkSection title="Members">
-          {myNetwork.map((connection, index) => (
-            <NetworkCard key={index} {...connection} />
-          ))}
-        </NetworkSection>
+        <NetworkSection title="Members" clubId={selectedClubId} />
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Camera, MapPin, Plus } from 'lucide-react';
+import { Camera, MapPin, Plus, Image } from 'lucide-react';
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import {
   Form,
@@ -30,8 +30,12 @@ type FormData = z.infer<typeof formSchema>;
 
 const CreatePage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const profileInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
   const { api } = useAuthenticatedApi();
   const { authToken } = useAuth();
 
@@ -46,12 +50,25 @@ const CreatePage = () => {
     },
   });
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfileImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setProfileImage(file);
       const reader = new FileReader();
       reader.onload = () => {
-        setProfileImage(reader.result as string);
+        setProfilePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCoverPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setCoverPhoto(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCoverPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -67,15 +84,28 @@ const CreatePage = () => {
 
     setIsSubmitting(true);
     try {
-      await api.post('/post/app/page/', {
-        name: data.pageName,
-        description: data.about,
-        is_active: true,
-        category: data.category,
-        website: data.website,
-        location: data.location,
-        cover_photo: null,
-        profile_picture: profileImage
+      // Create FormData object to handle file uploads
+      const formData = new FormData();
+      formData.append('name', data.pageName);
+      formData.append('description', data.about);
+      formData.append('is_active', true);
+      formData.append('category', data.category);
+      formData.append('website', data.website);
+      formData.append('location', data.location);
+      
+      if (profileImage) {
+        formData.append('profile_picture', profileImage);
+      }
+      
+      if (coverPhoto) {
+        formData.append('cover_photo', coverPhoto);
+      }
+
+      // Use axios directly with specific config for multipart/form-data
+      await api.post('/post/app/page/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
       toast('Success', {
@@ -84,6 +114,9 @@ const CreatePage = () => {
 
       form.reset();
       setProfileImage(null);
+      setCoverPhoto(null);
+      setProfilePreview(null);
+      setCoverPreview(null);
     } catch (error) {
       console.error('Error creating page:', error);
       toast("Error", {
@@ -98,36 +131,68 @@ const CreatePage = () => {
     <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-sm">
       <h1 className="text-2xl font-bold mb-6">Create Page</h1>
       
-      <div className="flex justify-center mb-8">
-        <div className="relative">
+      <div className="mb-8">
+        {/* Cover Photo Upload */}
+        <div className="mb-6">
+          <p className="text-sm font-medium mb-2">Cover Photo</p>
           <div 
-            className="w-28 h-28 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-blue-300 transition-colors"
-            onClick={() => fileInputRef.current?.click()}
+            className="w-full h-32 bg-gray-100 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center cursor-pointer hover:border-blue-300 transition-colors relative overflow-hidden"
+            onClick={() => coverInputRef.current?.click()}
           >
-            {profileImage ? (
+            {coverPreview ? (
               <img 
-                src={profileImage} 
-                alt="Profile" 
+                src={coverPreview} 
+                alt="Cover" 
                 className="w-full h-full object-cover"
               />
             ) : (
-              <Camera className="w-10 h-10 text-gray-400" />
+              <div className="flex flex-col items-center">
+                <Image className="w-8 h-8 text-gray-400 mb-2" />
+                <span className="text-sm text-gray-500">Upload cover photo</span>
+              </div>
             )}
+            <input
+              type="file"
+              ref={coverInputRef}
+              onChange={handleCoverPhotoUpload}
+              accept="image/*"
+              className="hidden"
+            />
           </div>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleImageUpload}
-            accept="image/*"
-            className="hidden"
-          />
-          <button
-            type="button"
-            className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-white shadow border border-gray-200 flex items-center justify-center hover:bg-gray-50"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Plus className="h-4 w-4" />
-          </button>
+        </div>
+
+        {/* Profile Image Upload */}
+        <div className="flex justify-center">
+          <div className="relative">
+            <div 
+              className="w-28 h-28 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-blue-300 transition-colors"
+              onClick={() => profileInputRef.current?.click()}
+            >
+              {profilePreview ? (
+                <img 
+                  src={profilePreview} 
+                  alt="Profile" 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Camera className="w-10 h-10 text-gray-400" />
+              )}
+            </div>
+            <input
+              type="file"
+              ref={profileInputRef}
+              onChange={handleProfileImageUpload}
+              accept="image/*"
+              className="hidden"
+            />
+            <button
+              type="button"
+              className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-white shadow border border-gray-200 flex items-center justify-center hover:bg-gray-50"
+              onClick={() => profileInputRef.current?.click()}
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -241,7 +306,7 @@ const CreatePage = () => {
           <div className="pt-6">
             <Button
               type="submit"
-              className="w-full py-2  mb-32 bg-blue-600 text-white hover:bg-blue-700"
+              className="w-full py-2 mb-32 bg-blue-600 text-white hover:bg-blue-700"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Creating..." : "Create Page"}

@@ -19,7 +19,6 @@ const AccountCreation = () => {
     const [loading, setLoading] = useState(false)
     const searchParams = useSearchParams()
     const router = useRouter()
-    const { setIsAuthenticated } = useAuth()
 
     const COOKIE_OPTIONS = {
         expires: 7,
@@ -112,7 +111,6 @@ const AccountCreation = () => {
                     }
                 }
 
-                setIsAuthenticated(true);
                 router.push('/');
             } else {
                 console.error("Authentication response missing tokens:", response.data);
