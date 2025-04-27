@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Image from "next/image";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
+import Link from 'next/link';
 
 interface ImageData {
     id: string;
@@ -29,6 +30,7 @@ interface Post {
     comment_count: number;
     author: string;
     club: string;
+    freelancer_profile:string;
 }
 
 const Posts = () => {
@@ -72,7 +74,7 @@ const PostCard = ({ post }: PostCardProps) => {
     return (
         <div className="bg-white rounded-xl p-4 mb-4 shadow-lg">
             <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
+                <Link href={`/profile/${post.freelancer_profile}`} className="flex items-center gap-3">
                     <Image
                         src={post.profile_picture || "https://randomuser.me/portraits/men/2.jpg"}
                         alt="User"
@@ -86,7 +88,7 @@ const PostCard = ({ post }: PostCardProps) => {
                         </h3>
                         <p className="text-sm text-gray-500">{formattedDate}</p>
                     </div>
-                </div>
+                </Link>
                 <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">Tech</span>
             </div>
 

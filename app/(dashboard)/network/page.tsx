@@ -14,7 +14,7 @@ interface Follower {
 interface FollowRequest {
   request_id: string;
   requester_username?: string;
-  follower_username?: string;  // Added this field based on API response
+  follower_username?: string;
 }
 
 interface FollowResponse {

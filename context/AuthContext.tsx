@@ -68,6 +68,7 @@ interface AuthContextType {
   apiCaller: AxiosInstance;
   logout: () => void;
   refreshProfile: () => Promise<void>;
+  updateProfile: (profileId: string, updatedData: Partial<FreelancerProfile>) => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -206,12 +207,47 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Add function to update profile data
+  const updateProfile = async (profileId: string, updatedData: Partial<FreelancerProfile>): Promise<void> => {
+    if (!isAuthenticated) return;
+    
+    try {
+      await apiCaller.patch(`/freelancer/freelancer-profile/${profileId}/`, updatedData);
+      // Refresh profile data after successful update
+      await fetchProfileData();
+    } catch (err: any) {
+      console.error('Error updating freelancer profile:', err);
+      throw new Error(err.response?.data?.message || 'Failed to update profile data');
+    }
+  };
+
   // Fetch profile data when authenticated
   useEffect(() => {
     if (isAuthenticated && !loading) {
       fetchProfileData();
     }
   }, [isAuthenticated, loading]);
+
+  // Create a websocket connection for real-time updates
+  useEffect(() => {
+    if (!isAuthenticated || !profileData) return;
+
+    // Example websocket implementation - modify as needed for your backend
+    // const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    // const wsUrl = `${wsProtocol}${window.location.host}/ws/profile/${profileData.id}/`;
+    // const ws = new WebSocket(wsUrl);
+    
+    // ws.onmessage = (event) => {
+    //   const data = JSON.parse(event.data);
+    //   if (data.type === 'profile_update') {
+    //     fetchProfileData();
+    //   }
+    // };
+
+    // return () => {
+    //   ws.close();
+    // };
+  }, [isAuthenticated, profileData]);
 
   // Logout function
   const logout = () => {
@@ -238,7 +274,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsAuthenticated,
     apiCaller,
     logout,
-    refreshProfile: fetchProfileData
+    refreshProfile: fetchProfileData,
+    updateProfile
   };
 
   return (

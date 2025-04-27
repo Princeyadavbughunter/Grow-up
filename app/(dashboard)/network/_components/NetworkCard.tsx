@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Mail, UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 interface NetworkCardProps {
   id: string;
@@ -24,7 +25,7 @@ interface NetworkCardProps {
 
 export function NetworkCard({ 
   id, 
-  name = "User", // Provide default value
+  name = "User",
   title, 
   location, 
   imageUrl, 
@@ -43,7 +44,7 @@ export function NetworkCard({
   
   return (
     <div className="flex items-start gap-4">
-      <div className="relative">
+      <Link href={`/profile/${id}`} className="relative">
         <Avatar className="h-12 w-12">
           <AvatarImage src={imageUrl} />
           <AvatarFallback>{nameInitial}</AvatarFallback>
@@ -51,7 +52,7 @@ export function NetworkCard({
         {isOnline && (
           <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white" />
         )}
-      </div>
+      </Link>
       <div className="flex-1">
         <div className="flex items-start justify-between">
           <div>
