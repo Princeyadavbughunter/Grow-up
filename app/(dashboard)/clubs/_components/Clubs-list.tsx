@@ -9,6 +9,8 @@ interface Club {
     created_at: string;
     created_by: string;
     participants_count?: number;
+    chat_room_id?: string;
+    is_user_member?: boolean;
     members?: string[];
 }
 
@@ -26,16 +28,19 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
 
     const fetchClubs = async () => {
         try {
-            const [allClubsResponse, myClubsResponse] = await Promise.all([
-                api.get('/freelancer/club/'),
-                api.get('/freelancer/joined-clubs/')
-            ]);
-            setAllClubs(allClubsResponse.data);
-            setMyClubs(myClubsResponse.data);
+            const response = await api.get('/freelancer/club/');
+            console.log(response.data);
+            
+            // Separate clubs into my clubs and all clubs based on is_user_member flag
+            const allClubsData = response.data || [];
+            const myClubsData = allClubsData.filter((club: Club) => club.is_user_member);
+            
+            setAllClubs(allClubsData);
+            setMyClubs(myClubsData);
             
             // Set default selected club if none is selected yet
-            if (!selectedClubId && allClubsResponse.data.length > 0) {
-                setSelectedClubId(allClubsResponse.data[0].id);
+            if (!selectedClubId && allClubsData.length > 0) {
+                setSelectedClubId(allClubsData[0].id);
             }
         } catch (error) {
             console.error('Error fetching clubs:', error);
@@ -50,7 +55,7 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
 
     const handleJoinToggle = async (clubId: string) => {
         try {
-            await api.post(`/freelancer/club/${clubId}/join/`);
+            await api.post(`/freelancer/join-club/?id=${clubId}`);
             fetchClubs();
             setActiveTab("my");
             setSelectedClubId(clubId);
@@ -62,6 +67,10 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
     const handleClubSelect = (clubId: string) => {
         setSelectedClubId(clubId);
     };
+
+    const displayClubs = activeTab === "all" 
+        ? allClubs
+        : myClubs;
 
     return (
         <div className="p-4 max-w-sm">
@@ -80,29 +89,22 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
                 </button>
             </div>
 
-            {activeTab === "all" && allClubs.map((club) => (
-                !myClubs.some(myClub => myClub.id === club.id) && (
+            {displayClubs.length > 0 ? (
+                displayClubs.map((club) => (
                     <ClubCard
                         key={club.id}
                         club={club}
-                        isMyClub={false}
+                        isMyClub={club.is_user_member || false}
                         isSelected={club.id === selectedClubId}
                         onJoinToggle={handleJoinToggle}
                         onSelect={handleClubSelect}
                     />
-                )
-            ))}
-
-            {activeTab === "my" && myClubs.map((club) => (
-                <ClubCard
-                    key={club.id}
-                    club={club}
-                    isMyClub={true}
-                    isSelected={club.id === selectedClubId}
-                    onJoinToggle={handleJoinToggle}
-                    onSelect={handleClubSelect}
-                />
-            ))}
+                ))
+            ) : (
+                <div className="text-center py-8 text-gray-500">
+                    {activeTab === "all" ? "No clubs available to join" : "You haven't joined any clubs yet"}
+                </div>
+            )}
         </div>
     );
 };
@@ -129,7 +131,7 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
                     <div>
                         <h3 className="font-semibold">{club.name}</h3>
                         <p className="text-sm text-gray-500">
-                            {isMyClub ? `${club.members?.length || 0} members` : `${club.participants_count || 0} members`}
+                            {club.participants_count || 0} members
                         </p>
                     </div>
                 </div>

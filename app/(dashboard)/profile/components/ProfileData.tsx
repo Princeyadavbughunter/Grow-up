@@ -12,29 +12,31 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/context/AuthContext";
 
+interface ProfileData {
+  id?: string;
+  first_name: string;
+  last_name: string;
+  bio: string;
+  profile_picture: string;
+  address: string;
+  city: string;
+  state: string;
+  skills: string;
+  follower_count: number;
+  github_account: string | null;
+  dribble_account: string | null;
+  figma_account: string | null;
+  youtube_account: string | null;
+  medium_account: string | null;
+}
+
 interface ProfileDataProps {
-  profileData: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    bio: string;
-    profile_picture: string;
-    address: string;
-    city: string;
-    state: string;
-    skills: string;
-    follower_count: number;
-    github_account: string | null;
-    dribble_account: string | null;
-    figma_account: string | null;
-    youtube_account: string | null;
-    medium_account: string | null;
-  } | null;
+  profileData?: ProfileData | null;
 }
 
 const ProfileDataEditable: React.FC<ProfileDataProps> = ({ profileData }) => {
   const { apiCaller, refreshProfile } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(!profileData);
   const [formData, setFormData] = useState({
     first_name: profileData?.first_name || "",
     last_name: profileData?.last_name || "",
@@ -47,11 +49,25 @@ const ProfileDataEditable: React.FC<ProfileDataProps> = ({ profileData }) => {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!profileData) {
-    return <div>Loading profile data...</div>;
-  }
+  const defaultData = {
+    first_name: "",
+    last_name: "",
+    bio: "",
+    profile_picture: "",
+    address: "",
+    city: "",
+    state: "",
+    skills: "",
+    follower_count: 0,
+    github_account: null,
+    dribble_account: null,
+    figma_account: null,
+    youtube_account: null,
+    medium_account: null,
+  };
 
-  const { first_name, last_name, bio, profile_picture, address, city, state, skills, follower_count } = profileData;
+  const currentData = profileData || defaultData;
+  const { first_name, last_name, bio, profile_picture, address, city, state, skills, follower_count } = currentData;
   const skillsArray = skills ? skills.split(',') : [];
   const fullName = `${first_name} ${last_name}`;
   const location = `${address ? address + ', ' : ''}${city ? city + ', ' : ''}${state || ''}`;
@@ -67,7 +83,11 @@ const ProfileDataEditable: React.FC<ProfileDataProps> = ({ profileData }) => {
     setIsSubmitting(true);
     
     try {
-      await apiCaller.patch(`/freelancer/freelancer-profile/?id=${profileData.id}`, formData);
+      if (profileData?.id) {
+        await apiCaller.patch(`/freelancer/freelancer-profile/?id=${profileData.id}`, formData);
+      } else {
+        await apiCaller.post('/freelancer/freelancer-profile/', formData);
+      }
       await refreshProfile();
       setIsEditing(false);
     } catch (error) {
@@ -79,13 +99,13 @@ const ProfileDataEditable: React.FC<ProfileDataProps> = ({ profileData }) => {
 
   const openEditModal = () => {
     setFormData({
-      first_name: profileData.first_name || "",
-      last_name: profileData.last_name || "",
-      bio: profileData.bio || "",
-      address: profileData.address || "",
-      city: profileData.city || "",
-      state: profileData.state || "",
-      skills: profileData.skills || "",
+      first_name: currentData.first_name || "",
+      last_name: currentData.last_name || "",
+      bio: currentData.bio || "",
+      address: currentData.address || "",
+      city: currentData.city || "",
+      state: currentData.state || "",
+      skills: currentData.skills || "",
     });
     setIsEditing(true);
   };
@@ -100,7 +120,7 @@ const ProfileDataEditable: React.FC<ProfileDataProps> = ({ profileData }) => {
         />
         <div className="flex-1">
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-10">
-            <h3 className="font-medium text-lg sm:text-xl">{fullName}</h3>
+            <h3 className="font-medium text-lg sm:text-xl">{fullName || "New Profile"}</h3>
             <div className="flex items-center gap-2">
               <button 
                 onClick={openEditModal}
@@ -113,10 +133,10 @@ const ProfileDataEditable: React.FC<ProfileDataProps> = ({ profileData }) => {
             </div>
           </div>
           <p className="text-gray-500 text-sm sm:text-base">
-            {bio || "Founder - Finzie | Ex Groww | BITS Pilani"}
+            {bio || ""}
           </p>
           <p className="text-gray-500 text-sm sm:text-base flex items-center gap-1">
-            <IoLocationSharp /> {location || "Lakshman Puri, Delhi"}
+            <IoLocationSharp /> {location || ""}
           </p>
         </div>
       </div>
@@ -155,11 +175,10 @@ const ProfileDataEditable: React.FC<ProfileDataProps> = ({ profileData }) => {
         </div>
       </div>
 
-      {/* Edit Profile Modal */}
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Profile</DialogTitle>
+            <DialogTitle>{profileData ? "Edit Profile" : "Create Profile"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 py-4">
@@ -233,19 +252,21 @@ const ProfileDataEditable: React.FC<ProfileDataProps> = ({ profileData }) => {
               </div>
             </div>
             <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setIsEditing(false)}
-              >
-                Cancel
-              </Button>
+              {profileData && (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsEditing(false)}
+                >
+                  Cancel
+                </Button>
+              )}
               <Button 
                 type="submit" 
                 disabled={isSubmitting}
                 className="bg-[#7052FF]"
               >
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                {isSubmitting ? 'Saving...' : profileData ? 'Save Changes' : 'Create Profile'}
               </Button>
             </DialogFooter>
           </form>

@@ -6,7 +6,6 @@ const page = () => {
     return (
         <div className='mx-auto px-40'>
             <AddBio />
-
         </div>
     )
 }

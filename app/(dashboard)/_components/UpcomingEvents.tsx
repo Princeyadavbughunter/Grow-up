@@ -57,7 +57,7 @@ const UpcomingEvents = () => {
   const handleRegister = async (eventId: string, e: React.MouseEvent) => {
     e.preventDefault();
     try {
-      await api.post(`/company/app/event-api/${eventId}/register/`);
+      await api.post(`/company/app/events-register/?event_id=${eventId}`);
       const response = await api.get("/company/app/event-api/");
       setUpcomingEvents(response.data.upcoming_events || []);
     } catch (error) {

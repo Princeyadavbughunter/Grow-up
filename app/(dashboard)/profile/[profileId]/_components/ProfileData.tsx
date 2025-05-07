@@ -6,6 +6,7 @@ import { TiSocialFacebook, TiSocialTwitter } from "react-icons/ti";
 import { Button } from "@/components/ui/button";
 import { ImUsers } from "react-icons/im";
 import { FaMessage } from "react-icons/fa6";
+import Link from "next/link";
 
 interface ProfileDataProps {
   profileData: {
@@ -86,11 +87,11 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
           <div>
             <p className="flex flex-wrap gap-2 font-semibold">
               <Button className="bg-[#7052FF] text-white font-medium flex items-center gap-1 px-4 py-2 rounded">
-                <ImUsers /> {follower_count || 0}k Followers
+                <ImUsers /> {follower_count || 0} Followers
               </Button>
-              <Button className="bg-white font-medium border border-[#7052FF] text-[#7052FF] flex items-center gap-1 px-4 py-2 rounded">
+              <Link href={`/chat/${profileData.id}`} className="bg-white font-medium border border-[#7052FF] text-[#7052FF] flex items-center gap-1 px-4 py-2 rounded">
                 <FaMessage /> Open Inbox
-              </Button>
+              </Link>
             </p>
           </div>
         </div>

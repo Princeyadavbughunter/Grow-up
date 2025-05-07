@@ -1,10 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Mail, UserPlus } from "lucide-react";
+import { Mail, UserPlus, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useAuthenticatedApi } from "@/context/AuthContext";
+import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
+import { Input } from "@/components/ui/input";
+import _ from "lodash";
 
 interface Participant {
   user_id: string;
@@ -55,29 +57,75 @@ interface NetworkSectionProps {
 export function NetworkSection({ title, children, clubId }: NetworkSectionProps) {
   const [clubData, setClubData] = useState<ClubData | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { api } = useAuthenticatedApi();
+  const { authToken } = useAuth();
+
+  const fetchParticipants = useCallback(async (searchUsername = "") => {
+    if (!clubId) return;
+    
+    setIsLoading(true);
+    try {
+      let url = `/freelancer/clubs-participants/?id=${clubId}`;
+      if (searchUsername) {
+        url += `&username=${encodeURIComponent(searchUsername)}`;
+      }
+      
+      const response = await api.get(url);
+      setClubData(response.data);
+      setParticipants(response.data.participants);
+    } catch (error) {
+      console.error('Error fetching club participants:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [clubId]);
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    _.debounce((term) => {
+      fetchParticipants(term);
+    }, 500),
+    [fetchParticipants]
+  );
+
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    debouncedSearch(value);
+  };
 
   useEffect(() => {
-    const fetchClubParticipants = async () => {
-      if (!clubId) return;
-      
-      try {
-        const response = await api.get(`/freelancer/clubs-participants/?id=${clubId}`);
-        setClubData(response.data);
-        setParticipants(response.data.participants);
-      } catch (error) {
-        console.error('Error fetching club participants:', error);
-      }
+    if (authToken) {
+      fetchParticipants();
+    }
+    
+    return () => {
+      debouncedSearch.cancel();
     };
-
-    fetchClubParticipants();
-  }, [clubId, api]);
+  }, [authToken, debouncedSearch]);
 
   return (
     <div className="mt-6">
       <h2 className="text-lg font-semibold mb-4">
         {clubData?.club ? `${clubData.club} Members` : title}
       </h2>
+      
+      <div className="relative mb-4">
+        <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+        <Input
+          type="text"
+          placeholder="Search by username"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="pl-8 pr-4"
+        />
+      </div>
+      
+      {isLoading && <p className="text-sm text-gray-500">Loading...</p>}
+      
       <div className="space-y-6">
         {participants.length > 0 ? 
           participants.map((participant) => (
@@ -93,7 +141,9 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
               showFollow={true}
             />
           ))
-        : children}
+        : !isLoading && (
+          searchTerm ? <p className="text-sm text-gray-500">No results found</p> : children
+        )}
       </div>
     </div>
   );
@@ -101,7 +151,7 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
 
 export function NetworkCard({ 
   id, 
-  name = "User", // Provide default value
+  name = "User",
   title, 
   location, 
   imageUrl, 
@@ -115,7 +165,6 @@ export function NetworkCard({
   onReject,
   onFollow
 }: NetworkCardProps) {
-  // Safe access for name with fallback
   const nameInitial = name && name.length > 0 ? name.charAt(0) : "U";
   
   return (
