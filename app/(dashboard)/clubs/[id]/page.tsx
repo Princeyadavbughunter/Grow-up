@@ -47,10 +47,6 @@ const Page = () => {
       </div>
 
       <div className="w-full bg-[#F9FAFF] p-4 md:p-6 fixed md:relative overflow-y-auto top-0 h-[580px]">
-        <div className="border rounded-full flex items-center gap-2 p-2">
-          <SearchIcon color='gray' size={18} />
-          <input placeholder='search members' className='outline-none border-none' />
-        </div>
         <NetworkSection title="Members" clubId={selectedClubId} />
       </div>
     </div>

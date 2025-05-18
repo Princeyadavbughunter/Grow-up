@@ -27,13 +27,13 @@ interface PageDetails {
     instagram?: string;
     facebook?: string;
   };
+  is_following: boolean;
 }
 
 const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }) => {
   const [activeTab, setActiveTab] = useState<string>('Home');
   const [pageDetails, setPageDetails] = useState<PageDetails | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isFollowing, setIsFollowing] = useState(false);
 
   const { api } = useAuthenticatedApi();
   const { authToken } = useAuth();
@@ -47,18 +47,8 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           : '/post/app/page/';
         
         const response = await api.get(endpoint);
-        const pageData = pageId 
-          ? response.data 
-          : response.data[0]; 
-
-
-        setPageDetails(pageData[0]);
-        
-        const followResponse = await api.get('/post/app/pages-follow/');
-        const isCurrentlyFollowing = followResponse.data.pages.some(
-          (page: any) => page.id === pageData.id
-        );
-        setIsFollowing(isCurrentlyFollowing);
+        const pageData = response.data;
+        setPageDetails(pageData);
       } catch (error) {
         console.error('Error fetching page details:', error);
       } finally {
@@ -77,11 +67,14 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
     try {
       const payload = {
         page_id: pageDetails.id,
-        is_admin: false
       };
 
       await api.post('/post/app/pages-follow/', payload);
-      setIsFollowing(!isFollowing);
+      setPageDetails(prev => prev ? {
+        ...prev,
+        is_following: !prev.is_following,
+        followers_count: prev.is_following ? prev.followers_count - 1 : prev.followers_count + 1
+      } : null);
     } catch (error) {
       console.error('Error toggling page follow:', error);
     }
@@ -99,8 +92,6 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
         return <PostTab pageId={pageDetails.id} />;
       case 'Job':
         return <JobTab pageId={pageDetails.id} />;
-      case 'People':
-        return <PeopleTab pageId={pageDetails.id} />;
       default:
         return null;
     }
@@ -155,13 +146,13 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
         <div className="mb-6 flex gap-4">
           <button 
             className={`flex-1 rounded-lg py-3 ${
-              isFollowing 
+              pageDetails.is_following 
                 ? 'bg-gray-200 text-gray-700' 
                 : 'bg-[#7052FF] text-white'
             }`}
             onClick={handleFollowToggle}
           >
-            {isFollowing ? 'Unfollow' : 'Follow'}
+            {pageDetails.is_following ? 'Unfollow' : 'Follow'}
           </button>
           <button className="flex-1 rounded-lg border border-[#7052FF] py-3 text-[#7052FF]">
             Message

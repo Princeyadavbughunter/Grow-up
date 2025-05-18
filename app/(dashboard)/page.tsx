@@ -13,7 +13,9 @@ const Home = () => {
         <ProgressProfile />
       </div>
       <div className="overflow-y-auto h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent md:col-span-3">
-        <PostButton />
+        <div className="sticky top-0 z-10 ">
+          <PostButton />
+        </div>
         <Posts />
       </div>
       <div className="h-fit md:sticky md:top-4 md:col-span-2">

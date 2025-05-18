@@ -30,6 +30,7 @@ interface Post {
     comment_count: number;
     author: string;
     club: string;
+    club_name: string;
     freelancer_profile: string;
 }
 
@@ -178,7 +179,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                         <p className="text-sm text-gray-500">{formattedDate}</p>
                     </div>
                 </Link>
-                <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">Tech</span>
+                <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">{post.club_name}</span>
             </div>
 
             <p className="mb-4">{post.title}</p>

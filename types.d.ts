@@ -36,6 +36,7 @@ interface Job {
       long: number | null;
       recruiter: string;
       user: string;
+      is_applied: boolean;
   }
 
   interface ProfileData {

@@ -49,13 +49,6 @@ const Followers: React.FC<FollowersProps> = ({ pageId }) => {
     <div>
       <div className="mb-6 rounded-lg border p-4 flex flex-col">
         <div className="div">
-          <div className="mb-4">
-            <div className="flex items-center gap-2">
-              <BiLink className="h-5 w-5 text-gray-500" />
-              <h3 className="text-lg font-medium">Invitation link</h3>
-            </div>
-            <p className="text-gray-500">https://sjsfhHAD44iddioAR.com/</p>
-          </div>
           <div>
             <div className="mb-2">
               <span className="font-medium">Website</span>
@@ -65,12 +58,6 @@ const Followers: React.FC<FollowersProps> = ({ pageId }) => {
               >
                 {pageDetails?.website || 'Not provided'}
               </a>
-            </div>
-            <div>
-              <span className="font-medium">Phone</span>
-              <span className="ml-2 text-purple-600">
-                {pageDetails?.phone_number || 'Not provided'}
-              </span>
             </div>
           </div>
         </div>

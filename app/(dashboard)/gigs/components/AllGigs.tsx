@@ -56,7 +56,7 @@ const AllGigs = ({
   const handleBookmark = async (e: React.MouseEvent, gig: Gig) => {
     e.stopPropagation();
     try {
-      await api.post('/freelancer/saving-jobs/', { job_id: gig.id });
+      await api.post('/freelancer/saving-jobs/', { job_posting: gig.id });
       setLocalGigs(prevGigs =>
         prevGigs.map(g =>
           g.id === gig.id ? { ...g, is_bookmark: !g.is_bookmark } : g
@@ -76,25 +76,27 @@ const AllGigs = ({
   };
 
   return (
-    <div className="bg-gray-50 lg:px-0 flex justify-center px-5">
+    <div className="bg-gray-50 py-3 px-2 lg:px-3 flex justify-center">
       <div className="max-w-[450px] w-full">
-        <div className="sticky top-0 z-10 bg-gray-50 py-4 space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+        <div className="sticky top-0 z-10 bg-gray-50 pt-2 pb-3">
+          <div className="relative bg-[#6A737D0F] rounded-xl mb-3">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
             <Input 
               placeholder="Search by Title, Location" 
-              className="pl-10"
+              className="pl-8 py-1.5 rounded-xl border-none text-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap mb-5 gap-2">
             {["Domain", "Remote", "Hybrid", "Onsite", "Latest"].map((tab) => (
               <Button
                 key={tab}
                 variant={activeWorkType === tab ? "default" : "secondary"}
-                className={activeWorkType === tab ? "bg-violet-600 hover:bg-violet-500 rounded-full" : "rounded-full"}
+                className={`px-3 py-1 text-sm ${activeWorkType === tab 
+                  ? "bg-violet-600 hover:bg-violet-500 rounded-full" 
+                  : "rounded-full"}`}
                 onClick={() => handleWorkTypeChange(tab)}
               >
                 {tab}
@@ -102,36 +104,40 @@ const AllGigs = ({
             ))}
           </div>
 
-          <div className="flex space-x-4">
-            {["All", "Freelance", "Collaboration", "Internship"].map((tab) => (
-              <Button
-                key={tab}
-                variant={activeJobType === tab ? "default" : "ghost"}
-                className={activeJobType === tab ? "bg-violet-600 hover:bg-violet-500 rounded-full" : "rounded-full"}
-                onClick={() => handleJobTypeChange(tab)}
-              >
-                {tab}
-              </Button>
-            ))}
-          </div>
+          {["All", "Freelance", "Collaboration", "Internship"].map((tab) => (
+        <button
+          key={tab}
+          className={`px-3 py-1 text-sm relative ${
+            activeJobType === tab 
+              ? "text-violet-600 font-medium" 
+              : "text-gray-600 hover:text-gray-800"
+          }`}
+          onClick={() => handleJobTypeChange(tab)}
+        >
+          {tab}
+          {activeJobType === tab && (
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-violet-600"></span>
+          )}
+        </button>
+      ))}
         </div>
 
-        <div className="overflow-y-auto h-[400px] space-y-4">
+        <div className="overflow-y-auto h-[450px] space-y-3 mt-1">
           {filteredGigs.length > 0 ? (
             filteredGigs.map((gig) => (
               <Card 
                 key={gig.id} 
                 className={`cursor-pointer transition-all ${
                   selectedGigId === gig.id 
-                    ? 'border-violet-500 shadow-md' 
-                    : 'hover:shadow-md'
-                }`}
+                    ? 'border-violet-500 shadow' 
+                    : 'hover:shadow-sm'
+                } rounded-lg`}
                 onClick={() => handleGigClick(gig)}
               >
-                <CardContent className="pt-4">
-                  <div className="flex items-start gap-4">
-                    <div className="h-12 w-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                      <Building2 className="h-6 w-6 text-orange-500" />
+                <CardContent className="p-3">
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <Building2 className="h-5 w-5 text-orange-500" />
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between items-start">
@@ -147,22 +153,24 @@ const AllGigs = ({
                           )}
                         </button>
                       </div>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs text-gray-500">
                         {gig.about_role} | {gig.location}
                       </p>
-                      <p className="text-sm text-gray-500">
-                        ₹{gig.salary_range}/month
-                      </p>
+                      <div className="flex justify-between items-center mt-1">
+                        <p className="text-xs font-medium text-gray-700">
+                          ₹{gig.salary_range}/month
+                        </p>
+                        <Badge variant="secondary" className="text-xs px-2 py-0.5 rounded-full">
+                          {gig.employment_type}
+                        </Badge>
+                      </div>
                     </div>
-                    <Badge variant="secondary">
-                      {gig.employment_type}
-                    </Badge>
                   </div>
                 </CardContent>
               </Card>
             ))
           ) : (
-            <div className="flex flex-col items-center justify-center h-full py-10 text-gray-500">
+            <div className="flex flex-col items-center justify-center h-full py-8 text-gray-500">
               <p>No gigs found matching your criteria</p>
             </div>
           )}

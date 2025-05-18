@@ -4,7 +4,7 @@ import React from "react";
 
 const PostButton = () => {
     return (
-        <div className="bg-white rounded-xl p-4 mb-4 shadow-sm">
+        <div className="bg-white rounded-xl p-4 mb-4">
             <div className="flex items-center gap-3 mb-4">
                 <Image
                     src="https://randomuser.me/portraits/men/1.jpg"

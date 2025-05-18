@@ -92,6 +92,8 @@ const AccountCreation = () => {
             );
 
             if (response.data.access && response.data.refresh) {
+                console.log(response.data);
+                
                 Cookies.set('access_token', response.data.access, COOKIE_OPTIONS);
                 Cookies.set('refresh_token', response.data.refresh, COOKIE_OPTIONS);
 

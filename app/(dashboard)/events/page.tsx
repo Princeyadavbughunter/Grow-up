@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, MapPin, Calendar, Clock, User } from "lucide-react";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Event {
   id: string;
@@ -51,6 +52,7 @@ export default function EventsPage() {
   const [activeTab, setActiveTab] = useState<string>("past");
   const [selectedFilter, setSelectedFilter] = useState<string>("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -68,6 +70,16 @@ export default function EventsPage() {
       fetchEvents();
     }
   }, [authToken, selectedFilter]);
+
+  const scrollEvents = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 300;
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   const EventTabs = () => (
     <div className="flex gap-8 mb-6">
@@ -110,56 +122,104 @@ export default function EventsPage() {
     </div>
   );
 
+  const formatEventTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
+
+  const formatEventDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short', 
+      month: 'short', 
+      day: 'numeric'
+    });
+  };
+
   const EventCard: React.FC<{ event: Event }> = ({ event }) => (
     <Card 
-      className="p-6 border-2 border-purple-100 rounded-3xl bg-[#F9FAFF] cursor-pointer mb-4"
+      className="p-4 border-2 border-purple-100 rounded-3xl bg-[#F9FAFF] cursor-pointer mb-4 hover:shadow-md transition-all duration-300 flex flex-col h-[400px]"
       onClick={() => setSelectedEvent(event)}
     >
-      <Badge className="bg-purple-100 text-purple-800 mb-2">{event.category_name || "Uncategorized"}</Badge>
-      <div className="relative rounded-xl overflow-hidden mb-4">
-        <div className="flex items-center">
-          <div className="flex-1">
-            <h3 className="text-md font-bold">{event.name}</h3>
-            <p className="text-gray-600 text-sm">{event.description}</p>
-          </div>
-          <img
-            src={event.freelancer_profile_picture || "/api/placeholder/400/320"}
-            alt="Event cover"
-            className="w-28 h-44 object-cover"
-          />
-        </div>
+      <div className="flex justify-between items-start mb-3">
+        <Badge className="bg-purple-100 text-purple-800">{event.category_name || "Uncategorized"}</Badge>
+        <Badge className="bg-yellow-100 text-yellow-800">
+          {formatEventDate(event.date)}
+        </Badge>
       </div>
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Badge className="bg-yellow-100 text-yellow-800">
-            {new Date(event.date).toLocaleDateString('en-US', { 
-              weekday: 'short', 
-              month: 'short', 
-              day: 'numeric',
-              hour: 'numeric',
-              minute: 'numeric'
-            })}
-          </Badge>
+      
+      <div className="relative rounded-xl overflow-hidden mb-4 flex-shrink-0">
+        <img
+          src={event.freelancer_profile_picture || "/api/placeholder/400/320"}
+          alt="Event cover"
+          className="w-full h-32 object-cover rounded-xl"
+        />
+        <div className="absolute bottom-0 right-0 bg-white p-1 rounded-tl-xl">
           <Badge className="bg-purple-100 text-purple-800">
-            {event.attendees.length} Buddy
+            {event.attendees.length} Buddies
           </Badge>
         </div>
-        <Button 
-          className="w-full rounded-full bg-[#7052FF]"
-          onClick={async (e: React.MouseEvent) => {
-            e.stopPropagation();
-            try {
-              await api.post(`/company/app/event-api/${event.id}/register/`);
-              const response = await api.get("/company/app/event-api/");
-              setEvents(response.data);
-            } catch (error) {
-              console.error("Error registering for event:", error);
-            }
-          }}
-        >
-          Register Now
-        </Button>
       </div>
+      
+      <div className="flex-grow overflow-hidden">
+        <h3 className="text-lg font-bold mb-2 line-clamp-2">{event.name}</h3>
+        <p className="text-gray-600 text-sm mb-3 line-clamp-2">{event.description}</p>
+        
+        <div className="space-y-2 text-sm text-gray-700">
+          <div className="flex items-center gap-2">
+            <Clock size={16} className="text-purple-600" />
+            <span>{formatEventTime(event.date)}</span>
+          </div>
+          
+          {event.location && (
+            <div className="flex items-center gap-2">
+              <MapPin size={16} className="text-purple-600" />
+              <span className="truncate">{event.location}</span>
+            </div>
+          )}
+          
+          {event.freelancer_first_name && (
+            <div className="flex items-center gap-2">
+              <User size={16} className="text-purple-600" />
+              <span>By {event.freelancer_first_name} {event.freelancer_first_last || ''}</span>
+            </div>
+          )}
+          
+          {event.skills_learning && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {event.skills_learning.split(',').slice(0, 3).map((skill) => (
+                <span key={skill.trim()} className="bg-gray-100 px-2 py-1 rounded-full text-xs">
+                  {skill.trim()}
+                </span>
+              ))}
+              {event.skills_learning.split(',').length > 3 && (
+                <span className="bg-gray-100 px-2 py-1 rounded-full text-xs">
+                  +{event.skills_learning.split(',').length - 3}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      
+      <Button 
+        className="w-full rounded-full bg-[#7052FF] mt-3"
+        onClick={async (e: React.MouseEvent) => {
+          e.stopPropagation();
+          try {
+            await api.post(`/company/app/event-api/${event.id}/register/`);
+            const response = await api.get("/company/app/event-api/");
+            setEvents(response.data);
+          } catch (error) {
+            console.error("Error registering for event:", error);
+          }
+        }}
+      >
+        Register Now
+      </Button>
     </Card>
   );
 
@@ -206,13 +266,17 @@ export default function EventsPage() {
 
       <div className="grid grid-cols-12 gap-8">
         <div className="col-span-4">
-          {currentEvents && currentEvents.length > 0 ? (
-            currentEvents.map(event => (
-              <EventCard key={event.id} event={event} />
-            ))
-          ) : (
-            <p>No events found</p>
-          )}
+          <ScrollArea className="h-[calc(100vh-200px)]" ref={scrollContainerRef}>
+            <div className="pr-4 space-y-4">
+              {currentEvents && currentEvents.length > 0 ? (
+                currentEvents.map(event => (
+                  <EventCard key={event.id} event={event} />
+                ))
+              ) : (
+                <p>No events found</p>
+              )}
+            </div>
+          </ScrollArea>
         </div>
 
         {selectedEvent && (
@@ -289,12 +353,7 @@ export default function EventsPage() {
           </>
         )}
       </div>
-
-      <div className="fixed bottom-20 right-4">
-        <Button className="rounded-full px-6" size="lg">
-          Messages
-        </Button>
-      </div>
     </div>
   );
 }
+

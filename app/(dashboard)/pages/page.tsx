@@ -34,6 +34,7 @@ interface Page {
   followers_count: number;
   is_active: boolean;
   creator: string;
+  is_admin?: boolean;
 }
 
 interface Message {
@@ -51,6 +52,7 @@ const ChatInterface = () => {
   const [messageInput, setMessageInput] = useState('');
   const [showProfile, setShowProfile] = useState(false);
   const [pages, setPages] = useState<Page[]>([]);
+  const [followedPages, setFollowedPages] = useState<Page[]>([]);
   const [selectedPage, setSelectedPage] = useState<Page | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,22 +60,19 @@ const ChatInterface = () => {
   const [wsError, setWsError] = useState<string | null>(null);
   const websocketRef = useRef<WebSocket | null>(null);
   const wsReconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { userId, authToken } = useAuth();
   const { api } = useAuthenticatedApi();
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
-
-  useEffect(() => {
     const fetchPages = async () => {
       try {
-        const response = await api.get('/post/app/page/');
-        setPages(response.data);
+        const [pagesResponse, followedPagesResponse] = await Promise.all([
+          api.get('/post/app/page/'),
+          api.get('/post/app/pages-follow/')
+        ]);
+        setPages(pagesResponse.data);
+        setFollowedPages(followedPagesResponse.data.pages);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching pages:', error);
@@ -161,11 +160,7 @@ const ChatInterface = () => {
       const response = await api.post('/chats/app/page-chatroom/', {
         name: pageName,
         participants: [{ id: pageId }],
-        type: "broadcast"
       });
-      
-      const pagesResponse = await api.get('/post/app/page/');
-      setPages(pagesResponse.data);
       
       return response.data;
     } catch (error) {
@@ -174,7 +169,7 @@ const ChatInterface = () => {
   };
 
   const sendBroadcast = () => {
-    if (!selectedPage?.chatroom_id || !messageInput.trim() || !selectedPage?.is_owner_of_page) return;
+    if (!selectedPage?.chatroom_id || !messageInput.trim() || !selectedPage?.is_admin) return;
 
     if (!websocketRef.current || websocketRef.current.readyState !== WebSocket.OPEN) {
       console.error('Broadcast connection is not open');
@@ -254,16 +249,16 @@ const ChatInterface = () => {
     }
   };
 
-  const filteredPages = pages.filter(page => 
+  const filteredFollowedPages = followedPages.filter(page => 
     page.name.toLowerCase().includes(searchInput.toLowerCase())
   );
 
   return (
-    <div className="flex h-full flex-col justify-between">
+    <div className="flex h-screen pb-20 flex-col">
       <nav className="border-b bg-white p-4">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-8">
-            <h1 className="text-xl font-bold">Page Broadcasts</h1>
+            <h1 className="text-xl font-bold">Recommended Pages</h1>
             <div className="flex gap-8 overflow-x-auto">
               {pages.map((page) => (
                 <div 
@@ -294,7 +289,7 @@ const ChatInterface = () => {
         </div>
       </nav>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         <div className="border-r bg-white p-4">
           <div className="mb-4">
             <div className="relative">
@@ -310,8 +305,8 @@ const ChatInterface = () => {
           </div>
 
           <div className="space-y-3 w-[300px]">
-            <h2 className="mb-4 text-lg font-semibold">Broadcast Channels</h2>
-            {filteredPages.map((page) => (
+            <h2 className="mb-4 text-lg font-semibold">My Buddies</h2>
+            {filteredFollowedPages.map((page) => (
               <div 
                 key={page.id} 
                 className={`flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50 cursor-pointer ${selectedPage?.id === page.id ? 'bg-gray-100' : ''}`}
@@ -326,9 +321,9 @@ const ChatInterface = () => {
                   <h3 className="font-medium">{page.name}</h3>
                   <p className="text-sm text-gray-500 flex items-center">
                     {page.followers_count} followers
-                    {page.is_owner_of_page && (
+                    {page.is_admin && (
                       <span className="ml-2 text-blue-500 flex items-center">
-                        <RiBroadcastFill className="mr-1" /> Creator
+                        <RiBroadcastFill className="mr-1" /> Admin
                       </span>
                     )}
                   </p>
@@ -344,7 +339,7 @@ const ChatInterface = () => {
             pageId={selectedPage.id}
           />
         ) : (
-          <div className="flex flex-1 flex-col">
+          <div className="flex flex-1 flex-col h-full">
             {selectedPage && (
               <div className="flex items-center justify-between border-b bg-white p-4">
                 <div className="flex items-center gap-3">
@@ -376,48 +371,49 @@ const ChatInterface = () => {
               </div>
             )}
 
-            <div className=" h-40 overflow-y-auto p-4">
-              {wsError && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                  <p>{wsError}</p>
-                </div>
-              )}
-              
-              {selectedPage && !selectedPage.is_owner_of_page && messages.length === 0 && (
-                <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                  <RiBroadcastFill className="h-12 w-12 mb-4 text-gray-300" />
-                  <p>No broadcasts from this page yet.</p>
-                  <p>Stay tuned for updates!</p>
-                </div>
-              )}
-              
-              {messages.map((message) => (
-                <div 
-                  key={message.message_id} 
-                  className="mb-4 flex items-start gap-3 justify-start"
-                >
-                  <img 
-                    src={selectedPage?.profile_picture || 'https://randomuser.me/portraits/thumb/men/1.jpg'} 
-                    alt="Page" 
-                    className="h-8 w-8 rounded-full"
-                  />
-                  
-                  <div className="text-left">
-                    <div className="font-medium flex items-center">
-                      {selectedPage?.name || 'Unknown Page'}
-                    </div>
-                    <div className="p-2 rounded-lg bg-gray-100">
-                      {message.message}
-                    </div>
-                    <div className="text-xs text-gray-500">{new Date(message.timestamp).toLocaleString()}</div>
+            <div className="flex-1 overflow-y-auto p-4 relative">
+              <div className="absolute inset-0 overflow-y-auto">
+                {wsError && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <p>{wsError}</p>
                   </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
+                )}
+                
+                {selectedPage && !selectedPage.is_admin && messages.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                    <RiBroadcastFill className="h-12 w-12 mb-4 text-gray-300" />
+                    <p>No broadcasts from this page yet.</p>
+                    <p>Stay tuned for updates!</p>
+                  </div>
+                )}
+                
+                {messages.map((message) => (
+                  <div 
+                    key={message.message_id} 
+                    className="mb-4 flex items-start gap-3 justify-start"
+                  >
+                    <img 
+                      src={selectedPage?.profile_picture || 'https://randomuser.me/portraits/thumb/men/1.jpg'} 
+                      alt="Page" 
+                      className="h-8 w-8 rounded-full"
+                    />
+                    
+                    <div className="text-left">
+                      <div className="font-medium flex items-center">
+                        {selectedPage?.name || 'Unknown Page'}
+                      </div>
+                      <div className="p-2 rounded-lg bg-gray-100">
+                        {message.message}
+                      </div>
+                      <div className="text-xs text-gray-500">{new Date(message.timestamp).toLocaleString()}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {selectedPage && selectedPage.is_owner_of_page && (
-              <div className="border-t bg-white p-4">
+            {selectedPage && selectedPage.is_admin && (
+              <div className="border-t bg-white p-4 sticky bottom-0">
                 <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-2">
                   <textarea
                     value={messageInput}
@@ -450,8 +446,8 @@ const ChatInterface = () => {
               </div>
             )}
             
-            {selectedPage && !selectedPage.is_owner_of_page && (
-              <div className="border-t bg-white p-4 text-center text-gray-500">
+            {selectedPage && !selectedPage.is_admin && (
+              <div className="border-t bg-white p-4 text-center text-gray-500 sticky bottom-0">
                 <div className="flex items-center justify-center">
                   <RiBroadcastFill className="h-5 w-5 mr-2 text-blue-500" />
                   <span>This is a broadcast channel. Only page owners can send messages.</span>

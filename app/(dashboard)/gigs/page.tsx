@@ -48,7 +48,7 @@ const GigsPage = () => {
     };
 
     return (
-        <div className='max-w-[1350px] justify-center gap-8 mx-auto grid lg:grid-cols-3 px-10'>
+        <div className='max-w-[1350px] bg-gray-50 py-5 justify-center gap-8 mx-auto grid lg:grid-cols-3 px-10'>
             <AllGigs 
                 gigs={gigs} 
                 onSelectGig={handleGigSelect} 
@@ -57,7 +57,10 @@ const GigsPage = () => {
                 onFilterChange={handleFilterChange}
             />
             <Description selectedGig={selectedGig} />
-            <ApplicationForm jobId={selectedGig?.id} />
+            <ApplicationForm 
+                jobId={selectedGig?.id} 
+                isApplied={selectedGig?.is_applied || false}
+            />
         </div>
     );
 };

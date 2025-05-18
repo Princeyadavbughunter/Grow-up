@@ -66,7 +66,8 @@ const ClubCard = ({ club, refresh }: ClubCardProps) => {
     };
 
     return (
-        <Link href={`/clubs/${club.id}`} className="bg-white rounded-xl p-4 mb-4 shadow-sm">
+        <Link href={`/clubs/${club.id}`} className="bg-white rounded-xl ">
+            <div className="p-4 mb-4 shadow-sm" >
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -89,6 +90,7 @@ const ClubCard = ({ club, refresh }: ClubCardProps) => {
                 {club.description}
                 <button className="text-purple-600 ml-1">Read More...</button>
             </p>
+            </div>
         </Link>
     );
 };

@@ -124,7 +124,7 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
         />
       </div>
       
-      {isLoading && <p className="text-sm text-gray-500">Loading...</p>}
+      {isLoading && <div className="flex justify-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div></div>}
       
       <div className="space-y-6">
         {participants.length > 0 ? 

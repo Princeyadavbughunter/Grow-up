@@ -16,28 +16,23 @@ interface PagePost {
 const HomeTab: React.FC<HomeTabProps> = ({ pageId }) => {
   const [pageDescription, setPageDescription] = useState<string>('');
   const [website, setWebsite] = useState<string>('');
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [pagePosts, setPagePosts] = useState<PagePost[]>([]);
   const [loading, setLoading] = useState(true);
-
-  console.log(pageId);
-  
 
   const { api } = useAuthenticatedApi();
 
   useEffect(() => {
     const fetchPageDetails = async () => {
       try {
-        const pageResponse = await api.get(`/post/app/page/?page_id=${pageId}`);
+        const pageResponse = await api.get(`/post/app/page-details/?id=${pageId}`);
         const pageData = pageResponse.data;
-        
+
         setPageDescription(pageData.description || 'No description available');
         
         const postsResponse = await api.get(`/post/app/page-posts/?page=${pageId}`);
         setPagePosts(postsResponse.data);
 
         setWebsite(pageData.website || 'Not provided');
-        setPhoneNumber(pageData.phone_number || 'Not provided');
       } catch (error) {
         console.error('Error fetching page details:', error);
       } finally {
@@ -67,11 +62,6 @@ const HomeTab: React.FC<HomeTabProps> = ({ pageId }) => {
         <div className="mb-3">
           <p className="font-medium text-gray-700">Website</p>
           <p className='text-[#7052FF]'>{website}</p>
-        </div>
-
-        <div>
-          <p className="font-medium text-gray-700">Phone</p>
-          <p className='text-[#7052FF]'>{phoneNumber}</p>
         </div>
       </div>
 
