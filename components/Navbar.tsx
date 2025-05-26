@@ -14,7 +14,6 @@ const NavBar: React.FC = () => {
 
   const buttonConfig: Record<string, { label: string; route: string }> = {
     '/pages': { label: 'Create Pages', route: '/pages/create-page' },
-    '/clubs': { label: 'Create Clubs', route: '/clubs/create' },
     '/gigs': { label: 'Post Gigs', route: '/gigs/post-gig' },
   };
 

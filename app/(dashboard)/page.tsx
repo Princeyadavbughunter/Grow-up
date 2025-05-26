@@ -3,7 +3,7 @@ import Clubs from "@/app/(dashboard)/_components/Clubs";
 import Posts from "@/app/(dashboard)/_components/Posts";
 import UpcomingEvents from "@/app/(dashboard)/_components/UpcomingEvents";
 import ProgressProfile from "./_components/ProgressProfile";
-import PostButton from "./add-bio-main/_components/PostButton";
+import PostButton from "./profile/create/_components/PostButton";
 
 const Home = () => {
   return (

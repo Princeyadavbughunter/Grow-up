@@ -2,9 +2,12 @@
 import { useAuth } from "@/context/AuthContext";
 import SummryTab from "./components/SummryTab";
 import ProfileData from "./components/ProfileData";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const Page = () => {
-  const {profileData} = useAuth()
+  const {profileData, profileLoading} = useAuth();
+  const router = useRouter();
 
   return (
     <div className="flex flex-col justify-between px-40 mx-auto">

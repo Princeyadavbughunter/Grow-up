@@ -18,7 +18,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
     const skillsArray = profileData?.skills ? profileData.skills.split(',').map(skill => skill.trim()) : [];
     
     return (
-        <div className='w-full'>
+        <div className='w-full mb-32'>
             <div className="flex space-x-4">
                 {["About", "Skills", "Porfolio", "Post"].map((tab) => (
                     <Button
@@ -94,46 +94,48 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                         </div>
                     </div>
 
-                    <div className="mb-8">
-                        <div className="flex items-center gap-4 mb-4">
-                            <h2 className="text-lg font-bold">My Skills</h2>
-                            <div className="flex items-center gap-2">
-                                <IoMdAdd className="text-xl cursor-pointer" />
-                                <CiCreditCard1 className="text-xl cursor-pointer" />
-                            </div>
-                        </div>
-                        
-                        {skillsArray.length > 0 ? (
-                            <div>
-                                <h3 className="font-semibold text-gray-600">Skills</h3>
-                                <div className="flex flex-wrap gap-2 mt-2 border-b py-2">
-                                    {skillsArray.map((skill) => (
-                                        <span key={skill} className="px-3 py-1 text-xs font-medium border rounded-full bg-[#E4DEFF]">
-                                            {skill}
-                                        </span>
-                                    ))}
+                    {activeJobTypeTab === "Skills" && (
+                        <div className="mb-8">
+                            <div className="flex items-center gap-4 mb-4">
+                                <h2 className="text-lg font-bold">My Skills</h2>
+                                <div className="flex items-center gap-2">
+                                    <IoMdAdd className="text-xl cursor-pointer" />
+                                    <CiCreditCard1 className="text-xl cursor-pointer" />
                                 </div>
                             </div>
-                        ) : (
-                            [
-                                { category: "Getting Started", skills: ["Premiere Pro", "Operation", "Flutter", "Social Media"] },
-                                { category: "Soft Skills", skills: ["Communication", "Leadership", "Problem-Solving"] },
-                            ].map((group) => (
-                                <div key={group.category}>
-                                    <h3 className="font-semibold text-gray-600">{group.category}</h3>
+                            
+                            {skillsArray.length > 0 ? (
+                                <div>
+                                    <h3 className="font-semibold text-gray-600">Skills</h3>
                                     <div className="flex flex-wrap gap-2 mt-2 border-b py-2">
-                                        {group.skills.map((skill) => (
+                                        {skillsArray.map((skill) => (
                                             <span key={skill} className="px-3 py-1 text-xs font-medium border rounded-full bg-[#E4DEFF]">
                                                 {skill}
                                             </span>
                                         ))}
                                     </div>
                                 </div>
-                            ))
-                        )}
-                    </div>
+                            ) : (
+                                [
+                                    { category: "Getting Started", skills: ["Premiere Pro", "Operation", "Flutter", "Social Media"] },
+                                    { category: "Soft Skills", skills: ["Communication", "Leadership", "Problem-Solving"] },
+                                ].map((group) => (
+                                    <div key={group.category}>
+                                        <h3 className="font-semibold text-gray-600">{group.category}</h3>
+                                        <div className="flex flex-wrap gap-2 mt-2 border-b py-2">
+                                            {group.skills.map((skill) => (
+                                                <span key={skill} className="px-3 py-1 text-xs font-medium border rounded-full bg-[#E4DEFF]">
+                                                    {skill}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
                     
-                    {activeJobTypeTab === "Porfolio" && <Portfolios />}
+                    {activeJobTypeTab === "Porfolio" && <Portfolios profileData={profileData} />}
                     
                     {activeJobTypeTab === "Post" && <Posts />}
                 </div>

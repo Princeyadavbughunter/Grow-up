@@ -1,9 +1,7 @@
 import React from 'react'
-import ProfileData from '../../profile/components/ProfileData'
+import ProfileData from '../../components/ProfileData'
 
 import AddBioMain from './AddBioMain';
-import CreatePost from './PostButton';
-import ShowCasePortfolios from '../../_components/ShowCasePortfolios';
 
 const AddBio = () => {
 
@@ -11,8 +9,6 @@ const AddBio = () => {
         <div className='pb-40'>
             <ProfileData />
             <AddBioMain />
-            <ShowCasePortfolios />
-            <CreatePost />
         </div>
     )
 }

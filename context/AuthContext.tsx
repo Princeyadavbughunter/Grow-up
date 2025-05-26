@@ -151,33 +151,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   apiCaller.interceptors.response.use(
     (response) => response,
     async (error) => {
-      const originalRequest = error.config;
-      
-      // if (error.response?.status === 401 && !originalRequest._retry && refreshToken) {
-      //   originalRequest._retry = true;
-        
-      //   try {
-      //     // Implement your token refresh logic here
-      //     const response = await axios.post(`${baseURL}/api/auth/token/refresh/`, {
-      //       refresh: refreshToken
-      //     });
-          
-      //     const newAccessToken = response.data.access;
-          
-      //     // Update token in state and cookies
-      //     setAuthToken(newAccessToken);
-      //     Cookies.set('access_token', newAccessToken, COOKIE_OPTIONS);
-          
-      //     // Retry the original request with new token
-      //     originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-      //     return axios(originalRequest);
-      //   } catch (refreshError) {
-      //     // If refresh fails, log out user
-      //     logout();
-      //     return Promise.reject(refreshError);
-      //   }
-      // }
-      
       return Promise.reject(error);
     }
   );
@@ -227,27 +200,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       fetchProfileData();
     }
   }, [isAuthenticated, loading]);
-
-  // Create a websocket connection for real-time updates
-  useEffect(() => {
-    if (!isAuthenticated || !profileData) return;
-
-    // Example websocket implementation - modify as needed for your backend
-    // const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    // const wsUrl = `${wsProtocol}${window.location.host}/ws/profile/${profileData.id}/`;
-    // const ws = new WebSocket(wsUrl);
-    
-    // ws.onmessage = (event) => {
-    //   const data = JSON.parse(event.data);
-    //   if (data.type === 'profile_update') {
-    //     fetchProfileData();
-    //   }
-    // };
-
-    // return () => {
-    //   ws.close();
-    // };
-  }, [isAuthenticated, profileData]);
 
   // Logout function
   const logout = () => {

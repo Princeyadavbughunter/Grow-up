@@ -49,7 +49,7 @@ const ChatInterface: React.FC = () => {
     const wsReconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-    const { userId, authToken } = useAuth();
+    const { profileData, authToken } = useAuth();
     const { api } = useAuthenticatedApi();
     const params = useParams();
 
@@ -59,13 +59,12 @@ const ChatInterface: React.FC = () => {
         const createRoom = async () => {
             if (roomCreatedRef.current) return;
             
-            console.log(userId,params.id);
             
             try {
                 const response = await api.post('/individualchats/chatroom/', {
                     name: "Test",
                     participants: [
-                        { id: userId },
+                        { id: profileData?.id },
                         { id: params.id }
                     ]
                 });
@@ -76,7 +75,7 @@ const ChatInterface: React.FC = () => {
             }
         };
 
-        if (authToken && userId && params.id) {
+        if (authToken && profileData?.id && params.id) {
             createRoom();
         }
     }, [authToken, params.id]);

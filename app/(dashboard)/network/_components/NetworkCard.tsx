@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Mail, UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface NetworkCardProps {
   id: string;
@@ -37,10 +38,11 @@ export function NetworkCard({
   requestSent,
   onAccept,
   onReject,
-  onFollow
+  onFollow,
 }: NetworkCardProps) {
   // Safe access for name with fallback
   const nameInitial = name && name.length > 0 ? name.charAt(0) : "U";
+  const router = useRouter();
   
   return (
     <div className="flex items-start gap-4">
@@ -107,10 +109,7 @@ export function NetworkCard({
               </Button>
             ) : (
               <>
-                <Button size="sm" variant="outline">View profile</Button>
-                <Button size="sm" variant="ghost">
-                  <Mail className="h-4 w-4" />
-                </Button>
+                <Button size="sm" variant="outline" onClick={() => router.push(`/profile/${id}`)}>View profile</Button>
               </>
             )}
           </div>

@@ -9,6 +9,27 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SearchIcon, MapPin, Calendar, Clock, User } from "lucide-react";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { EventComments } from './_components/EventComments';
+import { useRouter } from "next/navigation";
+
+interface Attendee {
+  id: string;
+  email: string;
+  profile_picture: string;
+  first_name: string;
+  last_name: string;
+  freelancer_profile_id: string;
+}
+
+interface Comment {
+  id: string;
+  event: string;
+  user: string;
+  user_name: string;
+  user_profile_picture: string;
+  comment_text: string;
+  created_at: string;
+}
 
 interface Event {
   id: string;
@@ -21,7 +42,8 @@ interface Event {
   is_active: boolean;
   freelancer: string | null;
   attendees: Attendee[];
-  category_name?: string;
+  comments: Comment[];
+  category_name_display?: string;
   skills_learning?: string;
   event_by?: string;
   event_title?: string;
@@ -31,16 +53,13 @@ interface Event {
   freelancer_first_last?: string;
 }
 
-interface Attendee {
-  name: string;
-  role?: string;
-}
+type TabType = "upcoming" | "past" | "my";
 
 interface EventsData {
   upcoming_events: Event[];
   past_events: Event[];
+  my_events: Event[];
   todays_events: Event[];
-  [key: string]: Event[];
 }
 
 const filters: string[] = ["Tech", "Product", "Design", "Web & Mobile Dev"];
@@ -48,11 +67,18 @@ const filters: string[] = ["Tech", "Product", "Design", "Web & Mobile Dev"];
 export default function EventsPage() {
   const { api } = useAuthenticatedApi();
   const { authToken } = useAuth();
-  const [events, setEvents] = useState<EventsData>({ upcoming_events: [], past_events: [], todays_events: [] });
-  const [activeTab, setActiveTab] = useState<string>("past");
+  const [events, setEvents] = useState<EventsData>({
+    upcoming_events: [],
+    past_events: [],
+    my_events: [],
+    todays_events: []
+  });
+  const [activeTab, setActiveTab] = useState<TabType>("past");
   const [selectedFilter, setSelectedFilter] = useState<string>("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [newComment, setNewComment] = useState<string>("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -84,7 +110,7 @@ export default function EventsPage() {
   const EventTabs = () => (
     <div className="flex gap-8 mb-6">
       {["Upcoming", "My Events", "Past Events"].map((tab) => {
-        const tabKey = tab.toLowerCase().replace(" ", "_").replace("_events", "");
+        const tabKey = tab.toLowerCase().replace(" ", "_").replace("_events", "") as TabType;
         return (
           <Button
             key={tab}
@@ -139,13 +165,13 @@ export default function EventsPage() {
     });
   };
 
-  const EventCard: React.FC<{ event: Event }> = ({ event }) => (
+  const EventCard = ({ event }: { event: Event }) => (
     <Card 
       className="p-4 border-2 border-purple-100 rounded-3xl bg-[#F9FAFF] cursor-pointer mb-4 hover:shadow-md transition-all duration-300 flex flex-col h-[400px]"
       onClick={() => setSelectedEvent(event)}
     >
       <div className="flex justify-between items-start mb-3">
-        <Badge className="bg-purple-100 text-purple-800">{event.category_name || "Uncategorized"}</Badge>
+        <Badge className="bg-purple-100 text-purple-800">{event.category_name_display || "Uncategorized"}</Badge>
         <Badge className="bg-yellow-100 text-yellow-800">
           {formatEventDate(event.date)}
         </Badge>
@@ -238,26 +264,44 @@ export default function EventsPage() {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
           />
         </div>
-        {participants.map((participant, index) => (
-          <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+        {participants.map((participant) => (
+          <div key={participant.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
             <div className="flex items-center gap-3">
               <Avatar>
-                <AvatarImage src="/api/placeholder/48/48" />
-                <AvatarFallback>{participant.name?.[0]}</AvatarFallback>
+                <AvatarImage src={participant.profile_picture} />
+                <AvatarFallback>{participant.first_name[0]}</AvatarFallback>
               </Avatar>
               <div>
-                <div className="font-medium">{participant.name}</div>
-                <div className="text-sm text-gray-500">{participant.role}</div>
+                <div className="font-medium">{participant.first_name} {participant.last_name}</div>
+                <div className="text-sm text-gray-500">{participant.email}</div>
               </div>
             </div>
-            <Button variant="ghost" size="sm">View Profile</Button>
+            <Button onClick={() => router.push(`/profile/${participant.freelancer_profile_id}`)} variant="ghost" size="sm">View Profile</Button>
           </div>
         ))}
       </div>
     );
   };
 
-  const currentEvents = events[`${activeTab}_events`] || [];
+  const handleAddComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEvent || !newComment.trim()) return;
+
+    try {
+      await api.post(`/company/app/event-api/${selectedEvent.id}/comments/`, {
+        comment_text: newComment
+      });
+      
+      // Refresh event data to get updated comments
+      const response = await api.get(`/company/app/event-api/${selectedEvent.id}/`);
+      setSelectedEvent(response.data);
+      setNewComment("");
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
+
+  const currentEvents = events[`${activeTab}_events` as keyof EventsData];
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 pb-40">
@@ -327,22 +371,24 @@ export default function EventsPage() {
                 </TabsList>
                 <TabsContent value="comments">
                   <div className="p-4 space-y-4">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src="/api/placeholder/48/48"
-                        alt="User"
-                        className="w-10 h-10 rounded-full"
+                    <form onSubmit={handleAddComment} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newComment}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewComment(e.target.value)}
+                        placeholder="Add a comment..."
+                        className="flex-1 border rounded-lg px-3 py-2"
                       />
-                      <div>
-                        <div className="font-medium">User Comment</div>
-                        <p className="text-sm text-gray-600">
-                          This is a sample comment...
-                        </p>
-                      </div>
-                    </div>
-                    <Button variant="outline" className="w-full">
-                      View all comments
-                    </Button>
+                      <Button type="submit">
+                        Post
+                      </Button>
+                    </form>
+                    
+                    {selectedEvent?.comments && selectedEvent.comments.length > 0 ? (
+                      <EventComments comments={selectedEvent.comments} />
+                    ) : (
+                      <p className="text-center text-gray-500">No comments yet</p>
+                    )}
                   </div>
                 </TabsContent>
                 <TabsContent value="participants">

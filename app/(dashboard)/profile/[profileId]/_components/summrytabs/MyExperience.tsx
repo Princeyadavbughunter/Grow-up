@@ -26,7 +26,7 @@ const MyExperience: React.FC<MyExperienceProps> = ({ id }) => {
   const [experiences, setExperiences] = useState<WorkExperience[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { api } = useAuthenticatedApi();
   const { authToken } = useAuth();
 
@@ -39,7 +39,7 @@ const MyExperience: React.FC<MyExperienceProps> = ({ id }) => {
   const fetchExperiences = async (): Promise<void> => {
     try {
       setLoading(true);
-      const response = await api.get(`/freelancer/work-experience/?id=${id}`);
+      const response = await api.get(`/freelancer/work-experience/?freelancer_id=${id}`);
       console.log(response.data);
       
       // Sort experiences by start date (most recent first)

@@ -1,50 +1,41 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Heart } from "lucide-react";
+import { formatDistanceToNow } from 'date-fns';
 
 interface Comment {
-  author: {
-    name: string;
-    image: string;
-  };
-  content: string;
-  likes: number;
+  id: string;
+  event: string;
+  user: string;
+  user_name: string;
+  user_profile_picture: string;
+  comment_text: string;
+  created_at: string;
 }
 
-export function EventComments() {
-  const comments: Comment[] = [
-    {
-      author: {
-        name: "Priya Sharma",
-        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces"
-      },
-      content: "Lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-      likes: 88826
-    }
-  ];
+interface EventCommentsProps {
+  comments: Comment[];
+}
 
+export function EventComments({ comments }: EventCommentsProps) {
   return (
     <div className="space-y-6">
-      {comments.map((comment, index) => (
-        <div key={index} className="space-y-4">
-          <div className="flex items-center gap-3">
-            <Avatar>
-              <AvatarImage src={comment.author.image} />
-              <AvatarFallback>{comment.author.name[0]}</AvatarFallback>
+      {comments.map((comment) => (
+        <div key={comment.id} className="space-y-4">
+          <div className="flex items-start gap-3">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={comment.user_profile_picture} alt={comment.user_name} />
+              <AvatarFallback>{comment.user_name[0]}</AvatarFallback>
             </Avatar>
-            <div>
-              <div className="font-medium">{comment.author.name}</div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">{comment.user_name}</span>
+                <span className="text-xs text-gray-500">
+                  {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">{comment.comment_text}</p>
             </div>
-          </div>
-          <p className="text-sm text-gray-600">{comment.content}</p>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="text-red-500">
-              <Heart className="w-4 h-4 mr-1" />
-              {comment.likes.toLocaleString()}
-            </Button>
-            <Button variant="ghost" size="sm">Reply</Button>
           </div>
         </div>
       ))}

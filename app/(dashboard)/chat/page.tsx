@@ -104,12 +104,16 @@ const ChatInterface: React.FC = () => {
   };
 
   const connectWebSocket = (roomId: string): void => {
+    console.log("Attempting to connect WebSocket for room:", roomId);
+    
     if (wsReconnectTimeoutRef.current) {
+      console.log("Clearing existing reconnect timeout");
       clearTimeout(wsReconnectTimeoutRef.current);
       wsReconnectTimeoutRef.current = null;
     }
 
     if (websocketRef.current) {
+      console.log("Closing existing WebSocket connection");
       websocketRef.current.close();
       websocketRef.current = null;
     }
@@ -118,19 +122,21 @@ const ChatInterface: React.FC = () => {
     setWsError(null);
 
     try {
-      const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/chats/${roomId}/?token=${authToken}`;
+      const wsUrl = `wss://backend.growupbuddy.in/ws/chats/${roomId}/?token=${authToken}`;
+      console.log("Connecting to WebSocket URL:", wsUrl);
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
-        console.log('WebSocket connection established');
+        console.log('WebSocket connection established successfully');
         setWsConnected(true);
         setWsError(null);
       };
 
       ws.onmessage = (event) => {
+        console.log("WebSocket message received:", event.data);
         try {
           const message = JSON.parse(event.data);
-          setMessages(prevMessages => [...prevMessages, message]);
+          setMessages(prevMessages => [...(prevMessages || []), message]);
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
         }
@@ -165,9 +171,18 @@ const ChatInterface: React.FC = () => {
   };
 
   const sendMessage = (): void => {
-    if (!selectedChatroom?.id || !messageInput.trim()) return;
+    console.log("Send message function called");
+    console.log("Selected chatroom:", selectedChatroom);
+    console.log("Message input:", messageInput);
+    console.log("WebSocket state:", websocketRef.current?.readyState);
+    
+    if (!selectedChatroom?.id || !messageInput.trim()) {
+      console.log("Validation failed - chatroom or message empty");
+      return;
+    }
 
     if (!websocketRef.current || websocketRef.current.readyState !== WebSocket.OPEN) {
+      console.log("WebSocket not connected, attempting reconnection");
       console.error('Chat connection is not open');
       
       if (selectedChatroom?.id) {
@@ -177,6 +192,7 @@ const ChatInterface: React.FC = () => {
         const tempMessage = messageInput;
         setTimeout(() => {
           if (websocketRef.current?.readyState === WebSocket.OPEN) {
+            console.log("Sending message after reconnection");
             websocketRef.current.send(JSON.stringify({
               room_id: selectedChatroom.id,
               message: tempMessage,
@@ -193,6 +209,8 @@ const ChatInterface: React.FC = () => {
             
             setMessages(prevMessages => [...prevMessages, tempMessageObj]);
             setWsError(null);
+          } else {
+            console.log("Failed to reconnect WebSocket");
           }
         }, 2000);
       }
@@ -202,12 +220,14 @@ const ChatInterface: React.FC = () => {
     }
 
     try {
+      console.log("Attempting to send message via WebSocket");
       websocketRef.current.send(JSON.stringify({
         room_id: selectedChatroom.id,
         message: messageInput,
         user_id: userId,
         message_type: "chat"
       }));
+      console.log("Message sent successfully");
       
       setMessageInput('');
     } catch (error) {
@@ -218,7 +238,7 @@ const ChatInterface: React.FC = () => {
 
   const fetchMessages = async (roomId: string): Promise<void> => {
     try {
-      const response = await api.get(`/individualchats/chatroom-messages/?room_id=${roomId}`);
+      const response = await api.get(`/individualchats/chatrooms-messages/?room_id=${roomId}`);
       setMessages(response.data.results || []);
       connectWebSocket(roomId);
     } catch (error) {
@@ -237,10 +257,7 @@ const ChatInterface: React.FC = () => {
 
   const handleChatroomAction = async (roomId: string, accept: boolean): Promise<void> => {
     try {
-      await api.patch('/individualchats/chatroom/', {
-        room_id: roomId,
-        is_accepted: accept
-      });
+      await api.patch(`/individualchats/chatroom/?room_id=${roomId}&is_accepted=${accept ? 'True' : 'False'}`);
       
       // Refresh lists
       fetchChatrooms();
@@ -449,7 +466,12 @@ const ChatInterface: React.FC = () => {
                   }}
                 />
                 <button
-                  onClick={sendMessage}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Send button clicked");
+                    sendMessage();
+                  }}
+                  type="button"
                   className="bg-blue-500 text-white rounded-r-lg px-4 py-2 hover:bg-blue-600"
                   disabled={!wsConnected}
                 >
