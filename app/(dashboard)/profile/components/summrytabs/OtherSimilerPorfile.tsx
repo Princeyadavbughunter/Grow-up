@@ -83,6 +83,8 @@ const OtherSimilarProfile: React.FC = () => {
         return <div className="flex justify-center items-center">Loading similar profiles...</div>
     }
 
+    console.log(similarProfiles);
+
     return (
         <div>
             <div className="mt-12">

@@ -317,7 +317,9 @@ export default function EventsPage() {
                   <EventCard key={event.id} event={event} />
                 ))
               ) : (
-                <p>No events found</p>
+                <div className="text-center py-10">
+                  <p className="text-gray-500">No events found for the selected filter. Try another filter or clear it.</p>
+                </div>
               )}
             </div>
           </ScrollArea>

@@ -109,7 +109,7 @@ const ChatInterface = () => {
     setWsError(null);
 
     try {
-      const wsUrl = `wss://backend.growupbuddy.in/ws/chat/${roomId}/?token=${authToken}`;
+      const wsUrl = `wss://backend.growupbuddy.com/ws/chat/${roomId}/?token=${authToken}`;
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {

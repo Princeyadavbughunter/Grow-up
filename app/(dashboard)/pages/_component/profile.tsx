@@ -8,7 +8,6 @@ import Followers from './followers';
 import HomeTab from './HomeTab';
 import AboutTab from './AboutTab';
 import PostTab from './PostTab';
-import JobTab from './JobTab';
 import PeopleTab from './PeopleTab';
 
 interface PageDetails {
@@ -89,9 +88,9 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
       case 'About':
         return <AboutTab pageDetails={pageDetails} />;
       case 'Post':
-        return <PostTab pageId={pageDetails.id} />;
-      case 'Job':
-        return <JobTab pageId={pageDetails.id} />;
+        return <PostTab pageId={pageDetails.id} />; 
+      case 'People':
+        return <PeopleTab pageId={pageDetails.id} />;
       default:
         return null;
     }
@@ -160,7 +159,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
         </div>
 
         <div className="mb-6 flex gap-4 justify-center">
-          {['Home', 'About', 'Post', 'Job', 'People'].map((tab) => (
+          {['Home', 'About', 'Post', 'People'].map((tab) => (
             <button
               key={tab}
               className={`rounded-lg px-4 py-2 font-medium ${

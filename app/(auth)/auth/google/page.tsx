@@ -39,7 +39,7 @@ const AccountCreation = () => {
     const handleGoogleAuth = async () => {
         setLoading(true)
         try {
-            const response = await axios.get<GoogleAuthResponse>('https://backend.growupbuddy.in/api/auth/o/google-oauth2/?redirect_uri=http://localhost:3000/auth/google')
+            const response = await axios.get<GoogleAuthResponse>('https://backend.growupbuddy.com/api/auth/o/google-oauth2/?redirect_uri=http://localhost:3000/auth/google')
 
             if (response.data.authorization_url) {
                 window.location.href = response.data.authorization_url
@@ -55,7 +55,7 @@ const AccountCreation = () => {
     const updateUserRole = async (email: string, token:string) => {
         try {
             const response = await axios.patch(
-                'https://backend.growupbuddy.in/api/auth/update-user-role/?pk=' + encodeURIComponent(email),
+                'https://backend.growupbuddy.com/api/auth/update-user-role/?pk=' + encodeURIComponent(email),
                 {
                     role: "freelancer",
                     verify: true
@@ -82,7 +82,7 @@ const AccountCreation = () => {
             const encodedCode = encodeURIComponent(code);
 
             const response = await axios.post<GoogleAuthResponse>(
-                `https://backend.growupbuddy.in/api/auth/o/google-oauth2/?state=${state}&code=${encodedCode}`,
+                `https://backend.growupbuddy.com/api/auth/o/google-oauth2/?state=${state}&code=${encodedCode}`,
                 {},
                 {
                     headers: {

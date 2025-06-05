@@ -41,8 +41,8 @@ interface PostType {
 }
 
 const Posts: React.FC = () => {
-  const [posts, setPosts] = useState<PostType[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { api } = useAuthenticatedApi();
   const { authToken } = useAuth();
 
@@ -50,7 +50,7 @@ const Posts: React.FC = () => {
     const fetchPosts = async (): Promise<void> => {
       try {
         const response = await api.get('/post/app/posts/');
-        setPosts(response.data.response);
+        setPosts(response.data.response || []);
       } catch (error) {
         console.error('Error fetching posts:', error);
       } finally {
@@ -86,82 +86,88 @@ const Posts: React.FC = () => {
           <div className="text-center py-10">Loading posts...</div>
         ) : (
           <div className="space-y-4">
-            {posts.map((post) => (
-              <div key={post.id} className="bg-white shadow-sm rounded-lg p-4 flex flex-col gap-4 w-full">
-                <div className="flex items-center gap-4">
-                  <img
-                    src={getImageUrl(post.profile_picture)}
-                    alt="Profile Picture"
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                  <span className="font-semibold flex justify-between items-center w-full">
-                    {post.first_name} {post.last_name}
-                    <HiDotsVertical className="text-gray-500 cursor-pointer" />
-                  </span>
-                </div>
-                
-                <div className="flex flex-col gap-3">
-                  <h3 className="font-medium">{post.title}</h3>
-                  <p className="text-gray-800">{post.content}</p>
+            {posts.length > 0 ? (
+              posts.map((post: PostType) => (
+                <div key={post.id} className="bg-white shadow-sm rounded-lg p-4 flex flex-col gap-4 w-full">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={getImageUrl(post.profile_picture)}
+                      alt="Profile Picture"
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <span className="font-semibold flex justify-between items-center w-full">
+                      {post.first_name} {post.last_name}
+                      <HiDotsVertical className="text-gray-500 cursor-pointer" />
+                    </span>
+                  </div>
                   
-                  {/* Display images if available */}
-                  {post.images && post.images.length > 0 && (
-                    <div className="grid grid-cols-1 gap-2 mt-2">
-                      {post.images.map((image) => (
-                        <img 
-                          key={image.id} 
-                          src={getImageUrl(image.file)} 
-                          alt="Post image" 
-                          className="rounded-lg w-full object-cover max-h-80"
-                        />
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* Display videos if available */}
-                  {post.videos && post.videos.length > 0 && (
-                    <div className="grid grid-cols-1 gap-2 mt-2">
-                      {post.videos.map((video, index) => (
-                        <video 
-                          key={video.id || index} 
-                          src={getImageUrl(video.file)} 
-                          controls 
-                          className="rounded-lg w-full"
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between mt-2 w-full">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1 text-red-600">
-                      <FaHeart />
-                      <span>{post.like_count}</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-gray-600">
-                      <FaCommentDots />
-                      <span>{post.comment_count}</span>
-                    </div>
+                  <div className="flex flex-col gap-3">
+                    <h3 className="font-medium">{post.title}</h3>
+                    <p className="text-gray-800">{post.content}</p>
+                    
+                    {/* Display images if available */}
+                    {post.images && post.images.length > 0 && (
+                      <div className="grid grid-cols-1 gap-2 mt-2">
+                        {post.images.map((image: ImageType) => (
+                          <img 
+                            key={image.id} 
+                            src={getImageUrl(image.file)} 
+                            alt="Post image" 
+                            className="rounded-lg w-full object-cover max-h-80"
+                          />
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Display videos if available */}
+                    {post.videos && post.videos.length > 0 && (
+                      <div className="grid grid-cols-1 gap-2 mt-2">
+                        {post.videos.map((video: VideoType, index: number) => (
+                          <video 
+                            key={video.id || index} 
+                            src={getImageUrl(video.file)} 
+                            controls 
+                            className="rounded-lg w-full"
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
 
-                  <div className="flex items-center gap-3 text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <FaEye />
-                      <span>0</span>
+                  <div className="flex items-center justify-between mt-2 w-full">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1 text-red-600">
+                        <FaHeart />
+                        <span>{post.like_count}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-gray-600">
+                        <FaCommentDots />
+                        <span>{post.comment_count}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <FaShare />
-                      <span>0</span>
+
+                    <div className="flex items-center gap-3 text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <FaEye />
+                        <span>0</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <FaShare />
+                        <span>0</span>
+                      </div>
                     </div>
                   </div>
+                  
+                  <div className="text-xs text-gray-500">
+                    Posted on {formatDate(post.created_at)}
+                  </div>
                 </div>
-                
-                <div className="text-xs text-gray-500">
-                  Posted on {formatDate(post.created_at)}
-                </div>
+              ))
+            ) : (
+              <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4 text-gray-500 text-center">
+                No posts available. Be the first to post!
               </div>
-            ))}
+            )}
           </div>
         )}
 
