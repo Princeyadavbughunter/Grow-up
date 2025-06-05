@@ -33,7 +33,7 @@ const PostTab: React.FC<PostTabProps> = ({ pageId }) => {
   }
 
   return (
-    <div className='max-w-xl flex flex-col justify-center mx-auto'>
+    <div className='flex flex-col justify-center mx-auto w-full'>
       <Posts posts={pagePosts} />
     </div>
   )

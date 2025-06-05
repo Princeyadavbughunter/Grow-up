@@ -108,7 +108,7 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
   }, [authToken, debouncedSearch]);
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 w-full">
       <h2 className="text-lg font-semibold mb-4">
         {clubData?.club ? `${clubData.club} Members` : title}
       </h2>
@@ -121,7 +121,7 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
           value={searchTerm}
           onChange={handleSearchChange}
           className="pl-8 pr-4"
-        />
+        />      
       </div>
       
       {isLoading && <div className="flex justify-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div></div>}
@@ -168,7 +168,7 @@ export function NetworkCard({
   const nameInitial = name && name.length > 0 ? name.charAt(0) : "U";
   
   return (
-    <div className="flex items-start gap-4">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border-b border-gray-200">
       <div className="relative">
         <Avatar className="h-12 w-12">
           <AvatarImage src={imageUrl} />
@@ -178,8 +178,8 @@ export function NetworkCard({
           <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white" />
         )}
       </div>
-      <div className="flex-1">
-        <div className="flex items-start justify-between">
+      <div className="flex-1 w-full">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-medium">{name}</h3>
@@ -195,7 +195,7 @@ export function NetworkCard({
             )}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-shrink-0">
             {showAccept ? (
               <>
                 <Button 

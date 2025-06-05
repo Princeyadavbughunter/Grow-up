@@ -9,8 +9,8 @@ interface DescriptionProps {
 const Description = ({ selectedGig }: DescriptionProps) => {
     if (!selectedGig) {
         return (
-            <div className="max-w-[450px]">
-                <Card className="h-[600px] flex flex-col justify-center items-center">
+            <div className="w-full p-2 sm:p-4">
+                <Card className="h-full flex flex-col justify-center items-center p-2 sm:p-4">
                     <p className="text-gray-500">Select a job to view details</p>
                 </Card>
             </div>
@@ -18,11 +18,11 @@ const Description = ({ selectedGig }: DescriptionProps) => {
     }
 
     return (
-        <div className="max-w-[450px] rounded-xl">
-            <Card className="h-[600px] border-none p-4 rounded-xl flex flex-col">
-                <CardHeader className="sticky top-0 z-10 bg-white">
+        <div className="w-full rounded-xl p-2 sm:p-4">
+            <Card className="h-full border-none p-2 sm:p-4 rounded-xl flex flex-col">
+                <CardHeader className="sticky top-0 z-10 bg-white pb-4">
                     <CardTitle>{selectedGig.job_title}</CardTitle>
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mt-2">
                         <div className="flex items-center">
                             <Building2 className="h-4 w-4 mr-1" />
                             {selectedGig.about_role}
@@ -39,7 +39,7 @@ const Description = ({ selectedGig }: DescriptionProps) => {
                     </div>
                 </CardHeader>
 
-                <CardContent className="overflow-y-auto space-y-10 h-[500px]">
+                <CardContent className="overflow-y-auto space-y-6 md:space-y-8 lg:space-y-10 h-[500px] pb-4">
                     <div>
                         <h3 className="font-medium mb-2">About Position</h3>
                         <p className="text-gray-600">

@@ -105,8 +105,8 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 flex space-x-5 mx-auto w-full">
-      <div className="mx-auto rounded-lg bg-white p-6 shadow-sm w-full">
+    <div className="min-h-screen bg-gray-50 p-4 flex flex-col lg:flex-row gap-4 mx-auto w-full max-w-7xl">
+      <div className="rounded-lg bg-white p-6 shadow-sm flex-1">
         <div className="mb-6 flex items-center gap-4">
           <button onClick={onBack} className="rounded-full p-2 hover:bg-gray-100">
             <BsArrowLeft className="h-6 w-6" />
@@ -128,7 +128,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
               )}
             </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap justify-center lg:justify-start">
             {pageDetails.social_links?.linkedin && <FaLinkedin className="h-6 w-6 text-gray-500" />}
             {pageDetails.social_links?.twitter && <FaTwitter className="h-6 w-6 text-gray-500" />}
             {pageDetails.social_links?.instagram && <FaInstagram className="h-6 w-6 text-gray-500" />}
@@ -142,7 +142,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           </p>
         </div>
 
-        <div className="mb-6 flex gap-4">
+        <div className="mb-6 flex flex-col sm:flex-row gap-4">
           <button 
             className={`flex-1 rounded-lg py-3 ${
               pageDetails.is_following 
@@ -158,7 +158,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           </button>
         </div>
 
-        <div className="mb-6 flex gap-4 justify-center">
+        <div className="mb-6 flex gap-4 justify-center flex-wrap">
           {['Home', 'About', 'Post', 'People'].map((tab) => (
             <button
               key={tab}
@@ -172,7 +172,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           ))}
         </div>
 
-        <div className="mb-6 overflow-y-auto h-96">
+        <div className="mb-6 overflow-y-auto">
           {renderTabContent()}
         </div>
       </div>

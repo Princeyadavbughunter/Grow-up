@@ -50,7 +50,7 @@ const Followers: React.FC<FollowersProps> = ({ pageId }) => {
       <div className="mb-6 rounded-lg border p-4 flex flex-col">
         <div className="div">
           <div>
-            <div className="mb-2">
+            <div className="mb-4 md:mb-2">
               <span className="font-medium">Website</span>
               <a 
                 href={pageDetails?.website || '#'} 
@@ -70,7 +70,7 @@ const Followers: React.FC<FollowersProps> = ({ pageId }) => {
               followers.map((follower) => (
                 <div key={follower.id} className="flex items-center gap-3">
                   <img 
-                    src={follower.profile_picture} 
+                    src={follower.profile_picture || 'https://randomuser.me/portraits/thumb/men/1.jpg'}
                     alt={`${follower.first_name} ${follower.last_name}`} 
                     className="h-12 w-12 rounded-full"
                   />

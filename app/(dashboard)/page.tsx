@@ -7,8 +7,8 @@ import PostButton from "./profile/create/_components/PostButton";
 
 const Home = () => {
   return (
-    <div className="max-w-7xl mx-auto h-[calc(100vh-136px)] grid grid-cols-1 md:grid-cols-7 gap-4">
-      <div className="h-fit md:sticky md:top-4 md:col-span-2">
+    <div className="max-w-7xl mx-auto h-[calc(100vh-136px)] grid grid-cols-1 lg:grid-cols-7 gap-4 p-4 md:p-6 lg:p-8">
+      <div className="h-fit lg:sticky lg:top-4 lg:col-span-2">
         <UpcomingEvents />
         <ProgressProfile />
       </div>
@@ -18,7 +18,7 @@ const Home = () => {
         </div>
         <Posts />
       </div>
-      <div className="h-fit md:sticky md:top-4 md:col-span-2">
+      <div className="h-fit lg:sticky lg:top-4 lg:col-span-2">
         <Clubs />
       </div>
     </div>

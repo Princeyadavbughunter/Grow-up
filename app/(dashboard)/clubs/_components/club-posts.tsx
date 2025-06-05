@@ -59,7 +59,7 @@ const Posts = ({ clubId }: PostsProps) => {
     }, [authToken, clubId]);
 
     return (
-        <div className="p-4">
+        <div className="p-4 space-y-4">
             {posts.map((post) => (
                 <PostCard key={post.id} post={post} />
             ))}
@@ -75,7 +75,7 @@ const PostCard = ({ post }: PostCardProps) => {
     const formattedDate = new Date(post.created_at).toLocaleString();
 
     return (
-        <div className="bg-white rounded-xl p-4 mb-4 shadow-lg">
+        <div className="bg-white rounded-xl p-4 mb-4 shadow-lg break-words">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                     <Image
@@ -97,17 +97,20 @@ const PostCard = ({ post }: PostCardProps) => {
 
             <p className="mb-4">{post.title}</p>
             {post.content && <p className="mb-4">{post.content}</p>}
-            
-            {post.images && post.images.length > 0 && (
-                <Image
-                    src={post.images[0].file}
-                    alt="Post"
-                    width={800}
-                    height={600}
-                    className="rounded-xl mb-4"
-                />
-            )}
 
+            {post.images && post.images.length > 0 && (
+                <div className="relative w-full h-auto mb-4 rounded-xl overflow-hidden">
+                    <Image
+                        src={post.images[0].file}
+                        alt="Post"
+                        layout="responsive"
+                        width={800}
+                        height={600}
+                        objectFit="cover"
+                    />
+                </div>
+            )}
+            
             <div className="flex items-center justify-between text-gray-500">
                 <button className="flex items-center gap-2">
                     <span>❤️</span>

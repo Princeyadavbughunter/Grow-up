@@ -108,7 +108,7 @@ export default function EventsPage() {
   };
 
   const EventTabs = () => (
-    <div className="flex gap-8 mb-6">
+    <div className="flex flex-wrap gap-4 md:gap-8 mb-6">
       {["Upcoming", "My Events", "Past Events"].map((tab) => {
         const tabKey = tab.toLowerCase().replace(" ", "_").replace("_events", "") as TabType;
         return (
@@ -117,7 +117,7 @@ export default function EventsPage() {
             variant="ghost"
             onClick={() => setActiveTab(tabKey)}
             className={`px-0 ${
-              activeTab === tabKey
+ activeTab === tabKey
                 ? "text-black font-semibold border-b-2 border-black rounded-none"
                 : "text-gray-500"
             }`}
@@ -130,7 +130,7 @@ export default function EventsPage() {
   );
 
   const EventFilters = () => (
-    <div className="flex gap-2 mb-6">
+    <div className="flex flex-wrap gap-2 mb-6">
       {filters.map((filter) => (
         <Button
           key={filter}
@@ -138,7 +138,7 @@ export default function EventsPage() {
           onClick={() => setSelectedFilter(filter)}
           className={`rounded-full ${
             selectedFilter === filter
-              ? "bg-[#7052FF] text-white hover:bg-[#7052FF]"
+ ? "bg-[#7052FF] text-white hover:bg-[#7052FF]"
               : "bg-gray-100 hover:bg-gray-200 text-gray-700"
           }`}
         >
@@ -167,7 +167,7 @@ export default function EventsPage() {
 
   const EventCard = ({ event }: { event: Event }) => (
     <Card 
-      className="p-4 border-2 border-purple-100 rounded-3xl bg-[#F9FAFF] cursor-pointer mb-4 hover:shadow-md transition-all duration-300 flex flex-col h-[400px]"
+      className="p-4 border-2 border-purple-100 rounded-3xl bg-[#F9FAFF] cursor-pointer mb-4 hover:shadow-md transition-all duration-300 flex flex-col h-auto"
       onClick={() => setSelectedEvent(event)}
     >
       <div className="flex justify-between items-start mb-3">
@@ -217,7 +217,7 @@ export default function EventsPage() {
           {event.skills_learning && (
             <div className="flex flex-wrap gap-1 mt-2">
               {event.skills_learning.split(',').slice(0, 3).map((skill) => (
-                <span key={skill.trim()} className="bg-gray-100 px-2 py-1 rounded-full text-xs">
+                <span key={skill.trim()} className="bg-gray-100 px-2 py-1 rounded-full text-xs whitespace-nowrap">
                   {skill.trim()}
                 </span>
               ))}
@@ -255,7 +255,7 @@ export default function EventsPage() {
 
     return (
       <div className="space-y-4">
-        <div className="border-[1px] flex items-center rounded-full p-2">
+        <div className="border-[1px] flex items-center rounded-full p-2 w-full">
           <SearchIcon size={18} color="gray" />
           <input 
             className="border-none ms-2 outline-none" 
@@ -265,7 +265,7 @@ export default function EventsPage() {
           />
         </div>
         {participants.map((participant) => (
-          <div key={participant.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+          <div key={participant.id} className="flex flex-col md:flex-row items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
             <div className="flex items-center gap-3">
               <Avatar>
                 <AvatarImage src={participant.profile_picture} />
@@ -308,8 +308,8 @@ export default function EventsPage() {
       <EventTabs />
       <EventFilters />
 
-      <div className="grid grid-cols-12 gap-8">
-        <div className="col-span-4">
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="w-full lg:w-1/3">
           <ScrollArea className="h-[calc(100vh-200px)]" ref={scrollContainerRef}>
             <div className="pr-4 space-y-4">
               {currentEvents && currentEvents.length > 0 ? (
@@ -327,7 +327,7 @@ export default function EventsPage() {
 
         {selectedEvent && (
           <>
-            <div className="col-span-4">
+            <div className="w-full lg:w-1/3">
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <Badge className="bg-yellow-100 text-yellow-800">
@@ -361,7 +361,7 @@ export default function EventsPage() {
               </div>
             </div>
 
-            <div className="col-span-4">
+            <div className="w-full lg:w-1/3">
               <Tabs defaultValue="comments" className="w-full">
                 <TabsList className="w-full mb-4 rounded-full border-2 border-[#7052FF]">
                   <TabsTrigger value="comments" className="flex-1 rounded-full text-lg">

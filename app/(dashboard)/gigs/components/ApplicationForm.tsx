@@ -57,7 +57,7 @@ export default function ApplicationForm({ jobId, isApplied }: { jobId?: string, 
     };
 
     return (
-        <div className="p-4 sm:p-8 mb-20 rounded-lg max-w-full sm:max-w-lg mx-auto bg-white">
+ <div className="p-4 sm:p-6 md:p-8 mb-20 rounded-lg w-full max-w-full sm:max-w-lg mx-auto bg-white">
             {profileData && (
                 <div className="flex flex-col sm:flex-row items-center space-x-0 sm:space-x-4 space-y-2 sm:space-y-0 mb-6">
                     <img

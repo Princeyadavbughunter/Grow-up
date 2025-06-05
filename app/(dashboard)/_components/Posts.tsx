@@ -196,7 +196,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
             )}
 
             <div className="flex items-center justify-between text-gray-500">
-                <button 
+                <button
                     className="flex items-center gap-2"
                     onClick={() => onLike(post.id)}
                 >
@@ -204,7 +204,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                     <span>{post.like_count}</span>
                 </button>
                 <button 
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 text-sm md:text-base"
                     onClick={handleCommentToggle}
                 >
                     <span>💬</span>
@@ -212,7 +212,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                 </button>
                 <button>
                     <span>📤</span>
-                </button>
+                </button> {/* Share button - consider adding functionality */}
             </div>
 
             {showComments && (
@@ -226,14 +226,14 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                             />
                         ))}
                     </div>
-                    
+
                     <form onSubmit={handleAddComment} className="flex gap-2">
                         <input
                             type="text"
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                             placeholder="Add a comment..."
-                            className="flex-1 border rounded-lg px-3 py-2"
+                            className="flex-1 border rounded-lg px-3 py-2 text-sm md:text-base"
                         />
                         <button 
                             type="submit"
@@ -341,7 +341,7 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
                         </form>
                     )}
 
-                    {showReplies && replies.length > 0 && (
+                    {showReplies && (
                         <div className="mt-2 space-y-3">
                             {replies.map(reply => (
                                 <div key={reply.id} className="flex items-start gap-2">

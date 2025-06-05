@@ -37,16 +37,16 @@ const AboutTab: React.FC<AboutTabProps> = ({ pageDetails }) => {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-xl text-gray-600 border p-4">
+    <div className="space-y-4 px-2 sm:px-4 md:px-6"> {/* Adjust padding based on screen size */}
+      <div className="rounded-xl text-gray-600 border p-4 md:p-6"> {/* Adjust padding */}
         <p className='font-semibold text-lg mb-3'>Overview</p>
         <p>{overview}</p>
         {overview.length > 200 && (
           <button className="text-[#7052FF] mt-2">See more</button>
         )}
       </div>
-
-      <div className="rounded-xl text-gray-600 border p-4">
+      
+      <div className="rounded-xl text-gray-600 border p-4 md:p-6"> {/* Adjust padding */}
         <p className='font-semibold text-lg mb-3'>Additional Information</p>
         <div className="space-y-2">
           <div>

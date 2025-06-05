@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 
 interface Club {
@@ -23,10 +23,17 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
     const [activeTab, setActiveTab] = useState("all");
     const [allClubs, setAllClubs] = useState<Club[]>([]);
     const [myClubs, setMyClubs] = useState<Club[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const { api } = useAuthenticatedApi();
     const { authToken } = useAuth();
 
-    const fetchClubs = async () => {
+    const fetchClubs = useCallback(async () => {
+        if (!authToken || !api) return;
+        
+        setLoading(true);
+        setError(null);
+        
         try {
             const response = await api.get('/freelancer/club/');
             console.log(response.data);
@@ -44,23 +51,27 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
             }
         } catch (error) {
             console.error('Error fetching clubs:', error);
+            setError('Failed to load clubs. Please try again.');
+        } finally {
+            setLoading(false);
         }
-    };
+    }, [authToken, selectedClubId]);
 
     useEffect(() => {
-        if (authToken) {
-            fetchClubs();
-        }
-    }, [authToken]);
+        fetchClubs();
+    }, [fetchClubs]);
 
     const handleJoinToggle = async (clubId: string) => {
+        if (!api) return;
+        
         try {
             await api.post(`/freelancer/join-club/?id=${clubId}`);
-            fetchClubs();
+            await fetchClubs(); // Refresh clubs after joining
             setActiveTab("my");
             setSelectedClubId(clubId);
         } catch (error) {
             console.error('Error toggling club membership:', error);
+            setError('Failed to join club. Please try again.');
         }
     };
 
@@ -68,24 +79,56 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
         setSelectedClubId(clubId);
     };
 
-    const displayClubs = activeTab === "all" 
-        ? allClubs
-        : myClubs;
+    const displayClubs = activeTab === "all" ? allClubs : myClubs;
+
+    if (loading) {
+        return (
+            <div className="p-4">
+                <div className="text-center py-8 text-gray-500">
+                    Loading clubs...
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-4">
+                <div className="text-center py-8 text-red-500">
+                    {error}
+                    <button 
+                        onClick={fetchClubs}
+                        className="block mx-auto mt-2 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="p-4 max-w-sm">
-            <div className="flex items-center gap-4 mb-4 border-b">
+        <div className="p-4">
+            <div className="flex flex-wrap items-center gap-4 mb-4 border-b">
                 <button
                     onClick={() => setActiveTab("all")}
-                    className={`py-2 px-4 ${activeTab === "all" ? "text-purple-600 border-b-2 border-purple-600 font-semibold" : "text-gray-500"}`}
+                    className={`py-2 px-4 transition-colors ${
+                        activeTab === "all" 
+                            ? "text-purple-600 border-b-2 border-purple-600 font-semibold" 
+                            : "text-gray-500 hover:text-gray-700"
+                    }`}
                 >
-                    All Clubs
+                    All Clubs ({allClubs.length})
                 </button>
                 <button
                     onClick={() => setActiveTab("my")}
-                    className={`py-2 px-4 ${activeTab === "my" ? "text-purple-600 border-b-2 border-purple-600 font-semibold" : "text-gray-500"}`}
+                    className={`py-2 px-4 transition-colors ${
+                        activeTab === "my" 
+                            ? "text-purple-600 border-b-2 border-purple-600 font-semibold" 
+                            : "text-gray-500 hover:text-gray-700"
+                    }`}
                 >
-                    My Clubs
+                    My Clubs ({myClubs.length})
                 </button>
             </div>
 
@@ -102,7 +145,10 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
                 ))
             ) : (
                 <div className="text-center py-8 text-gray-500">
-                    {activeTab === "all" ? "No clubs available to join" : "You haven't joined any clubs yet"}
+                    {activeTab === "all" 
+                        ? "No clubs available to join" 
+                        : "You haven't joined any clubs yet"
+                    }
                 </div>
             )}
         </div>
@@ -118,20 +164,30 @@ interface ClubCardProps {
 }
 
 const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCardProps) => {
+    const [showFullDescription, setShowFullDescription] = useState(false);
+    
+    const truncatedDescription = club.description?.length > 100 
+        ? club.description.substring(0, 100) + "..."
+        : club.description;
+
     return (
         <div 
-            className={`bg-white rounded-xl p-4 mb-4 shadow-sm w-[350px] cursor-pointer ${isSelected ? 'border-2 border-purple-500' : ''}`}
+            className={`bg-white rounded-xl p-4 mb-4 shadow-sm cursor-pointer transition-all hover:shadow-md ${
+                isSelected ? 'border-2 border-purple-500' : 'border border-gray-200'
+            }`}
             onClick={() => onSelect(club.id)}
         >
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <span className="text-purple-600 text-xl">{club.name[0]}</span>
+                        <span className="text-purple-600 text-xl font-semibold">
+                            {club.name?.[0]?.toUpperCase() || '?'}
+                        </span>
                     </div>
                     <div>
-                        <h3 className="font-semibold">{club.name}</h3>
+                        <h3 className="font-semibold text-gray-800">{club.name}</h3>
                         <p className="text-sm text-gray-500">
-                            {club.participants_count || 0} members
+                            {club.participants_count || 0} member{(club.participants_count || 0) !== 1 ? 's' : ''}
                         </p>
                     </div>
                 </div>
@@ -141,22 +197,34 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
                         e.stopPropagation();
                         onJoinToggle(club.id);
                     }}
-                    className={`text-purple-600 hover:text-purple-800 ${isMyClub ? "font-bold" : ""}`}
+                    className={`px-3 py-1 rounded text-sm transition-colors ${
+                        isMyClub 
+                            ? "bg-green-100 text-green-700 font-medium" 
+                            : "text-purple-600 hover:text-purple-800 hover:bg-purple-50"
+                    }`}
+                    disabled={isMyClub}
                 >
-                    {isMyClub ? "Joined" : "Join"}
+                    {isMyClub ? "✓ Joined" : "Join"}
                 </button>
             </div>
 
-            {!isMyClub && (
-                <p className="text-sm text-gray-600 mt-2">
-                    {club.description}
-                    <button 
-                        className="text-purple-600 ml-1"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        Read More...
-                    </button>
-                </p>
+            {!isMyClub && club.description && (
+                <div className="text-sm text-gray-600 mt-3">
+                    <p>
+                        {showFullDescription ? club.description : truncatedDescription}
+                        {club.description.length > 100 && (
+                            <button 
+                                className="text-purple-600 ml-1 hover:text-purple-800"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowFullDescription(!showFullDescription);
+                                }}
+                            >
+                                {showFullDescription ? "Show Less" : "Read More..."}
+                            </button>
+                        )}
+                    </p>
+                </div>
             )}
         </div>
     );

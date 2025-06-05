@@ -78,7 +78,7 @@ const ProgressProfile: React.FC = () => {
   }, [authToken]);
 
   if (!profileData) {
-    return <div className="px-5 border-gray-500 border p-4 rounded-xl">Loading profile data...</div>;
+    return <div className="px-4 py-5 border border-gray-200 rounded-xl text-center text-gray-500">Loading profile data...</div>;
   }
 
   // Define steps and check completion based on profile data
@@ -111,15 +111,15 @@ const ProgressProfile: React.FC = () => {
   const progressPercentage = Math.round((completedSteps / totalSteps) * 100);
 
   return (
-    <div className="px-5 border-gray-500 border p-4 rounded-xl">
-      <p className="font-semibold text-lg">Complete Your Profile</p>
-      <p className="text-xs text-gray-400">
+    <div className="p-4 border border-gray-200 rounded-xl">
+      <p className="font-semibold text-base md:text-lg">Complete Your Profile</p>
+      <p className="text-xs text-gray-500">
         {progressPercentage}% completed ({totalSteps - completedSteps} steps left)
       </p>
-      <div className="w-full bg-gray-200 h-2 rounded-lg mt-2 mb-4">
+      <div className="w-full bg-gray-200 h-2 rounded-full mt-2 mb-4">
         <div
-          className="h-2 rounded-lg"
-          style={{ width: `${progressPercentage}%`, backgroundColor: "#7052FF" }}
+          className="h-2 rounded-full bg-[#7052FF]"
+          style={{ width: `${progressPercentage}%` }}
         ></div>
       </div>
       <div>
@@ -127,6 +127,7 @@ const ProgressProfile: React.FC = () => {
           <div key={index} className="flex items-center mb-2">
             <HiOutlineStar
               className={`mr-2 ${step.completed ? "text-purple-600" : "text-gray-400"}`}
+              size={18} // Adjust icon size for readability
             />
             <p className={`${step.completed ? "text-black" : "text-gray-400"}`}>
               {step.label}

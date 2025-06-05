@@ -25,8 +25,8 @@ interface AllGigsProps {
 }
 
 const AllGigs = ({ 
-  gigs, 
-  onSelectGig, 
+ gigs, 
+ onSelectGig, 
   activeWorkType, 
   activeJobType, 
   onFilterChange 
@@ -76,8 +76,8 @@ const AllGigs = ({
   };
 
   return (
-    <div className="bg-gray-50 py-3 px-2 lg:px-3 flex justify-center">
-      <div className="max-w-[450px] w-full">
+    <div className="bg-gray-50 py-3 px-2 md:px-4 lg:px-3 w-full">
+      <div className="w-full mx-auto lg:max-w-full">
         <div className="sticky top-0 z-10 bg-gray-50 pt-2 pb-3">
           <div className="relative bg-[#6A737D0F] rounded-xl mb-3">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />

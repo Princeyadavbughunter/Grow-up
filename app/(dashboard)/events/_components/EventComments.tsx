@@ -22,19 +22,21 @@ export function EventComments({ comments }: EventCommentsProps) {
     <div className="space-y-6">
       {comments.map((comment) => (
         <div key={comment.id} className="space-y-4">
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-3 flex-col sm:flex-row sm:items-center">
             <Avatar className="h-8 w-8">
               <AvatarImage src={comment.user_profile_picture} alt={comment.user_name} />
               <AvatarFallback>{comment.user_name[0]}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{comment.user_name}</span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-medium text-sm sm:text-base">{comment.user_name}</span>
                 <span className="text-xs text-gray-500">
                   {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 mt-1">{comment.comment_text}</p>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                {comment.comment_text}
+              </p>
             </div>
           </div>
         </div>

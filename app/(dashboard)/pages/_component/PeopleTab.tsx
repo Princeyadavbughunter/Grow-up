@@ -49,14 +49,14 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ pageId }) => {
           <div 
             key={member.id} 
             className="flex items-center space-x-4 p-3 border rounded-lg"
-          >
+>
             <img 
               src={member.profile_picture} 
               alt={`${member.first_name} ${member.last_name}`} 
               className="w-12 h-12 rounded-full"
             />
             <div>
-              <p className="font-semibold">{`${member.first_name} ${member.last_name}`}</p>
+              <p className="font-semibold text-base md:text-lg">{`${member.first_name} ${member.last_name}`}</p>
               <p className="text-gray-500">{member.role}</p>
             </div>
           </div>

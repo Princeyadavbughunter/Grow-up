@@ -50,7 +50,7 @@ const HomeTab: React.FC<HomeTabProps> = ({ pageId }) => {
   }
 
   return (
-    <div className='flex flex-col justify-center px-20'>
+    <div className='flex flex-col px-4 md:px-10 lg:px-20'>
       <div className="rounded-xl bg-slate-50 text-gray-600 border p-4 mb-5">
         <p>{pageDescription}</p>
         {pageDescription.length > 200 && (
@@ -76,7 +76,7 @@ const HomeTab: React.FC<HomeTabProps> = ({ pageId }) => {
                 <img 
                   src={post.images[0].file} 
                   alt="Post image" 
-                  className="w-full h-48 object-cover rounded-lg mb-4"
+                  className="w-full h-auto object-cover rounded-lg mb-4"
                 />
               )}
               <h3 className="font-semibold text-lg mb-2">{post.title}</h3>
