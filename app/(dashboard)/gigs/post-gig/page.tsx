@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { IoMdLocate } from "react-icons/io";
 import { FaLongArrowAltLeft, FaCheckCircle } from "react-icons/fa";
 import { HiArrowNarrowRight } from "react-icons/hi";
-import { useAuthenticatedApi } from "@/context/AuthContext";
+import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 
 interface FormData {
   job_description: string;
@@ -38,6 +38,8 @@ const StepForm = () => {
     role: "",
     skill_set: ""
   });
+
+  const { profileData } = useAuth()
 
   const validateStep = (step: number) => {
     switch (step) {
@@ -134,6 +136,8 @@ const StepForm = () => {
       { id: 2, name: '' },
       { id: 3, name: '' }
     ];
+
+
   
     return (
       <div className="w-full max-w-md mx-auto mb-8">

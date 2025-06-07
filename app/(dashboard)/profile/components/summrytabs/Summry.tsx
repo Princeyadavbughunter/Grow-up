@@ -10,12 +10,59 @@ import Portfolios from './Portfolios'
 import MyExperience from './MyExperience'
 import MyEducation from './MyEducation'
 
+// Use the same interface as in AuthContext
+interface FreelancerProfile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  date_of_birth: string;
+  bio: string;
+  university_name: string;
+  graduation_year_from: string;
+  profile_picture: string;
+  address: string;
+  lat: number | null;
+  long: number | null;
+  city: string;
+  district: string;
+  pincode: number;
+  state: string;
+  interest_in: string;
+  hobbies: string;
+  highest_qualification: string;
+  passing_year: string;
+  created_at: string;
+  degree_name: string;
+  is_degree: boolean;
+  is_diploma: boolean;
+  diploma_name: string;
+  is_disabled: boolean;
+  resume: string | null;
+  skills: string;
+  gender: string;
+  saved_jobs_count: number;
+  follower_count: number;
+  dribble_account: string | null;
+  github_account: string | null;
+  figma_account: string | null;
+  youtube_account: string | null;
+  medium_account: string | null;
+  soft_skills: string;
+  position: string;
+  user: string;
+  work_experience: any[];
+  facebook_account?: string | null;
+  linkedin_account?: string | null;
+  instagram_account?: string | null;
+  twitter_account?: string | null;
+}
+
 interface SummryProps {
-  profileData: ProfileData | null;
+  profileData: FreelancerProfile | null;
 }
 
 const Summry: React.FC<SummryProps> = ({ profileData }) => {
-    const [activeJobTypeTab, setActiveJobTypeTab] = useState<string>('About');
+    const [activeJobTypeTab, setActiveJobTypeTab] = useState('About');
     
     const skillsArray = profileData?.skills ? profileData.skills.split(',').map(skill => skill.trim()) : [];
     
@@ -34,7 +81,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                 ))}
             </div>
 
-            <div className="flex justify-between gap-10">
+            <div className="flex justify-between flex-col md:flex-row gap-10">
                 <div className="">
                     <div>
                         <p className='flex items-center py-4 font-semibold gap-5'>Summary <CiEdit /></p>

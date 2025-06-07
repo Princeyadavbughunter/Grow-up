@@ -204,7 +204,7 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
                     }`}
                     disabled={isMyClub}
                 >
-                    {isMyClub ? "✓ Joined" : "Join"}
+                    {isMyClub ? "Joined" : "Join"}
                 </button>
             </div>
 

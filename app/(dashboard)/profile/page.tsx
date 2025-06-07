@@ -1,8 +1,8 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
-import SummryTab from "./components/SummryTab";
 import ProfileData from "./components/ProfileData";
 import { useRouter } from "next/navigation";
+import Summry from "./components/summrytabs/Summry";
 
 const Page = () => {
   const {profileData} = useAuth();
@@ -13,13 +13,13 @@ const Page = () => {
   }
 
   return (
-    <div className="flex flex-col justify-between px-40 mx-auto">
+    <div className="flex flex-col justify-between px-4 sm:px-8 md:px-16 lg:px-32 xl:px-40 mx-auto max-w-7xl">
       {!profileData ? (
         <div className="text-center py-10">Loading...</div>
       ) : (
         <>
           <ProfileData profileData={profileData} />
-          <SummryTab profileData={profileData} />
+          <Summry profileData={profileData} />
         </>
       )}
     </div>
