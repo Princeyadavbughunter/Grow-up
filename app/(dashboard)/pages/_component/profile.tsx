@@ -27,12 +27,13 @@ interface PageDetails {
     facebook?: string;
   };
   is_following: boolean;
+  is_admin: boolean;
 }
 
 const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }) => {
   const [activeTab, setActiveTab] = useState<string>('Home');
   const [pageDetails, setPageDetails] = useState<PageDetails | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const { api } = useAuthenticatedApi();
   const { authToken } = useAuth();
@@ -142,21 +143,23 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           </p>
         </div>
 
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
-          <button 
-            className={`flex-1 rounded-lg py-3 ${
-              pageDetails.is_following 
-                ? 'bg-gray-200 text-gray-700' 
-                : 'bg-[#7052FF] text-white'
-            }`}
-            onClick={handleFollowToggle}
-          >
-            {pageDetails.is_following ? 'Unfollow' : 'Follow'}
-          </button>
-          <button className="flex-1 rounded-lg border border-[#7052FF] py-3 text-[#7052FF]">
-            Message
-          </button>
-        </div>
+        {!pageDetails.is_admin && (
+          <div className="mb-6 flex flex-col sm:flex-row gap-4">
+            <button 
+              className={`flex-1 rounded-lg py-3 ${
+                pageDetails.is_following 
+                  ? 'bg-gray-200 text-gray-700' 
+                  : 'bg-[#7052FF] text-white'
+              }`}
+              onClick={handleFollowToggle}
+            >
+              {pageDetails.is_following ? 'Unfollow' : 'Follow'}
+            </button>
+            <button className="flex-1 rounded-lg border border-[#7052FF] py-3 text-[#7052FF]">
+              Message
+            </button>
+          </div>
+        )}
 
         <div className="mb-6 flex gap-4 justify-center flex-wrap">
           {['Home', 'About', 'Post', 'People'].map((tab) => (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +37,7 @@ interface Event {
   description: string;
   location: string;
   date: string;
+  already_registered: boolean;
   created_at: string;
   updated_at: string;
   is_active: boolean;
@@ -107,6 +108,19 @@ export default function EventsPage() {
     }
   };
 
+  const fetchEventComments = async (event: Event) => {
+    try {
+      const response = await api.get(`/company/app/event-comments/?event_id=${event.id}`);
+      setSelectedEvent({
+        ...event,
+        comments: response.data
+      });
+    } catch (error) {
+      console.error("Error fetching event comments:", error);
+      setSelectedEvent(event);
+    }
+  };
+
   const EventTabs = () => (
     <div className="flex flex-wrap gap-4 md:gap-8 mb-6">
       {["Upcoming", "My Events", "Past Events"].map((tab) => {
@@ -168,7 +182,7 @@ export default function EventsPage() {
   const EventCard = ({ event }: { event: Event }) => (
     <Card 
       className="p-4 border-2 border-purple-100 rounded-3xl bg-[#F9FAFF] cursor-pointer mb-4 hover:shadow-md transition-all duration-300 flex flex-col h-auto"
-      onClick={() => setSelectedEvent(event)}
+      onClick={() => fetchEventComments(event)}
     >
       <div className="flex justify-between items-start mb-3">
         <Badge className="bg-purple-100 text-purple-800">{event.category_name_display || "Uncategorized"}</Badge>
@@ -231,21 +245,30 @@ export default function EventsPage() {
         </div>
       </div>
       
-      <Button 
-        className="w-full rounded-full bg-[#7052FF] mt-3"
-        onClick={async (e: React.MouseEvent) => {
-          e.stopPropagation();
-          try {
-            await api.post(`/company/app/event-api/${event.id}/register/`);
-            const response = await api.get("/company/app/event-api/");
-            setEvents(response.data);
-          } catch (error) {
-            console.error("Error registering for event:", error);
-          }
-        }}
-      >
-        Register Now
-      </Button>
+      {event.already_registered ? (
+        <Button 
+          className="w-full rounded-full bg-gray-300 mt-3 cursor-not-allowed"
+          disabled
+        >
+          Registered
+        </Button>
+      ) : (
+        <Button 
+          className="w-full rounded-full bg-[#7052FF] mt-3"
+          onClick={async (e: React.MouseEvent) => {
+            e.stopPropagation();
+            try {
+              await api.post(`/company/app/events-register/?event_id=${event.id}`); 
+              const response = await api.get("/company/app/event-api/");
+              setEvents(response.data);
+            } catch (error) {
+              console.error("Error registering for event:", error);
+            }
+          }}
+        >
+          Register Now
+        </Button>
+      )}
     </Card>
   );
 
@@ -285,23 +308,27 @@ export default function EventsPage() {
 
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedEvent || !newComment.trim()) return;
+    if (!selectedEvent || !newComment?.trim()) return;
 
     try {
-      await api.post(`/company/app/event-api/${selectedEvent.id}/comments/`, {
-        comment_text: newComment
+      await api.post(`/company/app/event-comments/`, {
+        comment_text: newComment,
+        event: selectedEvent.id,
       });
       
-      // Refresh event data to get updated comments
-      const response = await api.get(`/company/app/event-api/${selectedEvent.id}/`);
-      setSelectedEvent(response.data);
+      // Refresh comments data and update the selected event
+      const response = await api.get(`/company/app/event-comments/?event_id=${selectedEvent.id}`);
+      setSelectedEvent({
+        ...selectedEvent,
+        comments: response.data
+      });
       setNewComment("");
     } catch (error) {
       console.error('Error adding comment:', error);
     }
   };
 
-  const currentEvents = events[`${activeTab}_events` as keyof EventsData];
+  const currentEvents = events?.[`${activeTab}_events` as keyof EventsData] || [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 pb-40">
@@ -325,7 +352,7 @@ export default function EventsPage() {
           </ScrollArea>
         </div>
 
-        {selectedEvent && (
+        {selectedEvent ? (
           <>
             <div className="w-full lg:w-1/3">
               <div className="space-y-6">
@@ -399,6 +426,8 @@ export default function EventsPage() {
               </Tabs>
             </div>
           </>
+        ) : (
+          <div className="p-4 text-center text-gray-500">Select an event to view details.</div>
         )}
       </div>
     </div>
