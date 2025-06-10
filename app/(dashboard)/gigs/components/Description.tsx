@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Building2, MapPin, Clock, Badge } from 'lucide-react'

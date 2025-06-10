@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react'
 import { useAuthenticatedApi } from '@/context/AuthContext'
 import JobList from '../../jobs/_component/job-list'

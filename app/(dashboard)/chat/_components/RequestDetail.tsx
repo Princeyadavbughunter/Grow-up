@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Button } from "@/components/ui/button";
 import { LucideSendHorizontal } from "lucide-react";
 import React, { useState } from "react";

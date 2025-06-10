@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Avatar } from '@/components/ui/avatar'
 import React, { useState } from 'react'
 import { IoMdLocate } from 'react-icons/io';

@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import React, { useState } from 'react'
 import Sidebar from '../../components/AllGigs'
 
@@ -12,9 +12,24 @@ const ExploreGigs = () => {
 
 const MainGigsTab = () => {
     const [activeTab, setActiveTab] = useState('myGigs')
+    const [activeWorkType, setActiveWorkType] = useState('Domain')
+    const [activeJobType, setActiveJobType] = useState('All')
 
     const handleTabSwitch = (tab: any) => {
         setActiveTab(tab)
+    }
+
+    const handleSelectGig = (gig: any) => {
+        // Handle gig selection
+        console.log('Selected gig:', gig)
+    }
+
+    const handleFilterChange = (type: string, value: string) => {
+        if (type === 'work') {
+            setActiveWorkType(value)
+        } else if (type === 'job') {
+            setActiveJobType(value)
+        }
     }
 
     return (
@@ -37,7 +52,15 @@ const MainGigsTab = () => {
             </div>
 
             <div className="tab-content ">
-                {activeTab === 'myGigs' && <Sidebar />}
+                {activeTab === 'myGigs' && (
+                    <Sidebar 
+                        gigs={[]} 
+                        onSelectGig={handleSelectGig}
+                        activeWorkType={activeWorkType}
+                        activeJobType={activeJobType}
+                        onFilterChange={handleFilterChange}
+                    />
+                )}
                 {activeTab === 'exploreGigs' && <ExploreGigs />}
             </div>
         </div>

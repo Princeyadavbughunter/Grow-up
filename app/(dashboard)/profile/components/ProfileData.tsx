@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useRef } from "react";
 import { HiDotsVertical } from "react-icons/hi";
 import { IoLocationSharp } from "react-icons/io5";

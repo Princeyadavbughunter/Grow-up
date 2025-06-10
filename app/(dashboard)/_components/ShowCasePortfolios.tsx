@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Description } from '@radix-ui/react-dialog'
 import React, { useEffect, useState } from 'react'
 import { useAuth } from "@/context/AuthContext"

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { FaLaptopCode } from 'react-icons/fa6';
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";

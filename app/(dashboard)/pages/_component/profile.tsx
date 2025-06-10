@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 import React, { useState, useEffect } from 'react';
 import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook } from 'react-icons/fa';

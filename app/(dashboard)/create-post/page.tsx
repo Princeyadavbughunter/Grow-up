@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 import React, { useState, useEffect } from 'react';

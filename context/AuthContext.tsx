@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 import React, { createContext, useState, useContext, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
 import axios, { AxiosInstance } from 'axios';

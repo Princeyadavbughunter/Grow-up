@@ -14,7 +14,7 @@ import { EffectCards } from 'swiper/modules';
 
 const WhyUs = () => {
   return (
-     <div className='flex sm:flex-row flex-col items-center justify-center items-center sm:gap-x-[112px] max-w-[1400px]'>
+     <div className='flex sm:flex-row flex-col justify-center items-center sm:gap-x-[112px] max-w-[1400px]'>
          <h1 className='font-bold text-[32px] sm:max-w-[15%] text-center text-[#4A4A4A]'>Why Choose Us?</h1>
          <div>
          <Swiper

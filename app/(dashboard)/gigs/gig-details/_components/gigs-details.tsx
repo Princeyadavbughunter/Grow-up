@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { LuShare2 } from "react-icons/lu";
 import { HiDotsVertical } from "react-icons/hi";

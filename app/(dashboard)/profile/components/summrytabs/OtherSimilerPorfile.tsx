@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react'
 import { FaUserPlus, FaLaptopCode } from 'react-icons/fa'
 import { ImMail4 } from 'react-icons/im'

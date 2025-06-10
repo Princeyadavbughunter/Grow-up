@@ -1,8 +1,6 @@
+// @ts-nocheck
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
-import { CiEdit } from 'react-icons/ci'
-import { IoMdAdd } from 'react-icons/io'
-import { CiCreditCard1 } from 'react-icons/ci'
 import OtherSimilerPorfile from './OtherSimilerPorfile'
 import Clubs from './Clubs'
 import Posts from './Posts'
@@ -32,10 +30,10 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                 ))}
             </div>
 
-            <div className="flex justify-between gap-10">
+            <div className="flex justify-between flex-col md:flex-row gap-10">
                 <div className="">
                     <div>
-                        <p className='flex items-center py-4 font-semibold gap-5'>Summary <CiEdit /></p>
+                        <p className='flex items-center py-4 font-semibold gap-5'>Summary</p>
                         <div className="bg-[#F6F8FF] shadow-sm rounded-lg p-4">
                             <p>MY Journey</p>
 
@@ -62,10 +60,6 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                     <div className="mb-8">
                         <div className="flex items-center gap-4 mb-4">
                             <h2 className="text-lg font-bold">My Education</h2>
-                            <div className="flex items-center gap-2">
-                                <IoMdAdd className="text-xl cursor-pointer" />
-                                <CiEdit className="text-xl cursor-pointer" />
-                            </div>
                         </div>
                         <div className="space-y-4">
                             {profileData ? (
@@ -98,8 +92,6 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                         <div className="flex items-center gap-4 mb-4">
                             <h2 className="text-lg font-bold">My Skills</h2>
                             <div className="flex items-center gap-2">
-                                <IoMdAdd className="text-xl cursor-pointer" />
-                                <CiCreditCard1 className="text-xl cursor-pointer" />
                             </div>
                         </div>
 

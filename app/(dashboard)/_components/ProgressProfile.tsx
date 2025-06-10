@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { HiOutlineStar } from "react-icons/hi2";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";

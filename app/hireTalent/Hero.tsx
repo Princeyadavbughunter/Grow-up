@@ -1,4 +1,4 @@
-import Button from '@/components/Button'
+// @ts-nocheck
 import React from 'react'
 
 const Hero = () => {

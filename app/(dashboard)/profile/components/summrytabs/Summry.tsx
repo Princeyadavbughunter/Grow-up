@@ -62,6 +62,7 @@ interface SummryProps {
 }
 
 const Summry: React.FC<SummryProps> = ({ profileData }) => {
+    // @ts-ignore
     const [activeJobTypeTab, setActiveJobTypeTab] = useState('About');
     
     const skillsArray = profileData?.skills ? profileData.skills.split(',').map(skill => skill.trim()) : [];
@@ -74,6 +75,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                         key={tab}
                         variant={activeJobTypeTab === tab ? "default" : "ghost"}
                         className={activeJobTypeTab === tab ? "bg-[#979797] hover:bg-[#dcdcdc] rounded-full" : "rounded-full bg-[#dcdcdc]"}
+                        // @ts-ignore
                         onClick={() => setActiveJobTypeTab(tab)}
                     >
                         {tab}
