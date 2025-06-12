@@ -96,13 +96,13 @@ export default function JobPostingsList({ onSelectJob, onViewApplications, selec
     }
 
     return (
-        <div className="space-y-4">
-            <div className="bg-white rounded-lg shadow-sm p-4">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Your Job Postings</h2>
-                <p className="text-gray-600 text-sm">{jobPostings.length} active job{jobPostings.length !== 1 ? 's' : ''}</p>
+        <div className="space-y-3 sm:space-y-4">
+            <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-4">Your Job Postings</h2>
+                <p className="text-gray-600 text-xs sm:text-sm">{jobPostings.length} active job{jobPostings.length !== 1 ? 's' : ''}</p>
             </div>
 
-            <div className="space-y-3 max-h-[600px] overflow-y-auto">
+            <div className="space-y-2 sm:space-y-3 max-h-[400px] sm:max-h-[600px] overflow-y-auto">
                 {jobPostings.map((job) => (
                     <div
                         key={job.id}
@@ -113,34 +113,34 @@ export default function JobPostingsList({ onSelectJob, onViewApplications, selec
                         }`}
                         onClick={() => onSelectJob(job)}
                     >
-                        <div className="p-4">
-                            <div className="flex items-start gap-3">
+                        <div className="p-3 sm:p-4">
+                            <div className="flex items-start gap-2 sm:gap-3">
                                 <img 
                                     src={job.logo} 
                                     alt={job.company_name}
-                                    className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover flex-shrink-0"
                                 />
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="font-semibold text-gray-900 truncate">
+                                    <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate">
                                         {job.job_title}
                                     </h3>
-                                    <p className="text-sm text-gray-600 truncate">
+                                    <p className="text-xs sm:text-sm text-gray-600 truncate">
                                         {job.company_name}
                                     </p>
                                     
-                                    <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2 text-xs text-gray-500">
                                         <div className="flex items-center gap-1">
-                                            <MapPin className="w-3 h-3" />
-                                            <span>{job.location}</span>
+                                            <MapPin className="w-3 h-3 flex-shrink-0" />
+                                            <span className="truncate">{job.location}</span>
                                         </div>
                                         <div className="flex items-center gap-1">
-                                            <Calendar className="w-3 h-3" />
+                                            <Calendar className="w-3 h-3 flex-shrink-0" />
                                             <span>{formatDate(job.created_at)}</span>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between mt-3">
-                                        <div className="flex items-center gap-4 text-xs">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mt-3">
+                                        <div className="flex items-center gap-3 sm:gap-4 text-xs">
                                             <div className="flex items-center gap-1 text-gray-500">
                                                 <Eye className="w-3 h-3" />
                                                 <span>{job.view_count} views</span>
@@ -151,7 +151,7 @@ export default function JobPostingsList({ onSelectJob, onViewApplications, selec
                                             </div>
                                         </div>
                                         
-                                        <span className={`px-2 py-1 text-xs rounded-full ${
+                                        <span className={`px-2 py-1 text-xs rounded-full self-start sm:self-auto ${
                                             job.is_active === 'open' 
                                                 ? 'bg-green-100 text-green-800' 
                                                 : 'bg-red-100 text-red-800'
@@ -166,9 +166,10 @@ export default function JobPostingsList({ onSelectJob, onViewApplications, selec
                                                 e.stopPropagation();
                                                 onViewApplications(job);
                                             }}
-                                            className="w-full mt-3 bg-blue-600 text-white py-2 px-3 rounded-md text-sm hover:bg-blue-700 transition-colors"
+                                            className="w-full mt-3 bg-blue-600 text-white py-2 px-3 rounded-md text-xs sm:text-sm hover:bg-blue-700 transition-colors"
                                         >
-                                            View {applicationCounts[job.id]} Application{applicationCounts[job.id] !== 1 ? 's' : ''}
+                                            <span className="hidden sm:inline">View {applicationCounts[job.id]} Application{applicationCounts[job.id] !== 1 ? 's' : ''}</span>
+                                            <span className="sm:hidden">{applicationCounts[job.id]} Applications</span>
                                         </button>
                                     )}
                                 </div>
@@ -179,12 +180,12 @@ export default function JobPostingsList({ onSelectJob, onViewApplications, selec
             </div>
 
             {jobPostings.length === 0 && (
-                <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+                <div className="bg-white rounded-lg shadow-sm p-6 sm:p-8 text-center">
                     <div className="text-gray-400 mb-4">
-                        <Users className="w-16 h-16 mx-auto" />
+                        <Users className="w-12 h-12 sm:w-16 sm:h-16 mx-auto" />
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No job postings yet</h3>
-                    <p className="text-gray-600">Create your first job posting to start hiring talent.</p>
+                    <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No job postings yet</h3>
+                    <p className="text-sm sm:text-base text-gray-600">Create your first job posting to start hiring talent.</p>
                 </div>
             )}
         </div>

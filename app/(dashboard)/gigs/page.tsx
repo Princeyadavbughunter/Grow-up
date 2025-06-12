@@ -77,16 +77,17 @@ const GigsPage = () => {
         <div className='max-w-[1350px] bg-gray-50 py-3 sm:py-5 mx-auto px-4 sm:px-10'>
             {/* Header with View Applications Button */}
             <div className="mb-6">
-                <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-2xl font-bold text-gray-900">Browse Gigs</h1>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Browse Gigs</h1>
                     
                     {!checkingJobs && hasJobPostings && (
                         <Link 
                             href="/gigs/jobs/manage" 
-                            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 shadow-md"
+                            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 shadow-md text-sm sm:text-base"
                         >
                             <Briefcase className="w-4 h-4" />
-                            View Applications
+                            <span className="hidden sm:inline">View Applications</span>
+                            <span className="sm:hidden">Applications</span>
                             <span className="bg-purple-500 text-white text-xs px-2 py-1 rounded-full ml-1">
                                 {userJobPostings.length}
                             </span>
@@ -95,15 +96,17 @@ const GigsPage = () => {
                 </div>
                 
                 {!checkingJobs && hasJobPostings && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                        <div className="flex items-center gap-2 text-blue-800">
-                            <Users className="w-5 h-5" />
-                            <span className="font-medium">
-                                You have {userJobPostings.length} job posting{userJobPostings.length !== 1 ? 's' : ''} - 
-                                <Link href="/gigs/jobs/manage" className="underline ml-1 hover:text-blue-900">
-                                    manage applications
-                                </Link>
-                            </span>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-blue-800">
+                            <div className="flex items-center gap-2">
+                                <Users className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                                <span className="font-medium text-sm sm:text-base">
+                                    You have {userJobPostings.length} job posting{userJobPostings.length !== 1 ? 's' : ''}
+                                </span>
+                            </div>
+                            <Link href="/gigs/jobs/manage" className="underline text-sm sm:text-base hover:text-blue-900 sm:ml-1">
+                                manage applications
+                            </Link>
                         </div>
                     </div>
                 )}
