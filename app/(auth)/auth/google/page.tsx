@@ -40,7 +40,7 @@ const AccountCreationContent = () => {
     const handleGoogleAuth = async () => {
         setLoading(true)
         try {
-            const response = await axios.get<GoogleAuthResponse>('https://backend.growupbuddy.com/api/auth/o/google-oauth2/?redirect_uri=http://localhost:3000/auth/google')
+            const response = await axios.get<GoogleAuthResponse>('https://backend.growupbuddy.com/api/auth/o/google-oauth2/?redirect_uri=https://growupbuddy.com/auth/google')
 
             if (response.data.authorization_url) {
                 window.location.href = response.data.authorization_url
