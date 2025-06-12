@@ -187,24 +187,6 @@ const AccountCreationContent = () => {
                                     <FcGoogle className="text-xl" />
                                     <span>{loading ? 'Loading...' : 'Continue with Google'}</span>
                                 </button>
-
-                                <button
-                                    className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-colors"
-                                    onClick={handleAppleAuth}
-                                    disabled={loading}
-                                >
-                                    <FaApple className="text-xl" />
-                                    <span>Continue with Apple ID</span>
-                                </button>
-
-                                <button
-                                    className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#0A66C2] text-white rounded-xl hover:bg-[#004182] transition-colors"
-                                    onClick={handleLinkedInAuth}
-                                    disabled={loading}
-                                >
-                                    <FaLinkedin className="text-xl" />
-                                    <span>Continue with LinkedIn</span>
-                                </button>
                             </div>
                         </div>
                     </div>
