@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Globe, Users, Network, Calendar, Layout } from 'lucide-react';
-import { useRouter, usePathname } from 'next/navigation';
+import { Globe, Users, Network, Calendar, Layout, MessageCircle } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 const routes = [
@@ -11,6 +11,7 @@ const routes = [
   { path: '/network', icon: Network, label: 'Network' },
   { path: '/events', icon: Calendar, label: 'Events' },
   { path: '/clubs', icon: Users, label: 'Clubs' },
+  { path: '/chat', icon: MessageCircle, label: 'Chat' },
   { path: '/pages', icon: Layout, label: 'Pages' }
 ];
 
@@ -19,7 +20,7 @@ const BottomNavbar = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-      <div className="flex items-center justify-around p-4 w-full md:w-[50%] mx-auto">
+      <div className="flex items-center justify-around px-2 py-4 md:p-4 w-full md:w-[50%] mx-auto">
         {routes.map(({ path, icon: Icon, label }) => (
           <NavItem
             key={path}
@@ -47,7 +48,7 @@ const NavItem = ({
 }) => (
   <Link
     href={href}
-    className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors
+    className={`flex flex-col items-center gap-1 p-1 md:p-2 rounded-lg transition-colors min-w-[50px] w-[50px] md:min-w-[60px] md:w-[60px]
       ${active 
         ? 'text-purple-600 bg-purple-50' 
         : 'text-gray-500 hover:text-purple-600 hover:bg-purple-50'

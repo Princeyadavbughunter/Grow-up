@@ -2,7 +2,7 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
 import { BiSearch } from 'react-icons/bi';
-import { Send, Check, X, MessageSquare, Clock } from 'lucide-react';
+import { Send, Check, X, MessageSquare, Clock, ArrowLeft } from 'lucide-react';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 import { useParams } from 'next/navigation';
 
@@ -45,6 +45,7 @@ const ChatInterface: React.FC = () => {
     const [tab, setTab] = useState<'active' | 'pending'>('pending');
     const [wsConnected, setWsConnected] = useState<boolean>(false);
     const [wsError, setWsError] = useState<string | null>(null);
+    const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
     const websocketRef = useRef<WebSocket | null>(null);
     const wsReconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -59,13 +60,11 @@ const ChatInterface: React.FC = () => {
     useEffect(() => {
         const createRoom = async () => {
             if (roomCreatedRef.current) return;
-            
-            
             try {
                 const response = await api.post('/individualchats/chatroom/', {
                     name: "Test",
                     participants: [
-                        { id: profileData?.id },
+                        { id: profileData?.user },
                         { id: params.id }
                     ]
                 });
@@ -76,7 +75,7 @@ const ChatInterface: React.FC = () => {
             }
         };
 
-        if (authToken && profileData?.id && params.id) {
+        if (authToken && profileData?.user && params.id) {
             createRoom();
         }
     }, [authToken, params.id]);
@@ -210,14 +209,14 @@ const ChatInterface: React.FC = () => {
                         websocketRef.current.send(JSON.stringify({
                             room_id: selectedChatroom.id,
                             message: tempMessage,
-                            user_id: userId,
+                            user_id: profileData?.user,
                             message_type: "chat"
                         }));
 
                         const tempMessageObj: Message = {
                             message_id: `temp-${Date.now()}`,
                             message: tempMessage,
-                            user_id: userId || '',
+                            user_id: profileData?.user || '',
                             timestamp: new Date().toISOString(),
                         };
 
@@ -235,7 +234,7 @@ const ChatInterface: React.FC = () => {
             websocketRef.current.send(JSON.stringify({
                 room_id: selectedChatroom.id,
                 message: messageInput,
-                user_id: userId,
+                user_id: profileData?.user,
                 message_type: "chat"
             }));
 
@@ -248,7 +247,7 @@ const ChatInterface: React.FC = () => {
 
     const fetchMessages = async (roomId: string): Promise<void> => {
         try {
-            const response = await api.get(`/individualchats/chatroom-messages/?room_id=${roomId}`);
+            const response = await api.get(`/individualchats/chatroom/?room_id=${roomId}`);
             setMessages(response.data.results || []);
             connectWebSocket(roomId);
         } catch (error) {
@@ -258,6 +257,7 @@ const ChatInterface: React.FC = () => {
 
     const handleChatroomSelect = async (chatroom: Chatroom): Promise<void> => {
         setSelectedChatroom(chatroom);
+        setShowSidebar(false);
         fetchMessages(chatroom.id);
         const details = await fetchChatroomDetails(chatroom.id);
         if (details) {
@@ -265,12 +265,14 @@ const ChatInterface: React.FC = () => {
         }
     };
 
+    const handleBackToSidebar = (): void => {
+        setShowSidebar(true);
+        setSelectedChatroom(null);
+    };
+
     const handleChatroomAction = async (roomId: string, accept: boolean): Promise<void> => {
         try {
-            await api.patch('/individualchats/chatroom/', {
-                room_id: roomId,
-                is_accepted: accept
-            });
+            await api.patch(`/individualchats/chatroom/?room_id=${roomId}&is_accepted=${accept ? 'True' : 'False'}`);
 
             // Refresh lists
             fetchChatrooms();
@@ -299,37 +301,38 @@ const ChatInterface: React.FC = () => {
     );
 
     return (
-        <div className="flex h-full">
-            <div className="w-1/4 border-r bg-white">
-                <div className="p-4 border-b">
-                    <div className="relative mb-4">
+        <div className="flex h-full bg-gray-100">
+            {/* Sidebar */}
+            <div className={`${showSidebar ? 'block' : 'hidden'} w-full md:block md:w-1/4 border-r bg-white md:relative absolute inset-0 z-10 md:z-auto`}>
+                <div className="p-2 mt-16 md:mt-0 md:p-4 border-b">
+                    <div className="relative mb-2 md:mb-4">
                         <BiSearch className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                         <input
                             type="text"
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
                             placeholder="Search chats..."
-                            className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-4"
+                            className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-4 text-sm md:text-base"
                         />
                     </div>
 
                     <div className="flex border-b mb-2">
                         <button
                             onClick={() => setTab('active')}
-                            className={`flex-1 py-2 text-center ${tab === 'active' ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-500"}`}
+                            className={`flex-1 py-2 text-center text-sm md:text-base ${tab === 'active' ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-500"}`}
                         >
                             Active Chats
                         </button>
                         <button
                             onClick={() => setTab('pending')}
-                            className={`flex-1 py-2 text-center ${tab === 'pending' ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-500"}`}
+                            className={`flex-1 py-2 text-center text-sm md:text-base ${tab === 'pending' ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-500"}`}
                         >
                             Pending ({pendingChatrooms.length})
                         </button>
                     </div>
                 </div>
 
-                <div className="overflow-y-auto h-full">
+                <div className="overflow-y-auto h-full pb-16 md:pb-0">
                     {tab === 'active' ? (
                         <>
                             {loading ? (
@@ -340,19 +343,19 @@ const ChatInterface: React.FC = () => {
                                 filteredChatrooms.map((chatroom) => (
                                     <div
                                         key={chatroom.id}
-                                        className={`flex items-center p-4 hover:bg-gray-50 cursor-pointer ${selectedChatroom?.id === chatroom.id ? 'bg-gray-100' : ''}`}
+                                        className={`flex items-center p-3 md:p-4 hover:bg-gray-50 cursor-pointer active:bg-gray-100 ${selectedChatroom?.id === chatroom.id ? 'bg-gray-100' : ''}`}
                                         onClick={() => handleChatroomSelect(chatroom)}
                                     >
                                         <img
-                                            src={chatroom.chatting_with_current_user?.image || ''}
+                                            src={chatroom.chatting_with_current_user.image || '/default-avatar.png'}
                                             alt={chatroom.chatting_with_current_user.name}
-                                            className="h-12 w-12 rounded-full mr-3"
+                                            className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0"
                                         />
-                                        <div className="flex-1">
-                                            <h3 className="font-medium">{chatroom.chatting_with_current_user.name}</h3>
-                                            <p className="text-sm text-gray-500 truncate">{chatroom.name}</p>
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-medium text-sm md:text-base truncate">{chatroom.chatting_with_current_user.name}</h3>
+                                            <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                                         </div>
-                                        <div className="text-xs text-gray-400">
+                                        <div className="text-xs text-gray-400 flex-shrink-0">
                                             {new Date(chatroom.created_at).toLocaleDateString()}
                                         </div>
                                     </div>
@@ -367,30 +370,30 @@ const ChatInterface: React.FC = () => {
                                 <div className="p-4 text-center text-gray-500">No pending requests</div>
                             ) : (
                                 filteredPendingChatrooms.map((chatroom) => (
-                                    <div key={chatroom.id} className="flex items-center p-4 border-b">
+                                    <div key={chatroom.id} className="flex items-center p-3 md:p-4 border-b">
                                         <img
-                                            src={chatroom.chatting_with_current_user?.image || '/default-avatar.png'}
-                                            alt={chatroom.chatting_with_current_user?.name}
-                                            className="h-12 w-12 rounded-full mr-3"
+                                            src={chatroom.chatting_with_current_user.image || '/default-avatar.png'}
+                                            alt={chatroom.chatting_with_current_user.name}
+                                            className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0"
                                         />
-                                        <div className="flex-1">
-                                            <h3 className="font-medium">{chatroom.chatting_with_current_user?.name}</h3>
-                                            <p className="text-sm text-gray-500 truncate">{chatroom?.name}</p>
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-medium text-sm md:text-base truncate">{chatroom.chatting_with_current_user.name}</h3>
+                                            <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                                             <div className="text-xs text-gray-400 flex items-center">
                                                 <Clock className="h-3 w-3 mr-1" />
                                                 {new Date(chatroom.created_at).toLocaleDateString()}
                                             </div>
                                         </div>
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-1 md:gap-2 flex-shrink-0">
                                             <button
                                                 onClick={() => handleChatroomAction(chatroom.id, true)}
-                                                className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200"
+                                                className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 active:bg-green-300"
                                             >
                                                 <Check className="h-4 w-4" />
                                             </button>
                                             <button
                                                 onClick={() => handleChatroomAction(chatroom.id, false)}
-                                                className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200"
+                                                className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 active:bg-red-300"
                                             >
                                                 <X className="h-4 w-4" />
                                             </button>
@@ -403,23 +406,31 @@ const ChatInterface: React.FC = () => {
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-col">
+            {/* Main Chat Area */}
+            <div className={`${!showSidebar ? 'block' : 'hidden'} md:block flex-1 flex flex-col bg-white`}>
                 {!selectedChatroom ? (
-                    <div className="flex-1 flex items-center justify-center flex-col text-gray-500">
-                        <MessageSquare className="h-16 w-16 mb-4 text-gray-300" />
-                        <p className="text-xl">Select a chat to start messaging</p>
+                    <div className="flex-1 flex items-center justify-center flex-col text-gray-500 p-4">
+                        <MessageSquare className="h-12 w-12 md:h-16 md:w-16 mb-4 text-gray-300" />
+                        <p className="text-lg md:text-xl text-center">Select a chat to start messaging</p>
                     </div>
                 ) : (
                     <>
-                        <div className="p-4 border-b bg-white flex items-center">
+                        {/* Chat Header */}
+                        <div className="p-3 md:p-4 border-b bg-white flex items-center">
+                            <button
+                                onClick={handleBackToSidebar}
+                                className="md:hidden mr-3 p-2 hover:bg-gray-100 rounded-full"
+                            >
+                                <ArrowLeft className="h-5 w-5" />
+                            </button>
                             <img
                                 src={selectedChatroom.chatting_with_current_user.image || '/default-avatar.png'}
                                 alt={selectedChatroom.chatting_with_current_user.name}
-                                className="h-10 w-10 rounded-full mr-3"
+                                className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0"
                             />
-                            <div>
-                                <h2 className="font-medium">{selectedChatroom.chatting_with_current_user.name}</h2>
-                                <p className="text-sm text-gray-500 flex items-center">
+                            <div className="min-w-0">
+                                <h2 className="font-medium text-sm md:text-base truncate">{selectedChatroom.chatting_with_current_user.name}</h2>
+                                <p className="text-xs md:text-sm text-gray-500 flex items-center">
                                     {wsConnected ?
                                         <span className="text-green-500 flex items-center"><span className="h-2 w-2 bg-green-500 rounded-full mr-1"></span>Online</span> :
                                         <span className="text-gray-500 flex items-center"><span className="h-2 w-2 bg-gray-300 rounded-full mr-1"></span>Offline</span>
@@ -428,30 +439,31 @@ const ChatInterface: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+                        {/* Messages Area */}
+                        <div className="flex-1 p-3 md:p-4 overflow-y-auto bg-gray-50">
                             {wsError && (
-                                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                                <div className="bg-red-100 border border-red-400 text-red-700 px-3 md:px-4 py-2 md:py-3 rounded mb-4 text-sm">
                                     <p>{wsError}</p>
                                 </div>
                             )}
 
                             {messages.length === 0 ? (
                                 <div className="flex items-center justify-center h-full text-gray-500">
-                                    <p>No messages yet. Start the conversation!</p>
+                                    <p className="text-sm md:text-base">No messages yet. Start the conversation!</p>
                                 </div>
                             ) : (
                                 messages.map((message) => {
-                                    const isCurrentUser = message.user_id === userId;
+                                    const isCurrentUser = message.user_id === profileData?.user;
                                     return (
                                         <div
                                             key={message.message_id}
-                                            className={`mb-4 flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+                                            className={`mb-3 md:mb-4 flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                                         >
                                             <div
-                                                className={`max-w-[70%] rounded-lg p-3 ${isCurrentUser ? 'bg-blue-500 text-white' : 'bg-white border'
+                                                className={`max-w-[85%] md:max-w-[70%] rounded-lg p-2 md:p-3 ${isCurrentUser ? 'bg-blue-500 text-white' : 'bg-white border'
                                                     }`}
                                             >
-                                                <p>{message.message}</p>
+                                                <p className="text-sm md:text-base">{message.message}</p>
                                                 <div className={`text-xs mt-1 ${isCurrentUser ? 'text-blue-100' : 'text-gray-500'}`}>
                                                     {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </div>
@@ -463,14 +475,15 @@ const ChatInterface: React.FC = () => {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        <div className="p-4 border-t bg-white">
-                            <div className="flex">
+                        {/* Message Input */}
+                        <div className="p-3 md:p-4 border-t bg-white">
+                            <div className="flex gap-2">
                                 <input
                                     type="text"
                                     value={messageInput}
                                     onChange={(e) => setMessageInput(e.target.value)}
                                     placeholder="Type a message..."
-                                    className="flex-1 rounded-l-lg border p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="flex-1 rounded-lg border p-2 md:p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             sendMessage();
@@ -479,10 +492,10 @@ const ChatInterface: React.FC = () => {
                                 />
                                 <button
                                     onClick={sendMessage}
-                                    className="bg-blue-500 text-white rounded-r-lg px-4 py-2 hover:bg-blue-600"
+                                    className="bg-blue-500 text-white rounded-lg px-3 md:px-4 py-2 md:py-3 hover:bg-blue-600 active:bg-blue-700 flex-shrink-0"
                                     disabled={!wsConnected}
                                 >
-                                    <Send className="h-5 w-5" />
+                                    <Send className="h-4 w-4 md:h-5 md:w-5" />
                                 </button>
                             </div>
                         </div>

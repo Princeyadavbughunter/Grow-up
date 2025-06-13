@@ -5,15 +5,19 @@ import { ImMail4 } from 'react-icons/im'
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext"
 
 interface Freelancer {
-  freelancer_id?: string;
-  id?: string;
-  freelancer_username?: string;
-  name?: string;
-  title?: string;
-  location?: string;
-  summary?: string;
-  imageUrl?: string;
-  follower_count?: number;
+  id: string;
+  first_name: string;
+  last_name: string;
+  bio: string;
+  profile_picture: string;
+  address: string;
+  city: string;
+  state: string;
+  skills: string;
+  follower_count: number;
+  is_following: boolean;
+  follow_request_sent: boolean;
+  position?: string;
 }
 
 interface SimilarProfile {
@@ -23,16 +27,13 @@ interface SimilarProfile {
   location: string;
   summary: string;
   img: string;
-  followerCount?: number;
-  requestSent?: boolean;
+  followerCount: number;
+  requestSent: boolean;
 }
 
 const OtherSimilarProfile: React.FC = () => {
-    // @ts-ignore
     const [similarProfiles, setSimilarProfiles] = useState<SimilarProfile[]>([])
-    // @ts-ignore
     const [loading, setLoading] = useState<boolean>(true)
-    // @ts-ignore
     const { api } = useAuthenticatedApi()
     const { isAuthenticated } = useAuth()
 
@@ -42,15 +43,16 @@ const OtherSimilarProfile: React.FC = () => {
                 setLoading(true)
                 const response = await api.get('/freelancer/unfollowed-freelancers/')
                 
-                // Assuming the API returns an array of freelancer objects
+                // Map the actual API response to our component structure
                 const processedProfiles: SimilarProfile[] = response.data.map((freelancer: Freelancer) => ({
-                    id: freelancer.freelancer_id || freelancer.id || '',
-                    name: freelancer.freelancer_username || freelancer.name || '',
-                    title: freelancer.title || "Freelancer",
-                    location: freelancer.location || "Unknown",
-                    summary: freelancer.summary || "Freelancer profile",
-                    img: freelancer.imageUrl || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-                    followerCount: freelancer.follower_count
+                    id: freelancer.id,
+                    name: `${freelancer.first_name} ${freelancer.last_name}`.trim(),
+                    title: freelancer.position || "Freelancer",
+                    location: `${freelancer.city || ''}, ${freelancer.state || ''}`.replace(/^,\s*|,\s*$/g, '') || freelancer.address || "Unknown",
+                    summary: freelancer.bio || "No bio available",
+                    img: freelancer.profile_picture || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+                    followerCount: freelancer.follower_count || 0,
+                    requestSent: freelancer.follow_request_sent || false
                 }))
                 
                 setSimilarProfiles(processedProfiles)

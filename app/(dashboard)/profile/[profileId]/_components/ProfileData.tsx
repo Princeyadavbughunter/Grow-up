@@ -31,6 +31,7 @@ interface ProfileDataProps {
     twitter_account?: string | null;
     is_following: boolean;
     follow_request_sent: boolean;
+    user: string;
   } | null;
 }
 
@@ -111,7 +112,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   const followButtonContent = getFollowButtonContent();
 
   const handleOpenInbox = () => {
-    router.push(`/chat/${profileData.id}`);
+    router.push(`/chat/${profileData.user}`);
   };
 
   return (

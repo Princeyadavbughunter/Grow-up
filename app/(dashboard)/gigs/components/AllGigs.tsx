@@ -77,25 +77,25 @@ const AllGigs = ({
   };
 
   return (
-    <div className="bg-gray-50 py-3 px-2 md:px-4 lg:px-3 w-full">
+    <div className="bg-gray-50 py-2 px-1 sm:px-2 md:px-4 lg:px-3 w-full">
       <div className="w-full mx-auto lg:max-w-full">
-        <div className="sticky top-0 z-10 bg-gray-50 pt-2 pb-3">
-          <div className="relative bg-[#6A737D0F] rounded-xl mb-3">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+        <div className="sticky top-0 z-10 bg-gray-50 pt-1 pb-2">
+          <div className="relative bg-[#6A737D0F] rounded-lg mb-2">
+            <Search className="absolute left-2 top-2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
             <Input 
               placeholder="Search by Title, Location" 
-              className="pl-8 py-1.5 rounded-xl border-none text-sm"
+              className="pl-7 sm:pl-8 py-1 sm:py-1.5 rounded-lg border-none text-xs sm:text-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
-          <div className="flex flex-wrap mb-5 gap-2">
-            {["Domain", "Remote", "Hybrid", "Onsite", "Latest"].map((tab) => (
+          <div className="flex flex-wrap mb-2 sm:mb-3 gap-1 sm:gap-2">
+            {[ "Remote", "Hybrid", "Onsite"].map((tab) => (
               <Button
                 key={tab}
                 variant={activeWorkType === tab ? "default" : "secondary"}
-                className={`px-3 py-1 text-sm ${activeWorkType === tab 
+                className={`px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm h-6 sm:h-8 ${activeWorkType === tab 
                   ? "bg-violet-600 hover:bg-violet-500 rounded-full" 
                   : "rounded-full"}`}
                 onClick={() => handleWorkTypeChange(tab)}
@@ -105,25 +105,27 @@ const AllGigs = ({
             ))}
           </div>
 
-          {["All", "Freelance", "Collaboration", "Internship"].map((tab) => (
-        <button
-          key={tab}
-          className={`px-3 py-1 text-sm relative ${
-            activeJobType === tab 
-              ? "text-violet-600 font-medium" 
-              : "text-gray-600 hover:text-gray-800"
-          }`}
-          onClick={() => handleJobTypeChange(tab)}
-        >
-          {tab}
-          {activeJobType === tab && (
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-violet-600"></span>
-          )}
-        </button>
-      ))}
+          <div className="flex flex-wrap gap-2 sm:gap-4 mb-2 sm:mb-3">
+            {["All", "Freelance", "Collaboration", "Internship", "Contract", "Full Time", "Part time"].map((tab) => (
+              <button
+                key={tab}
+                className={`px-1 sm:px-2 py-1 text-xs sm:text-sm relative ${
+                  activeJobType === tab 
+                    ? "text-violet-600 font-medium" 
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
+                onClick={() => handleJobTypeChange(tab)}
+              >
+                {tab}
+                {activeJobType === tab && (
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-violet-600"></span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="overflow-y-auto h-[450px] space-y-3 mt-1">
+        <div className="overflow-y-auto h-[400px] sm:h-[450px] space-y-2 sm:space-y-3 mt-1">
           {filteredGigs.length > 0 ? (
             filteredGigs.map((gig) => (
               <Card 

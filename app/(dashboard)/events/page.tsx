@@ -123,7 +123,7 @@ export default function EventsPage() {
   };
 
   const EventTabs = () => (
-    <div className="flex flex-wrap gap-4 md:gap-8 mb-6">
+    <div className="flex flex-wrap gap-2 sm:gap-4 md:gap-8 mb-4 sm:mb-6">
       {["Upcoming", "My Events", "Past Events"].map((tab) => {
         const tabKey = tab.toLowerCase().replace(" ", "_").replace("_events", "") as TabType;
         return (
@@ -131,7 +131,7 @@ export default function EventsPage() {
             key={tab}
             variant="ghost"
             onClick={() => setActiveTab(tabKey)}
-            className={`px-0 ${
+            className={`px-0 text-sm sm:text-base ${
  activeTab === tabKey
                 ? "text-black font-semibold border-b-2 border-black rounded-none"
                 : "text-gray-500"
@@ -145,13 +145,13 @@ export default function EventsPage() {
   );
 
   const EventFilters = () => (
-    <div className="flex flex-wrap gap-2 mb-6">
+    <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-6">
       {filters.map((filter) => (
         <Button
           key={filter}
           variant="secondary"
           onClick={() => setSelectedFilter(filter)}
-          className={`rounded-full ${
+          className={`rounded-full text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2 h-auto ${
             selectedFilter === filter
  ? "bg-[#7052FF] text-white hover:bg-[#7052FF]"
               : "bg-gray-100 hover:bg-gray-200 text-gray-700"
@@ -332,7 +332,7 @@ export default function EventsPage() {
   const currentEvents = events?.[`${activeTab}_events` as keyof EventsData] || [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 pb-40">
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-8 pb-40">
       <EventTabs />
       <EventFilters />
 
@@ -355,7 +355,7 @@ export default function EventsPage() {
 
         {selectedEvent ? (
           <>
-            <div className="w-full lg:w-1/3">
+            <div className="w-full px-2 lg:w-1/3">
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <Badge className="bg-yellow-100 text-yellow-800">
