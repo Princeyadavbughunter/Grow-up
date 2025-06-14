@@ -1,6 +1,7 @@
 import Navbar from '@/components/Navbar'
 import BottomNavbar from '@/components/BottomNavbar'
 import { AuthProvider } from '@/context/AuthContext'
+import ProfileRequired from './_components/ProfileRequired'
 
 interface LayoutProps {
     children: React.ReactNode
@@ -14,7 +15,9 @@ export default function RootLayout({ children }: LayoutProps) {
                     <Navbar />
                 </div>
                 <div className="h-[calc(100vh-10rem)]">
-                    {children}
+                    <ProfileRequired>
+                        {children}
+                    </ProfileRequired>
                 </div>
                 <div className="sticky bottom-0 z-50 bg-white shadow">
                     <BottomNavbar />

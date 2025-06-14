@@ -100,7 +100,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
   
   // Add profile state
-  const [profileData, setProfileData] = useState<FreelancerProfile | undefined>();
+  const [profileData, setProfileData] = useState<FreelancerProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState<boolean>(false);
   const [profileError, setProfileError] = useState<string | null>(null);
 

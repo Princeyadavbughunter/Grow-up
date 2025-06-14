@@ -4,7 +4,7 @@ import AddBio from './_components/AddBio'
 
 const page = () => {
     return (
-        <div className='mx-auto px-40'>
+        <div className='mx-auto px-4 sm:px-8 md:px-16 lg:px-24 xl:px-40'>
             <AddBio />
         </div>
     )
