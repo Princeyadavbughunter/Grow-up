@@ -77,7 +77,7 @@ const AllGigs = ({
   };
 
   return (
-    <div className="bg-gray-50 py-2 px-1 sm:px-2 md:px-4 lg:px-3 w-full">
+    <div className="bg-gray-50 h-[calc(100vh-12rem)] py-2 px-1 sm:px-2 md:px-4 lg:px-3 w-full">
       <div className="w-full mx-auto lg:max-w-full">
         <div className="sticky top-0 z-10 bg-gray-50 pt-1 pb-2">
           <div className="relative bg-[#6A737D0F] rounded-lg mb-2">
@@ -125,7 +125,7 @@ const AllGigs = ({
           </div>
         </div>
 
-        <div className="overflow-y-auto h-[400px] sm:h-[450px] space-y-2 sm:space-y-3 mt-1">
+        <div className="overflow-y-scroll h-[400px] sm:h-[450px] space-y-2 sm:space-y-3 mt-1">
           {filteredGigs.length > 0 ? (
             filteredGigs.map((gig) => (
               <Card 

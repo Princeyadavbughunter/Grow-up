@@ -66,7 +66,7 @@ export default function NetworkPage() {
   const [error, setError] = useState<string | null>(null);
 
   const { api } = useAuthenticatedApi();
-  const { authToken } = useAuth();
+  const { authToken, profileData } = useAuth();
 
   const fetchNetworkData = async () => {
     if (!authToken || !api) return;
@@ -108,7 +108,7 @@ export default function NetworkPage() {
       // Process other freelancers (exclude already connected ones)
       const connectedIds = new Set(processedFollowers.map(f => f.id));
       const processedFreelancers = (freelancersData || [])
-        .filter((freelancer: Freelancer) => !connectedIds.has(freelancer.id))
+        .filter((freelancer: Freelancer) => !connectedIds.has(freelancer.id) && freelancer.id !== profileData.id)
         .map((freelancer: Freelancer) => ({
           id: freelancer.id,
           name: `${freelancer.first_name || ""} ${freelancer.last_name || ""}`.trim() || "User",

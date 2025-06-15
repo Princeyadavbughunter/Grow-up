@@ -104,7 +104,7 @@ const Posts = () => {
     };
 
     return (
-        <div className="p-4">
+        <div className="p-4 h-[calc(100vh-18rem)] overflow-y-scroll">
             {posts.map((post) => (
                 <PostCard 
                     key={post.id} 

@@ -19,7 +19,7 @@ const Description = ({ selectedGig }: DescriptionProps) => {
     }
 
     return (
-        <div className="w-full rounded-xl p-2 sm:p-4">
+        <div className="w-full h-[calc(100vh-12rem)] overflow-y-scroll rounded-xl p-2 sm:p-4">
             <Card className="h-full border-none p-2 sm:p-4 rounded-xl flex flex-col">
                 <CardHeader className="sticky top-0 z-10 bg-white pb-4">
                     <CardTitle>{selectedGig.job_title}</CardTitle>

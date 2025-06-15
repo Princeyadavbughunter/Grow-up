@@ -211,7 +211,6 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     };
     
     setFormData(resetFormData);
-    router.push('/gigs');
     setProfileImagePreview(null);
     setProfileImageFile(null);
     setResumeFile(null);
