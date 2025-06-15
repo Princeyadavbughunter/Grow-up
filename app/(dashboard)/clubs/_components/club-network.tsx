@@ -127,7 +127,7 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
       
       {isLoading && <div className="flex justify-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div></div>}
       
-      <div className="space-y-6">
+      <div className="space-y-6 w-full overflow-x-hidden overflow-y-scroll">
         {participants.length > 0 ? 
           participants.map((participant) => (
             <NetworkCard
@@ -179,18 +179,17 @@ export function NetworkCard({
           <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white" />
         )}
       </div>
-      <div className="flex-1 w-full">
+      <div className=" overflow-auto ">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
+          <div className="max-w-[50%]">
             <div className="flex items-center gap-2">
-              <h3 className="font-medium">{name}</h3>
-              <Badge variant="secondary" className="text-xs">1st</Badge>
+              <h3 className="font-medium truncate">{name}</h3>
             </div>
-            <p className="text-sm text-gray-600">{title}</p>
-            <p className="text-sm text-gray-500">{location}</p>
-            {summary && <p className="text-sm text-gray-500 mt-1">{summary}</p>}
+            <p className="text-sm text-gray-600 truncate">{title}</p>
+            <p className="text-sm text-gray-500 truncate">{location}</p>
+            {summary && <p className="text-sm text-gray-500 mt-1 truncate">{summary}</p>}
             {followerCount !== undefined && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 mt-1 truncate">
                 {followerCount} {followerCount === 1 ? 'follower' : 'followers'}
               </p>
             )}
