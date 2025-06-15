@@ -329,6 +329,27 @@ export default function EventsPage() {
     }
   };
 
+  const handleAddReply = async (parentId: string, replyText: string) => {
+    if (!selectedEvent || !replyText.trim()) return;
+    
+    try {
+      await api.post('/company/app/event-comments/', {
+        comment_text: replyText,
+        event: selectedEvent.id,
+        parent: parentId,  // Include the parent comment ID for replies
+      });
+      
+      // Refresh comments after adding the reply
+      const response = await api.get(`/company/app/event-comments/?event_id=${selectedEvent.id}`);
+      setSelectedEvent({
+        ...selectedEvent,
+        comments: response.data  // Assuming response.data includes the updated comments with replies
+      });
+    } catch (error) {
+      console.error('Error adding reply:', error);
+    }
+  };
+
   const currentEvents = events?.[`${activeTab}_events` as keyof EventsData] || [];
 
   return (
@@ -338,7 +359,7 @@ export default function EventsPage() {
 
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-1/3">
-          <ScrollArea className="h-[calc(100vh-200px)]" ref={scrollContainerRef}>
+          <ScrollArea className="h-[calc(100vh-20rem)]" ref={scrollContainerRef}>
             <div className="pr-4 space-y-4">
               {currentEvents && currentEvents.length > 0 ? (
                 currentEvents.map(event => (
@@ -355,7 +376,7 @@ export default function EventsPage() {
 
         {selectedEvent ? (
           <>
-            <div className="w-full px-2 lg:w-1/3">
+            <div className="w-full h-[calc(100vh-20rem)] px-2 lg:w-1/3">
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <Badge className="bg-yellow-100 text-yellow-800">
@@ -415,7 +436,7 @@ export default function EventsPage() {
                     </form>
                     
                     {selectedEvent?.comments && selectedEvent.comments.length > 0 ? (
-                      <EventComments comments={selectedEvent.comments} />
+                      <EventComments comments={selectedEvent.comments} onAddReply={handleAddReply} />
                     ) : (
                       <p className="text-center text-gray-500">No comments yet</p>
                     )}
