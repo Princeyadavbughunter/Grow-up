@@ -64,7 +64,10 @@ const Page = () => {
       }
     };
 
-    fetchSelectedClub();
+    if (authToken) {
+      fetchSelectedClub();
+    }
+
   }, [selectedClubId, authToken]);
 
   const handleClubChange = (clubId) => {
@@ -78,18 +81,14 @@ const Page = () => {
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden">
-      {/* Clubs List - Hidden on mobile when club is selected */}
       <div className={`w-full lg:w-1/4 bg-[#F9FAFF] p-4 md:p-6 overflow-y-auto ${selectedClubId ? 'hidden lg:block' : 'block'}`}>
         <ClubsList selectedClubId={selectedClubId} setSelectedClubId={setSelectedClubId} />
       </div>
 
-      {/* Posts Section - Show on mobile when club is selected */}
       <div className={`flex-1 flex flex-col ${!selectedClubId ? 'hidden lg:flex' : 'flex'}`}>
-        {/* Header - Fixed */}
         <div className="bg-white border-b relative">
           <div className="flex items-center justify-between border mx-4 p-4 rounded-xl mt-5 mb-5">
             <div className="flex items-center gap-3 flex-1">
-              {/* Club Info - Clickable on mobile for club selection */}
               <div 
                 className="flex items-center gap-3 flex-1 lg:cursor-default cursor-pointer"
                 onClick={toggleClubSelector}
@@ -102,7 +101,6 @@ const Page = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold line-clamp-1">{selectedClub?.name || 'Select a club'}</h3>
-                    {/* Dropdown arrow for mobile */}
                     <svg className="w-4 h-4 lg:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
@@ -114,7 +112,6 @@ const Page = () => {
             <Link className="text-purple-600 text-sm font-medium flex-shrink-0" href="/create-post">Create Post</Link>
           </div>
           
-          {/* Mobile Club Selector Dropdown */}
           {showClubSelector && (
             <div className="lg:hidden absolute top-full left-4 right-4 bg-white border shadow-lg z-50 max-h-64 overflow-y-auto rounded-lg">
               {allClubs && allClubs.length > 0 ? (
@@ -146,13 +143,11 @@ const Page = () => {
           )}
         </div>
         
-        {/* Posts - Scrollable */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 ">
           {selectedClubId && <Posts clubId={selectedClubId} />}
         </div>
       </div>
 
-      {/* Network Section - Hidden on mobile */}
       <div className="hidden lg:block w-1/4 bg-[#F9FAFF] p-4 md:p-6 overflow-y-auto">
         <NetworkSection title="Members" clubId={selectedClubId || ""} />
       </div>

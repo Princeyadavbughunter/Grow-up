@@ -60,7 +60,7 @@ const Posts = ({ clubId }: PostsProps) => {
     }, [authToken, clubId]);
 
     return (
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4 h-[calc(100vh-18rem)] overflow-y-auto">
             {posts.map((post) => (
                 <PostCard key={post.id} post={post} />
             ))}

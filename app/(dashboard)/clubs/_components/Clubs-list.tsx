@@ -59,20 +59,24 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
     }, [authToken, selectedClubId]);
 
     useEffect(() => {
-        fetchClubs();
-    }, [fetchClubs]);
+        if (authToken) {    
+            fetchClubs();
+        }
+    }, [authToken]);
 
-    const handleJoinToggle = async (clubId: string) => {
+    const handleJoinToggle = async (clubId: string, isCurrentlyJoined: boolean) => {
         if (!api) return;
         
         try {
             await api.post(`/freelancer/join-club/?id=${clubId}`);
-            await fetchClubs(); // Refresh clubs after joining
-            setActiveTab("my");
-            setSelectedClubId(clubId);
+            await fetchClubs();
+            if (!isCurrentlyJoined) {
+                setActiveTab("my");
+                setSelectedClubId(clubId);
+            }
         } catch (error) {
             console.error('Error toggling club membership:', error);
-            setError('Failed to join club. Please try again.');
+            setError(`Failed to ${isCurrentlyJoined ? 'leave' : 'join'} club. Please try again.`);
         }
     };
 
@@ -160,7 +164,7 @@ interface ClubCardProps {
     club: Club;
     isMyClub: boolean;
     isSelected: boolean;
-    onJoinToggle: (clubId: string) => void;
+    onJoinToggle: (clubId: string, isCurrentlyJoined: boolean) => void;
     onSelect: (clubId: string) => void;
 }
 
@@ -196,14 +200,13 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
-                        onJoinToggle(club.id);
+                        onJoinToggle(club.id, isMyClub);
                     }}
                     className={`px-3 py-1 rounded text-sm transition-colors ${
                         isMyClub 
-                            ? "bg-green-100 text-green-700 font-medium" 
+                            ? "bg-green-100 text-green-700 font-medium hover:bg-green-200" 
                             : "text-purple-600 hover:text-purple-800 hover:bg-purple-50"
                     }`}
-                    disabled={isMyClub}
                 >
                     {isMyClub ? "Joined" : "Join"}
                 </button>

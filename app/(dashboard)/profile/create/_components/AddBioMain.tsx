@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 
 interface WorkExperience {
   id: string;
@@ -51,12 +51,13 @@ interface ProfileData {
 }
 
 const AddBioMain = () => {
-  const { apiCaller } = useAuth();
+  const { authToken } = useAuth();
   const [activeJobTypeTab, setActiveJobTypeTab] = useState<string>("About");
   const [modalType, setModalType] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const { api } = useAuthenticatedApi();
   
   // Profile Data State
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
@@ -111,14 +112,16 @@ const AddBioMain = () => {
   const [profileForm, setProfileForm] = useState(defaultProfileForm);
 
   useEffect(() => {
-    fetchProfileData();
-    fetchExperiences();
-  }, []);
+    if (authToken) {
+      fetchProfileData();
+      fetchExperiences();
+    }
+  }, [authToken]);
 
   const fetchProfileData = async () => {
     setIsLoading(true);
     try {
-      const response = await apiCaller.get('/freelancer/freelancer-profile/');
+      const response = await api.get('/freelancer/freelancer-profile/');
       if (response.data && response.data.length > 0) {
         setProfileData(response.data[0]);
         setProfileForm({
@@ -157,7 +160,7 @@ const AddBioMain = () => {
 
   const fetchExperiences = async () => {
     try {
-      const response = await apiCaller.get('/freelancer/work-experience/');
+      const response = await api.get('/freelancer/work-experience/');
       if (response.data) {
         setExperiences(response.data);
       }
@@ -198,9 +201,9 @@ const AddBioMain = () => {
     
     try {
       if (profileData?.id) {
-        await apiCaller.patch(`/freelancer/freelancer-profile/?id=${profileData.id}`, formData);
+        await api.patch(`/freelancer/freelancer-profile/?id=${profileData.id}`, formData);
       } else {
-        await apiCaller.post('/freelancer/freelancer-profile/', formData);
+        await api.post('/freelancer/freelancer-profile/', formData);
       }
       await fetchProfileData();
       setModalType("");
@@ -231,9 +234,9 @@ const AddBioMain = () => {
 
     try {
       if (isEditingExperience && selectedExperience) {
-        await apiCaller.patch(`/freelancer/work-experience/?id=${selectedExperience.id}`, dataToSubmit);
+        await api.patch(`/freelancer/work-experience/?id=${selectedExperience.id}`, dataToSubmit);
       } else {
-        await apiCaller.post('/freelancer/work-experience/', [dataToSubmit]);
+        await api.post('/freelancer/work-experience/', [dataToSubmit]);
       }
       
       await fetchExperiences();
@@ -276,7 +279,7 @@ const AddBioMain = () => {
 
   const deleteExperience = async (id: string) => {
     try {
-      await apiCaller.delete(`/freelancer/work-experience/?id=${id}`);
+      await api.delete(`/freelancer/work-experience/?id=${id}`);
       await fetchExperiences();
     } catch (error) {
       console.error("Error deleting experience:", error);
