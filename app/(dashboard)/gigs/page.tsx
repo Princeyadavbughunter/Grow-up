@@ -119,7 +119,7 @@ const GigsPage = () => {
                     activeJobType={jobType}
                     onFilterChange={handleFilterChange}
                 />
-                <Description selectedGig={selectedGig} />
+                <Description showSmaller={hasJobPostings} selectedGig={selectedGig} />
                 <ApplicationForm
                     jobId={selectedGig?.id}
                     isApplied={selectedGig?.is_applied || false}

@@ -176,7 +176,7 @@ export default function ManageJobsPage() {
                                         </div>
                                     </div>
 
-                                    <div className="space-y-4 sm:space-y-6">
+                                    <div className="space-y-4 h-[calc(100vh-26rem)] overflow-y-scroll sm:space-y-6">
                                         <div>
                                             <h3 className="text-base sm:text-lg font-semibold mb-2">Job Description</h3>
                                             <p className="text-sm sm:text-base text-gray-700 break-words">{selectedJob.job_description}</p>

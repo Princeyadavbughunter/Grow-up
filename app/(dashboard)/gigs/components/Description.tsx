@@ -5,9 +5,10 @@ import { Building2, MapPin, Clock, Badge } from 'lucide-react'
 
 interface DescriptionProps {
     selectedGig: Gig | null;
+    showSmaller: boolean;
 }
 
-const Description = ({ selectedGig }: DescriptionProps) => {
+const Description = ({ selectedGig, showSmaller }: DescriptionProps) => {
     if (!selectedGig) {
         return (
             <div className="w-full p-2 sm:p-4">
@@ -19,7 +20,7 @@ const Description = ({ selectedGig }: DescriptionProps) => {
     }
 
     return (
-        <div className="w-full h-[calc(100vh-12rem)] overflow-y-scroll rounded-xl p-2 sm:p-4">
+        <div className={`w-full ${showSmaller ? 'h-[calc(100vh-20rem)]' : 'h-[calc(100vh-12rem)]'} overflow-y-scroll rounded-xl p-2 sm:p-4`}>
             <Card className="h-full border-none p-2 sm:p-4 rounded-xl flex flex-col">
                 <CardHeader className="sticky top-0 z-10 bg-white pb-4">
                     <CardTitle>{selectedGig.job_title}</CardTitle>
