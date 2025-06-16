@@ -19,8 +19,12 @@ interface Follower {
 
 interface FollowRequest {
   request_id: string;
-  requester_username?: string;
-  follower_username?: string;
+  follower_username: string;
+  follower_email: string;
+  follower_address: string;
+  follower_bio: string;
+  freelancer_image: string;
+  requested_at: string;
 }
 
 interface FollowResponse {
@@ -28,9 +32,31 @@ interface FollowResponse {
   approved_followers?: Follower[];
 }
 
+interface FollowingRequest {
+  request_id: string;
+  freelancer_username: string;
+  freelancer_email: string;
+  freelancer_address: string;
+  freelancer_bio: string;
+  freelancer_image: string | null;
+  requested_at: string;
+}
+
+interface FollowingApproved {
+  freelancer_id: string;
+  freelancer_username: string;
+  freelancer_email: string;
+  freelancer_address: string;
+  freelancer_bio: string;
+  freelancer_image: string | null;
+  followed_at: string;
+}
+
 interface RequestsResponse {
   approved_followers: Follower[];
   pending_follow_requests: FollowRequest[];
+  following_requests: FollowingRequest[];
+  following_approved: FollowingApproved[];
 }
 
 interface Freelancer {
@@ -83,36 +109,56 @@ export default function NetworkPage() {
       const freelancersResponse = await api.get('/freelancer/freelancer-profile/');
       const freelancersData: Freelancer[] = freelancersResponse.data;
       
-      // Process approved followers
+      // Process approved followers (people who follow you)
       const processedFollowers = (followersData.approved_followers || []).map((follower: Follower) => ({
         id: follower.profile_id,
         name: follower.follower_username || "User",
-        title: "Freelancer",
         location: follower.follower_address || "Unknown",
         imageUrl: follower.freelancer_image || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
         isOnline: Math.random() > 0.5,
         summary: follower.follower_bio
       }));
+
+      // Process following requests (people you are following - pending)
+      const processedFollowingRequests = (followersData.following_requests || []).map((following: FollowingRequest) => ({
+        id: following.request_id,
+        name: following.freelancer_username,
+        location: following.freelancer_address,
+        imageUrl: following.freelancer_image || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+        isOnline: Math.random() > 0.5,
+        summary: following.freelancer_bio
+      }));
+
+      // Process following approved (people you are following - approved)
+      const processedFollowingApproved = (followersData.following_approved || []).map((following: FollowingApproved) => ({
+        id: following.freelancer_id,
+        name: following.freelancer_username,
+        location: following.freelancer_address,
+        imageUrl: following.freelancer_image || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+        isOnline: Math.random() > 0.5,
+        summary: following.freelancer_bio
+      }));
+
+      // Combine followers, following requests, and following approved into My Network
+      const combinedNetwork = [...processedFollowers, ...processedFollowingRequests, ...processedFollowingApproved];
       
       // Process pending follow requests
       const processedRequests = (followersData.pending_follow_requests || []).map((request: FollowRequest) => ({
         id: request.request_id,
-        name: request.follower_username || request.requester_username || "User",
-        title: "Freelancer",
-        location: "Unknown",
-        imageUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=48&h=48&fit=crop&crop=faces",
+        name: request.follower_username,
+        location: request.follower_address,
+        imageUrl: request.freelancer_image,
         isOnline: Math.random() > 0.5,
-        summary: "Wants to connect with you",
+        summary: request.follower_bio,
       }));
       
       // Process other freelancers (exclude already connected ones)
-      const connectedIds = new Set(processedFollowers.map(f => f.id));
+      const connectedIds = new Set(combinedNetwork.map(f => f.id));
       const processedFreelancers = (freelancersData || [])
         .filter((freelancer: Freelancer) => !connectedIds.has(freelancer.id) && freelancer.id !== profileData.id)
         .map((freelancer: Freelancer) => ({
           id: freelancer.id,
           name: `${freelancer.first_name || ""} ${freelancer.last_name || ""}`.trim() || "User",
-          title: freelancer.position || "Freelancer",
           location: [freelancer.city, freelancer.state].filter(Boolean).join(", ") || "Unknown",
           imageUrl: freelancer.profile_picture || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
           isOnline: Math.random() > 0.5,
@@ -121,7 +167,7 @@ export default function NetworkPage() {
           requestSent: false
         }));
 
-      setMyNetwork(processedFollowers);
+      setMyNetwork(combinedNetwork);
       setInvites(processedRequests);
       setNearNetwork(processedFreelancers);
     } catch (error) {

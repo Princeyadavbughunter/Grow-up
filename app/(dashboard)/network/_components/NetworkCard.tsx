@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 interface NetworkCardProps {
   id: string;
   name: string;
-  title: string;
   location: string;
   imageUrl: string;
   isOnline?: boolean;
@@ -27,7 +26,6 @@ interface NetworkCardProps {
 export function NetworkCard({ 
   id, 
   name = "User",
-  title, 
   location, 
   imageUrl, 
   isOnline, 
@@ -60,9 +58,7 @@ export function NetworkCard({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-medium">{name}</h3>
-              <Badge variant="secondary" className="text-xs">1st</Badge>
             </div>
-            <p className="text-sm text-gray-600">{title}</p>
             <p className="text-sm text-gray-500">{location}</p>
             {summary && <p className="text-sm text-gray-500 mt-1">{summary}</p>}
             {followerCount !== undefined && (

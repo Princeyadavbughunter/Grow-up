@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import _ from "lodash";
+import { useRouter } from "next/navigation";
 
 interface Participant {
   user_id: string;
@@ -23,6 +24,7 @@ interface Participant {
   city: string | null;
   district: string | null;
   state: string | null;
+  freelancer_id: string;
 }
 
 interface ClubData {
@@ -132,7 +134,7 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
           participants.map((participant) => (
             <NetworkCard
               key={participant.user_id}
-              id={participant.user_id}
+              id={participant.freelancer_id}
               name={participant.username || "User"}
               title={participant.position || "Member"}
               location={participant.city && participant.state ? `${participant.city}, ${participant.state}` : ""}
@@ -167,21 +169,19 @@ export function NetworkCard({
   onFollow
 }: NetworkCardProps) {
   const nameInitial = name && name.length > 0 ? name.charAt(0) : "U";
+  const router = useRouter();
   
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border-b border-gray-200">
+    <div onClick={() => router.push(`/profile/${id}`)} className="flex cursor-pointer flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border-b border-gray-200">
       <div className="relative">
         <Avatar className="h-12 w-12">
           <AvatarImage src={imageUrl} />
           <AvatarFallback>{nameInitial}</AvatarFallback>
         </Avatar>
-        {isOnline && (
-          <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white" />
-        )}
       </div>
-      <div className=" overflow-auto ">
+      <div className="overflow-auto ">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="max-w-[50%]">
+          <div className="">
             <div className="flex items-center gap-2">
               <h3 className="font-medium truncate">{name}</h3>
             </div>
@@ -192,51 +192,6 @@ export function NetworkCard({
               <p className="text-xs text-gray-500 mt-1 truncate">
                 {followerCount} {followerCount === 1 ? 'follower' : 'followers'}
               </p>
-            )}
-          </div>
-
-          <div className="flex gap-2 flex-shrink-0">
-            {showAccept ? (
-              <>
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  className="text-gray-500 rounded-full border-slate-400 border-[1px] h-8 w-8 bg-white"
-                  onClick={onReject}
-                >
-                  <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </Button>
-                <Button 
-                  size="sm" 
-                  className="shadow-none hover:bg-white bg-white text-purple-600 border-purple-700 border-[1px] rounded-full"
-                  onClick={onAccept}
-                >
-                  Accept
-                </Button>
-              </>
-            ) : showFollow ? (
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="flex items-center gap-1"
-                onClick={onFollow}
-              >
-                <UserPlus className="h-4 w-4" />
-                Follow
-              </Button>
-            ) : requestSent ? (
-              <Button size="sm" variant="outline" disabled>
-                Request Sent
-              </Button>
-            ) : (
-              <>
-                <Button size="sm" variant="outline">View profile</Button>
-                <Button size="sm" variant="ghost">
-                  <Mail className="h-4 w-4" />
-                </Button>
-              </>
             )}
           </div>
         </div>
