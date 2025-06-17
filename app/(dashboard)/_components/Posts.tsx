@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from "next/image";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import Link from 'next/link';
+import { FiUser } from 'react-icons/fi';
 
 interface ImageData {
     id: string;
