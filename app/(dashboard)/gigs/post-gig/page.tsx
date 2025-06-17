@@ -204,7 +204,7 @@ const StepForm = () => {
   }
 
   return (
-    <div className="flex flex-col md:justify-center items-center bg-gray-50 px-2 sm:px-4 py-4 sm:py-6 md:py-8 min-h-screen">
+    <div className="flex h-[calc(100vh-10rem)] overflow-y-auto pt-96 flex-col md:justify-center items-center ">
       <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-4xl">
         <StepProgressBar />
         

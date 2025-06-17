@@ -114,7 +114,7 @@ export default function NetworkPage() {
         id: follower.profile_id,
         name: follower.follower_username || "User",
         location: follower.follower_address || "Unknown",
-        imageUrl: follower.freelancer_image || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+        imageUrl: follower.freelancer_image,
         isOnline: Math.random() > 0.5,
         summary: follower.follower_bio
       }));
@@ -124,7 +124,7 @@ export default function NetworkPage() {
         id: following.request_id,
         name: following.freelancer_username,
         location: following.freelancer_address,
-        imageUrl: following.freelancer_image || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+        imageUrl: following.freelancer_image,
         isOnline: Math.random() > 0.5,
         summary: following.freelancer_bio
       }));
@@ -134,7 +134,7 @@ export default function NetworkPage() {
         id: following.freelancer_id,
         name: following.freelancer_username,
         location: following.freelancer_address,
-        imageUrl: following.freelancer_image || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+        imageUrl: following.freelancer_image,
         isOnline: Math.random() > 0.5,
         summary: following.freelancer_bio
       }));
@@ -160,7 +160,7 @@ export default function NetworkPage() {
           id: freelancer.id,
           name: `${freelancer.first_name || ""} ${freelancer.last_name || ""}`.trim() || "User",
           location: [freelancer.city, freelancer.state].filter(Boolean).join(", ") || "Unknown",
-          imageUrl: freelancer.profile_picture || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+          imageUrl: freelancer.profile_picture,
           isOnline: Math.random() > 0.5,
           followerCount: freelancer.follower_count || 0,
           summary: freelancer.bio || undefined,

@@ -6,6 +6,7 @@ import { Mail, UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { FiUser } from 'react-icons/fi';
 
 interface NetworkCardProps {
   id: string;
@@ -47,7 +48,7 @@ export function NetworkCard({
       <Link href={`/profile/${id}`} className="relative">
         <Avatar className="h-12 w-12">
           <AvatarImage src={imageUrl} />
-          <AvatarFallback>{nameInitial}</AvatarFallback>
+          <AvatarFallback><FiUser className="h-6 w-6" /></AvatarFallback>
         </Avatar>
         {isOnline && (
           <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white" />

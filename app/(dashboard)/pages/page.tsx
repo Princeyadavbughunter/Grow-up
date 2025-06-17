@@ -276,7 +276,7 @@ const ChatInterface = () => {
   }
 
   return (
-    <div className="flex flex-col pb-20 h-screen bg-gray-50">
+    <div className="flex flex-col h-[calc(100vh-10rem)] bg-gray-50">
       {/* Top Navigation */}
       <nav className="border-b bg-white shadow-sm">
         <div className="p-4">

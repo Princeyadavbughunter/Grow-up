@@ -91,10 +91,10 @@ const Posts = () => {
     const handleLikePost = async (postId: string) => {
         try {
             await api.post(`/post/app/toggle-like/?post_id=${postId}`);
-            setPosts(prevPosts => 
-                prevPosts.map(post => 
-                    post.id === postId 
-                        ? { ...post, like_count: post.like_count + 1 } 
+            setPosts(prevPosts =>
+                prevPosts.map(post =>
+                    post.id === postId
+                        ? { ...post, like_count: post.like_count + 1 }
                         : post
                 )
             );
@@ -106,9 +106,9 @@ const Posts = () => {
     return (
         <div className="p-4 h-[calc(100vh-18rem)] overflow-y-scroll">
             {posts.map((post) => (
-                <PostCard 
-                    key={post.id} 
-                    post={post} 
+                <PostCard
+                    key={post.id}
+                    post={post}
                     onLike={handleLikePost}
                 />
             ))}
@@ -154,7 +154,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                 content: newComment,
                 is_take_down: "False"
             });
-            
+
             setNewComment('');
             fetchComments();
         } catch (error) {
@@ -166,13 +166,21 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
         <div className="bg-white rounded-xl p-4 mb-4 shadow-lg">
             <div className="flex items-center justify-between mb-4">
                 <Link href={`/profile/${post.freelancer_profile}`} className="flex items-center gap-3">
-                    <Image
-                        src={post.profile_picture || "https://randomuser.me/portraits/men/2.jpg"}
-                        alt="User"
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                    />
+                    <div>
+                        {post.profile_picture ? (
+                            <Image
+                                src={post.profile_picture}
+                                alt="Profile"
+                                width={40}
+                                height={40}
+                                className="rounded-full md:w-10 md:h-10 w-8 h-8"
+                            />
+                        ) : (
+                            <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
+                                <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
+                            </div>
+                        )}
+                    </div>
                     <div>
                         <h3 className="font-semibold">
                             {post.first_name || post.company_name || 'Anonymous'}
@@ -185,7 +193,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
 
             <p className="mb-4">{post.title}</p>
             {post.content && <p className="mb-4">{post.content}</p>}
-            
+
             {post.images && post.images.length > 0 && (
                 <Image
                     src={post.images[0].file}
@@ -204,7 +212,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                     <span>❤️</span>
                     <span>{post.like_count}</span>
                 </button>
-                <button 
+                <button
                     className="flex items-center gap-2 text-sm md:text-base"
                     onClick={handleCommentToggle}
                 >
@@ -220,8 +228,8 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                 <div className="mt-4 border-t pt-4">
                     <div className="space-y-4 mb-4">
                         {comments.map(comment => (
-                            <CommentItem 
-                                key={comment.id} 
+                            <CommentItem
+                                key={comment.id}
                                 comment={comment}
                                 api={api}
                             />
@@ -236,7 +244,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                             placeholder="Add a comment..."
                             className="flex-1 border rounded-lg px-3 py-2 text-sm md:text-base"
                         />
-                        <button 
+                        <button
                             type="submit"
                             className="bg-blue-500 text-white px-4 py-2 rounded-lg"
                         >
@@ -287,7 +295,7 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
                 content: newReply,
                 is_take_down: "False"
             });
-            
+
             setNewReply('');
             fetchReplies();
             setShowReplies(true);
@@ -333,7 +341,7 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
                                 placeholder="Add a reply..."
                                 className="flex-1 border rounded-lg px-3 py-1 text-sm"
                             />
-                            <button 
+                            <button
                                 type="submit"
                                 className="bg-blue-500 text-white px-3 py-1 text-sm rounded-lg"
                             >

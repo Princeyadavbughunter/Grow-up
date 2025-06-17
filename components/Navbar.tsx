@@ -28,7 +28,7 @@ const NavBar: React.FC = () => {
   return (
     <div className="relative">
       <div className="flex items-center justify-between md:p-4 p-2 border-b">
-        <div className="flex items-center gap-2">
+        <div onClick={() => router.push('/')} className="flex items-center gap-2 cursor-pointer">
           <Image src="/logo.svg" alt="GrowUp Buddy" width={40} height={40} className="md:w-10 md:h-10 w-8 h-8" />
           <span className=" md:text-xl text-lg font-semibold">GrowUp Buddy</span>
         </div>
