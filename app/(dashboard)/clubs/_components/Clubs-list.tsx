@@ -1,6 +1,7 @@
 // @ts-nocheck
 "use client";
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 
 interface Club {
@@ -17,7 +18,7 @@ interface Club {
 
 interface ClubsListProps {
     selectedClubId: string;
-    setSelectedClubId: (id: string) => void;
+    setSelectedClubId?: (id: string) => void; // Make optional since we'll use router navigation
 }
 
 const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
@@ -28,6 +29,7 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
     const [error, setError] = useState<string | null>(null);
     const { api } = useAuthenticatedApi();
     const { authToken } = useAuth();
+    const router = useRouter();
 
     const fetchClubs = useCallback(async () => {
         if (!authToken || !api) return;
@@ -48,7 +50,7 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
             
             // Set default selected club if none is selected yet
             if (!selectedClubId && allClubsData.length > 0) {
-                setSelectedClubId(allClubsData[0].id);
+                router.push(`/clubs/${allClubsData[0].id}`);
             }
         } catch (error) {
             console.error('Error fetching clubs:', error);
@@ -72,7 +74,7 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
             await fetchClubs();
             if (!isCurrentlyJoined) {
                 setActiveTab("my");
-                setSelectedClubId(clubId);
+                router.push(`/clubs/${clubId}`);
             }
         } catch (error) {
             console.error('Error toggling club membership:', error);
@@ -81,7 +83,7 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
     };
 
     const handleClubSelect = (clubId: string) => {
-        setSelectedClubId(clubId);
+        router.push(`/clubs/${clubId}`);
     };
 
     const displayClubs = activeTab === "all" ? allClubs : myClubs;

@@ -277,42 +277,11 @@ const ChatInterface = () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)] bg-gray-50">
-      {/* Top Navigation */}
-      <nav className="border-b bg-white shadow-sm">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              {selectedPage && (
-                <button
-                  onClick={() => setShowSidebar(true)}
-                  className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
-                >
-                  <HiMenuAlt3 className="h-5 w-5" />
-                </button>
-              )}
-              <h1 className="text-lg md:text-xl font-bold">
-                {selectedPage ? (
-                  <div className="flex items-center gap-2">
-                    <span className="hidden md:inline">Broadcasting:</span>
-                    <span className="truncate max-w-[200px]">{selectedPage.name}</span>
-                  </div>
-                ) : (
-                  'Recommended Pages'
-                )}
-              </h1>
-            </div>
-            {!selectedPage && (
-              <button
-                onClick={() => setShowSidebar(true)}
-                className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
-              >
-                <HiMenuAlt3 className="h-5 w-5" />
-              </button>
-            )}
-          </div>
-          
-          {/* Horizontal scrolling pages - only show when no page is selected */}
-          {!selectedPage && (
+
+          <div className='p-2 border-b'>
+            <h1 className="text-lg mb-2 md:text-xl font-bold">
+              Recommended Pages
+            </h1>
             <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
               {pages.map((page) => (
                 <div 
@@ -339,9 +308,7 @@ const ChatInterface = () => {
                 </div>
               ))}
             </div>
-          )}
         </div>
-      </nav>
 
       <div className="flex flex-1 overflow-hidden relative">
         {/* Mobile Sidebar Overlay */}
