@@ -98,7 +98,7 @@ const Portfolios: React.FC<PortfoliosProps> = ({ profileData }) => {
     return (
         <div>
             {/* My Portfolios */}
-            <div className="">
+            <div className="my-8">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-bold">My Portfolios</h2>
                     <div className="flex items-center gap-2">

@@ -34,6 +34,7 @@ interface Post {
     club: string;
     club_name: string;
     freelancer_profile: string;
+    is_liked?: boolean;
 }
 
 interface Comment {
@@ -91,16 +92,22 @@ const Posts = () => {
 
     const handleLikePost = async (postId: string) => {
         try {
-            await api.post(`/post/app/toggle-like/?post_id=${postId}`);
+            const response = await api.post(`/post/app/toggle-like/?post_id=${postId}`);
+            const { post: updatedPost, is_like } = response.data;
+            
             setPosts(prevPosts =>
                 prevPosts.map(post =>
                     post.id === postId
-                        ? { ...post, like_count: post.like_count + 1 }
+                        ? { 
+                            ...post, 
+                            like_count: updatedPost.like_count,
+                            is_liked: is_like 
+                        }
                         : post
                 )
             );
         } catch (error) {
-            console.error('Error liking post:', error);
+            console.error('Error toggling like:', error);
         }
     };
 
@@ -207,7 +214,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
 
             <div className="flex items-center justify-between text-gray-500">
                 <button
-                    className="flex items-center gap-2"
+                    className={`flex items-center gap-2 ${post.is_liked ? 'text-red-500' : 'text-gray-500'}`}
                     onClick={() => onLike(post.id)}
                 >
                     <span>❤️</span>

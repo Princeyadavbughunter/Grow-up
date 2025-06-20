@@ -12,63 +12,63 @@ import MyEducation from './MyEducation'
 
 // Use the same interface as in AuthContext
 interface FreelancerProfile {
-  id: string;
-  first_name: string;
-  last_name: string;
-  date_of_birth: string;
-  bio: string;
-  university_name: string;
-  graduation_year_from: string;
-  profile_picture: string;
-  address: string;
-  lat: number | null;
-  long: number | null;
-  city: string;
-  district: string;
-  pincode: number;
-  state: string;
-  interest_in: string;
-  hobbies: string;
-  highest_qualification: string;
-  passing_year: string;
-  created_at: string;
-  degree_name: string;
-  is_degree: boolean;
-  is_diploma: boolean;
-  diploma_name: string;
-  is_disabled: boolean;
-  resume: string | null;
-  skills: string;
-  gender: string;
-  saved_jobs_count: number;
-  follower_count: number;
-  dribble_account: string | null;
-  github_account: string | null;
-  figma_account: string | null;
-  youtube_account: string | null;
-  medium_account: string | null;
-  soft_skills: string;
-  position: string;
-  user: string;
-  work_experience: any[];
-  facebook_account?: string | null;
-  linkedin_account?: string | null;
-  instagram_account?: string | null;
-  twitter_account?: string | null;
+    id: string;
+    first_name: string;
+    last_name: string;
+    date_of_birth: string;
+    bio: string;
+    university_name: string;
+    graduation_year_from: string;
+    profile_picture: string;
+    address: string;
+    lat: number | null;
+    long: number | null;
+    city: string;
+    district: string;
+    pincode: number;
+    state: string;
+    interest_in: string;
+    hobbies: string;
+    highest_qualification: string;
+    passing_year: string;
+    created_at: string;
+    degree_name: string;
+    is_degree: boolean;
+    is_diploma: boolean;
+    diploma_name: string;
+    is_disabled: boolean;
+    resume: string | null;
+    skills: string;
+    gender: string;
+    saved_jobs_count: number;
+    follower_count: number;
+    dribble_account: string | null;
+    github_account: string | null;
+    figma_account: string | null;
+    youtube_account: string | null;
+    medium_account: string | null;
+    soft_skills: string;
+    position: string;
+    user: string;
+    work_experience: any[];
+    facebook_account?: string | null;
+    linkedin_account?: string | null;
+    instagram_account?: string | null;
+    twitter_account?: string | null;
 }
 
 interface SummryProps {
-  profileData: FreelancerProfile | null;
+    profileData: FreelancerProfile | null;
 }
 
 const Summry: React.FC<SummryProps> = ({ profileData }) => {
     // @ts-ignore
     const [activeJobTypeTab, setActiveJobTypeTab] = useState('About');
-    
+
     const skillsArray = profileData?.skills ? profileData.skills.split(',').map(skill => skill.trim()) : [];
-    
+
     return (
-        <div className='w-full mb-32'>
+        <div className='w-full mb-10'>
             <div className="flex space-x-4">
                 {["About", "Skills", "Porfolio", "Post"].map((tab) => (
                     <Button
@@ -84,36 +84,35 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
             </div>
 
             <div className="flex justify-between flex-col md:flex-row gap-10">
-                <div className="">
-                    <div>
-                        <p className='flex items-center py-4 font-semibold gap-5'>Summary <CiEdit /></p>
-                        <div className="bg-[#F6F8FF] shadow-sm rounded-lg p-4">
-                            <p>MY Journey</p>
+                <div>
+                    {activeJobTypeTab === "About" && (
+                    <div className='flex flex-col'>
+                        <div>
+                            <p className='flex items-center py-4 font-semibold gap-5'>Summary <CiEdit /></p>
+                            <div className="bg-[#F6F8FF] shadow-sm rounded-lg p-4">
+                                <p>MY Journey</p>
 
-                            <div className='py-2'>
-                                <p className="flex flex-wrap gap-2 font-semibold">
-                                    {skillsArray.length > 0 ? (
-                                        skillsArray.map((skill, index) => (
-                                            <button key={index} className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
-                                                {skill}
-                                            </button>
-                                        ))
-                                    ) : null}
-                                </p>
+                                <div className='py-2'>
+                                    <p className="flex flex-wrap gap-2 font-semibold">
+                                        {skillsArray.length > 0 ? (
+                                            skillsArray.map((skill, index) => (
+                                                <button key={index} className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
+                                                    {skill}
+                                                </button>
+                                            ))
+                                        ) : null}
+                                    </p>
+                                </div>
+
+                                <p className='text-[#6A737D]'>{profileData?.bio || 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the Lorem Ipsum is simply dummy text of the printing and typesetting industry.'}</p>
                             </div>
-
-                            <p className='text-[#6A737D]'>{profileData?.bio || 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the Lorem Ipsum is simply dummy text of the printing and typesetting industry.'}</p>
                         </div>
-                    </div>
-
-                    <div className="py-10">
                         <MyExperience />
+                        <MyEducation profileData={profileData} />
                     </div>
-
-                    <MyEducation profileData={profileData} />
-
+                    )}
                     {activeJobTypeTab === "Skills" && (
-                        <div className="mb-8">
+                        <div className="my-8">
                             <div className="flex items-center gap-4 mb-4">
                                 <h2 className="text-lg font-bold">My Skills</h2>
                                 <div className="flex items-center gap-2">
@@ -121,7 +120,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                                     <CiCreditCard1 className="text-xl cursor-pointer" />
                                 </div>
                             </div>
-                            
+
                             {skillsArray.length > 0 ? (
                                 <div>
                                     <h3 className="font-semibold text-gray-600">Skills</h3>
@@ -140,9 +139,9 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                             )}
                         </div>
                     )}
-                    
+
                     {activeJobTypeTab === "Porfolio" && <Portfolios profileData={profileData} />}
-                    
+
                     {activeJobTypeTab === "Post" && <Posts />}
                 </div>
 

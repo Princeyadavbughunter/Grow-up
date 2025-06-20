@@ -129,7 +129,7 @@ const CreatePage = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-sm">
+    <div className="max-w-lg h-[calc(100vh-12rem)] overflow-y-auto mx-auto p-6 bg-white rounded-lg shadow-sm">
       <h1 className="text-2xl font-bold mb-6">Create Page</h1>
       
       <div className="mb-8">
@@ -290,16 +290,6 @@ const CreatePage = () => {
                   </div>
                 </FormControl>
                 <FormMessage />
-                <button
-                  type="button"
-                  className="text-blue-600 p-0 h-auto font-normal flex items-center mt-1 text-sm hover:text-blue-700"
-                  onClick={() => form.setValue('location', 'San Francisco, CA')}
-                >
-                  <div className="w-4 h-4 rounded-full border border-blue-600 flex items-center justify-center mr-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-600" />
-                  </div>
-                  Auto-detect my city
-                </button>
               </FormItem>
             )}
           />
