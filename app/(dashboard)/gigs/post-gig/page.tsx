@@ -6,6 +6,7 @@ import { IoMdLocate } from "react-icons/io";
 import { FaLongArrowAltLeft, FaCheckCircle } from "react-icons/fa";
 import { HiArrowNarrowRight } from "react-icons/hi";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface FormData {
   job_description: string;
@@ -24,6 +25,7 @@ interface FormData {
 
 const StepForm = () => {
   const { api } = useAuthenticatedApi();
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -82,25 +84,9 @@ const StepForm = () => {
       console.log("Job posted successfully:", response.data);
       setSubmitSuccess(true);
       
-      // Reset form after successful submission
       setTimeout(() => {
-        setFormData({
-          job_description: "",
-          job_title: "",
-          location: "",
-          work_type: "Remote",
-          job_type: "Full Time",
-          required_skills: "",
-          salary_range: "",
-          is_active: "open",
-          about_role: "",
-          experience: "",
-          role: "",
-          skill_set: ""
-        });
-        setCurrentStep(1);
-        setSubmitSuccess(false);
-      }, 3000);
+        router.push("/gigs");
+      }, 2000);
       
     } catch (error) {
       console.error("Error posting job:", error);
@@ -197,7 +183,7 @@ const StepForm = () => {
           <div className="w-full h-2 bg-gray-200 rounded-full mb-2">
             <div className="h-2 bg-green-500 rounded-full animate-pulse" style={{ width: '100%' }}></div>
           </div>
-          <p className="text-xs sm:text-sm text-gray-500">Redirecting to dashboard...</p>
+          <p className="text-xs sm:text-sm text-gray-500">Redirecting to gigs page...</p>
         </div>
       </div>
     );
