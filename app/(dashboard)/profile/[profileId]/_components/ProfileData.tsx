@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from "react";
 import { IoLocationSharp } from "react-icons/io5";
 import { FaLinkedin, FaInstagramSquare, FaUserPlus, FaUserCheck, FaClock } from "react-icons/fa";
@@ -5,7 +6,7 @@ import { TiSocialFacebook, TiSocialTwitter } from "react-icons/ti";
 import { Button } from "@/components/ui/button";
 import { ImUsers } from "react-icons/im";
 import { BsChatDots } from "react-icons/bs";
-import { useAuthenticatedApi } from "@/context/AuthContext";
+import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
 interface ProfileDataProps {
@@ -38,12 +39,10 @@ interface ProfileDataProps {
 const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   const { api } = useAuthenticatedApi();
   const router = useRouter();
-// @ts-ignore
   const [isFollowing, setIsFollowing] = useState(profileData?.is_following || false);
-  // @ts-ignore
   const [followRequestSent, setFollowRequestSent] = useState(profileData?.follow_request_sent || false);
-  // @ts-ignore
   const [isLoading, setIsLoading] = useState(false);
+  const { profileData: userProfileData } = useAuth();
 
   if (!profileData) {
     return <div>Loading profile data...</div>;
@@ -58,31 +57,25 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   const handleFollowAction = async () => {
     if (isLoading) return;
     
-    // @ts-ignore
     setIsLoading(true);
     try {
       if (isFollowing) {
         // Unfollow
         await api.post(`/freelancer/unfollow/`, { freelancer_id: profileData.id });
-        // @ts-ignore
         setIsFollowing(false);
-        // @ts-ignore
         setFollowRequestSent(false);
       } else if (followRequestSent) {
         // Cancel follow request
         await api.post(`/freelancer/cancel-follow-request/`, { freelancer_id: profileData.id });
-        // @ts-ignore
         setFollowRequestSent(false);
       } else {
         // Send follow request or follow
         await api.post(`/freelancer/follow/?freelancer_id=${profileData.id}`);
-        // @ts-ignore
         setFollowRequestSent(true);
       }
     } catch (error) {
       console.error('Error handling follow action:', error);
     } finally {
-      // @ts-ignore
       setIsLoading(false);
     }
   };
@@ -179,22 +172,24 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
         <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto">
           <ImUsers /> {follower_count || 0} Followers
         </Button>
-        {isFollowing ? (
-          <Button 
-            onClick={handleOpenInbox}
-            className="bg-green-600 hover:bg-green-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto transition-colors"
-          >
-            <BsChatDots /> Open Inbox
-          </Button>
-        ) : (
-          <Button 
-            onClick={handleFollowAction}
-            disabled={isLoading}
-            className={`${followButtonContent.className} font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto transition-colors disabled:opacity-50`}
-          >
-            {followButtonContent.icon} 
-            {isLoading ? "Loading..." : followButtonContent.text}
-          </Button>
+        {userProfileData?.id !== profileData.id && (
+          isFollowing ? (
+            <Button 
+              onClick={handleOpenInbox}
+              className="bg-green-600 hover:bg-green-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto transition-colors"
+            >
+              <BsChatDots /> Open Inbox
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleFollowAction}
+              disabled={isLoading}
+              className={`${followButtonContent.className} font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto transition-colors disabled:opacity-50`}
+            >
+              {followButtonContent.icon} 
+              {isLoading ? "Loading..." : followButtonContent.text}
+            </Button>
+          )
         )}
       </div>
     </div>

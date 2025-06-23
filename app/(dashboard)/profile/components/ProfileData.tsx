@@ -605,9 +605,13 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
         </div>
       </div>
 
-      {/* Resume Section - Responsive */}
-      {resume && (
-        <div className="mb-6">
+
+      {/* Action Buttons - Responsive */}
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start">
+        <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto">
+          <ImUsers /> {follower_count || 0} Followers
+        </Button>
+        {resume && (
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3">
             <Button 
               onClick={downloadResume}
@@ -617,17 +621,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
               Download Resume
             </Button>
           </div>
-        </div>
       )}
-
-      {/* Action Buttons - Responsive */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start">
-        <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto">
-          <ImUsers /> {follower_count || 0} Followers
-        </Button>
-        <Button className="bg-white font-medium border border-[#7052FF] text-[#7052FF] hover:bg-[#7052FF] hover:text-white flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto">
-          <FaMessage /> Open Inbox
-        </Button>
       </div>
 
       {/* Edit Modal */}

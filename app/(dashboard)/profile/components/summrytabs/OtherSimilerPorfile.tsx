@@ -1,19 +1,23 @@
 // @ts-nocheck
 import React, { useEffect, useState } from 'react'
-import { FaUserPlus, FaLaptopCode } from 'react-icons/fa'
-import { ImMail4 } from 'react-icons/im'
+import { FaUserPlus, FaLaptopCode, FaUser } from 'react-icons/fa'
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext"
+import { useRouter } from 'next/navigation'
 
 interface Freelancer {
-  freelancer_id?: string;
-  id?: string;
-  freelancer_username?: string;
-  name?: string;
-  title?: string;
-  location?: string;
-  summary?: string;
-  imageUrl?: string;
-  follower_count?: number;
+  id: string;
+  first_name: string;
+  last_name: string;
+  bio: string;
+  profile_picture: string;
+  address: string;
+  city: string;
+  state: string;
+  skills: string;
+  follower_count: number;
+  is_following: boolean;
+  follow_request_sent: boolean;
+  position?: string;
 }
 
 interface SimilarProfile {
@@ -23,8 +27,8 @@ interface SimilarProfile {
   location: string;
   summary: string;
   img: string;
-  followerCount?: number;
-  requestSent?: boolean;
+  followerCount: number;
+  requestSent: boolean;
 }
 
 const OtherSimilarProfile: React.FC = () => {
@@ -32,6 +36,7 @@ const OtherSimilarProfile: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true)
     const { api } = useAuthenticatedApi()
     const { isAuthenticated } = useAuth()
+    const router = useRouter()
 
     useEffect(() => {
         const fetchSimilarProfiles = async (): Promise<void> => {
@@ -39,18 +44,19 @@ const OtherSimilarProfile: React.FC = () => {
                 setLoading(true)
                 const response = await api.get('/freelancer/unfollowed-freelancers/')
                 
-                // Assuming the API returns an array of freelancer objects
+                // Map the actual API response to our component structure
                 const processedProfiles: SimilarProfile[] = response.data.map((freelancer: Freelancer) => ({
-                    id: freelancer.freelancer_id || freelancer.id || '',
-                    name: freelancer.freelancer_username || freelancer.name || '',
-                    title: freelancer.title || "Freelancer",
-                    location: freelancer.location || "Unknown",
-                    summary: freelancer.summary || "Freelancer profile",
-                    img: freelancer.imageUrl || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
-                    followerCount: freelancer.follower_count
+                    id: freelancer.id,
+                    name: `${freelancer.first_name} ${freelancer.last_name}`.trim(),
+                    location: `${freelancer.city || ''}, ${freelancer.state || ''}`.replace(/^,\s*|,\s*$/g, '') || freelancer.address || "Unknown",
+                    summary: freelancer.bio || "No bio available",
+                    img: freelancer.profile_picture || "",
+                    followerCount: freelancer.follower_count || 0,
+                    requestSent: freelancer.follow_request_sent || false
                 }))
                 
-                setSimilarProfiles(processedProfiles)
+                // Limit to 5 profiles
+                setSimilarProfiles(processedProfiles.slice(0, 5))
             } catch (error) {
                 console.error('Error fetching similar profiles:', error)
                 setSimilarProfiles([])
@@ -80,64 +86,89 @@ const OtherSimilarProfile: React.FC = () => {
         }
     }
 
+    const handleProfileClick = (profileId: string): void => {
+        router.push(`/profile/${profileId}`)
+    }
+
     if (loading) {
         return <div className="flex justify-center items-center">Loading similar profiles...</div>
     }
 
-    console.log(similarProfiles);
-
     return (
-        <div>
-            <div className="mt-12">
-                <div className="mb-8">
+        <div className="max-w-full overflow-hidden">
+                <div className="my-8 w-full">
                     <h3 className="text-lg font-semibold mb-4">Other similar profiles</h3>
-                    <div className="space-y-4">
+                    <div className="grid gap-4 w-full">
                         {similarProfiles.length > 0 ? (
                             similarProfiles.map((profile) => (
                                 <div
                                     key={profile.id}
-                                    className="flex items-center gap-4 p-4 border rounded-lg hover:shadow-sm transition-shadow"
+                                    className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200 w-full cursor-pointer"
+                                    onClick={() => handleProfileClick(profile.id)}
                                 >
-                                    <img
-                                        src={profile.img}
-                                        alt={profile.name}
-                                        className="w-12 h-12 rounded-full object-cover"
-                                    />
-                                    <div className="flex flex-col">
-                                        <h4 className="text-sm font-bold">{profile.name}</h4>
-                                        <p className="text-xs text-gray-500">{profile.title}</p>
-                                        <p className="text-xs text-gray-400">{profile.location}</p>
-                                        <p className="text-xs text-gray-400 truncate">{profile.summary}</p>
-                                        {profile.followerCount && (
-                                            <p className="text-xs text-gray-400">{profile.followerCount} followers</p>
+                                    <div className="flex items-start gap-4 max-w-full">
+                                        {profile.img ? (
+                                            <img
+                                                src={profile.img}
+                                                alt={profile.name}
+                                                className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                                            />
+                                        ) : (
+                                            <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                                                <FaUser className="text-gray-500 text-xl" />
+                                            </div>
                                         )}
-
-                                        <div className="flex items-center gap-2 mt-2">
-                                            <button 
-                                                onClick={() => handleConnect(profile.id)}
-                                                disabled={profile.requestSent}
-                                                className={`flex items-center gap-2 text-sm font-semibold px-4 py-1 border rounded-full transition-colors ${
-                                                    profile.requestSent 
-                                                        ? "border-gray-300 text-gray-300 cursor-not-allowed" 
-                                                        : "border-gray-400 text-gray-400 hover:bg-gray-50"
-                                                }`}
-                                            >
-                                                <FaUserPlus />
-                                                {profile.requestSent ? "Request Sent" : "Connect"}
-                                            </button>
-                                            <div className="text-gray-400 hover:text-gray-600 cursor-pointer">
-                                                <ImMail4 className="text-2xl cursor-pointer" />
+                                        <div className="flex flex-col flex-1 min-w-0 max-w-full overflow-hidden">
+                                            <p className="text-sm text-gray-600 truncate max-w-full">{profile.name}</p>
+                                            <p className="text-sm text-gray-600 mt-2 overflow-hidden" 
+                                               style={{
+                                                   display: '-webkit-box',
+                                                   WebkitLineClamp: 2,
+                                                   WebkitBoxOrient: 'vertical',
+                                                   textOverflow: 'ellipsis'
+                                               }}>
+                                               {profile.location}
+                                            </p>
+                                            <p className="text-sm text-gray-600 mt-2 overflow-hidden" 
+                                               style={{
+                                                   display: '-webkit-box',
+                                                   WebkitLineClamp: 2,
+                                                   WebkitBoxOrient: 'vertical',
+                                                   textOverflow: 'ellipsis'
+                                               }}>
+                                               {profile.summary}
+                                            </p>
+                                            {profile.followerCount > 0 && (
+                                                <p className="text-sm text-gray-500 mt-1 truncate">{profile.followerCount} followers</p>
+                                            )}
+                                            <div className="flex items-center mt-4">
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handleConnect(profile.id)
+                                                    }}
+                                                    disabled={profile.requestSent}
+                                                    className={`flex items-center gap-2 text-sm font-medium px-4 py-2 border rounded-full transition-colors whitespace-nowrap ${
+                                                        profile.requestSent 
+                                                            ? "border-gray-300 text-gray-400 bg-gray-50 cursor-not-allowed" 
+                                                            : "border-blue-500 text-blue-500 hover:bg-blue-50"
+                                                    }`}
+                                                >
+                                                    <FaUserPlus className="text-sm flex-shrink-0" />
+                                                    {profile.requestSent ? "Request Sent" : "Connect"}
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <p className="text-gray-500">No similar profiles found.</p>
+                            <div className="text-center py-8">
+                                <p className="text-gray-500">No similar profiles found.</p>
+                            </div>
                         )}
                     </div>
                 </div>
-            </div>
         </div>
     )
 }

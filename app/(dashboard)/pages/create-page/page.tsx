@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   pageName: z.string().min(1, 'Page name is required'),
@@ -39,6 +40,7 @@ const CreatePage = () => {
   const coverInputRef = useRef<HTMLInputElement>(null);
   const { api } = useAuthenticatedApi();
   const { authToken } = useAuth();
+  const router = useRouter();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -118,6 +120,7 @@ const CreatePage = () => {
       setCoverPhoto(null);
       setProfilePreview(null);
       setCoverPreview(null);
+      router.push('/pages');
     } catch (error) {
       console.error('Error creating page:', error);
       toast("Error", {

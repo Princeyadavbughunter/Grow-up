@@ -84,7 +84,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
             </div>
 
             <div className="flex justify-between flex-col md:flex-row gap-10">
-                <div>
+                <div className='w-1/2'>
                     {activeJobTypeTab === "About" && (
                     <div className='flex flex-col'>
                         <div>
@@ -145,7 +145,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                     {activeJobTypeTab === "Post" && <Posts />}
                 </div>
 
-                <div className="div">
+                <div className="w-1/2">
                     <OtherSimilerPorfile />
                     <Clubs />
                 </div>

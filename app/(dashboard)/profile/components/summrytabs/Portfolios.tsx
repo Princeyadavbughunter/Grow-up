@@ -1,7 +1,6 @@
 // @ts-nocheck
 import React, { useState } from 'react'
 import { IoMdAdd } from 'react-icons/io'
-import { CiEdit } from 'react-icons/ci'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -30,11 +29,11 @@ interface PortfoliosProps {
 }
 
 const portfolioIcons = {
-    "GitHub": "./images/git.png",
-    "Dribbble": "./images/dribble.png",
-    "Figma": "./images/p1.png",
-    "YouTube": "./images/youtube.png",
-    "Medium": "./images/medium.png",
+    "GitHub": "/images/git.png",
+    "Dribbble": "/images/dribble.png",
+    "Figma": "/images/p1.png",
+    "YouTube": "/images/youtube.png",
+    "Medium": "/images/medium.png",
 } as const;
 
 type PortfolioType = keyof typeof portfolioIcons;
@@ -106,15 +105,18 @@ const Portfolios: React.FC<PortfoliosProps> = ({ profileData }) => {
                             className="text-xl cursor-pointer" 
                             onClick={() => handleEditClick()}
                         />
-                        <CiEdit className="text-xl cursor-pointer" />
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-10">
                     {portfolioLinks.map((portfolio) => (
                         <div
                             key={portfolio.name}
-                            className="w-32 h-40 flex flex-col items-center justify-between shadow-md rounded-lg p-4 cursor-pointer"
-                            onClick={() => handleEditClick(portfolio)}
+                            className="w-32 h-40 flex flex-col items-center justify-between shadow-md rounded-lg p-4 cursor-pointer hover:shadow-lg transition-shadow relative group"
+                            onClick={() => window.open(portfolio.url, '_blank')}
+                            onContextMenu={(e) => {
+                                e.preventDefault();
+                                handleEditClick(portfolio);
+                            }}
                         >
                             <div className="w-60 h-40 flex items-center justify-center">
                                 <img
@@ -124,6 +126,17 @@ const Portfolios: React.FC<PortfoliosProps> = ({ profileData }) => {
                                 />
                             </div>
                             <span className="text-sm font-semibold mt-2">{portfolio.name}</span>
+                            {/* Edit button that appears on hover */}
+                            <button
+                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditClick(portfolio);
+                                }}
+                                title="Edit portfolio"
+                            >
+                                ✏️
+                            </button>
                         </div>
                     ))}
                     {portfolioLinks.length === 0 && (

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { FaLaptopCode } from 'react-icons/fa6';
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
@@ -12,7 +13,6 @@ interface Club {
 }
 
 const Clubs = () => {
-    // @ts-ignore
     const [clubs, setClubs] = useState([] as Club[]);
     const { authToken } = useAuth();
     const { api } = useAuthenticatedApi();
@@ -20,7 +20,8 @@ const Clubs = () => {
     const fetchClubs = async () => {
         try {
             const response = await api.get('/freelancer/club/');
-            setClubs(response.data.slice(0, 3));
+            const availableClubs = response.data.filter((club: Club) => club.is_user_member === false).slice(0, 3);
+            setClubs(availableClubs);
         } catch (error) {
             console.error('Error fetching clubs:', error);
         }
@@ -51,9 +52,7 @@ const Clubs = () => {
                     </Link>
                 </div>
                 <div className="space-y-4">
-                    {/* @ts-ignore */}
                     {clubs && clubs.length > 0 ? (
-    // @ts-ignore
                         clubs.map((club) => (
                             <div
                                 key={club.id}
@@ -69,19 +68,15 @@ const Clubs = () => {
                                 </div>
                                 <button 
                                     onClick={() => handleJoin(club.id)}
-                                    disabled={club.is_user_member}
-                                    className={`text-sm font-semibold ${club.is_user_member 
-                                        ? "text-white bg-[#7052FF]" 
-                                        : "text-[#7052FF] hover:bg-[#7052FF] hover:text-white"} 
-                                        px-4 py-1 border border-[#7052FF] rounded-full transition-colors`}
+                                    className="text-sm font-semibold text-[#7052FF] hover:bg-[#7052FF] hover:text-white px-4 py-1 border border-[#7052FF] rounded-full transition-colors"
                                 >
-                                    {club.is_user_member ? 'Joined' : 'Join'}
+                                    Join
                                 </button>
                             </div>
                         ))
                     ) : (
                         <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4 text-gray-500 text-center">
-                            No clubs available. Explore more to join one.
+                            No clubs available to join. Explore more or check back later.
                         </div>
                     )}
                 </div>
