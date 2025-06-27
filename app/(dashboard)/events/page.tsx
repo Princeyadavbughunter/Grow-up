@@ -99,6 +99,11 @@ export default function EventsPage() {
     }
   }, [authToken, selectedFilter]);
 
+  // Reset selected event when filter or tab changes
+  useEffect(() => {
+    setSelectedEvent(null);
+  }, [selectedFilter, activeTab]);
+
   const scrollEvents = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = 300;
@@ -436,7 +441,11 @@ export default function EventsPage() {
                     </form>
                     
                     {selectedEvent?.comments && selectedEvent.comments.length > 0 ? (
-                      <EventComments comments={selectedEvent.comments} onAddReply={handleAddReply} />
+                      <EventComments 
+                        comments={selectedEvent.comments} 
+                        onAddReply={handleAddReply}
+                        onUserClick={(userId) => router.push(`/profile/${userId}`)}
+                      />
                     ) : (
                       <p className="text-center text-gray-500">No comments yet</p>
                     )}

@@ -58,7 +58,13 @@ const ClubCard = ({ club, refresh }: ClubCardProps) => {
 
     const handleClick = async () => {
         try {
-            await api.post(`/freelancer/join-club/?id=${club.id}`);
+            if (club.is_user_member) {
+                // Exit club
+                await api.get(`/freelancer/exit-club/?id=${club.id}`);
+            } else {
+                // Join club
+                await api.post(`/freelancer/join-club/?id=${club.id}`);
+            }
             setIsJoined(!isJoined);
             refresh()
         } catch (error) {
@@ -82,11 +88,10 @@ const ClubCard = ({ club, refresh }: ClubCardProps) => {
                     </div>
                 </div>
                 <button
-                    className={`text-purple-600 hover:text-purple-800 text-sm md:text-base ${ club.is_user_member ? "font-bold" : ""}`}
+                    className={`text-purple-600 hover:text-purple-800 text-sm md:text-base ${club.is_user_member ? "font-bold" : ""}`}
                     onClick={(e) => {e.preventDefault(); handleClick()}}
-                    disabled={club.is_user_member}
                 >
-                    { club.is_user_member ? "Joined" : "Join"}
+                    {club.is_user_member ? "Joined" : "Join"}
                 </button>
             </div>
             <p className="text-sm text-gray-600 mt-2 flex-grow">

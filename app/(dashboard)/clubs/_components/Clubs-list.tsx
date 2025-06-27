@@ -70,7 +70,13 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
         if (!api) return;
         
         try {
-            await api.post(`/freelancer/join-club/?id=${clubId}`);
+            if (isCurrentlyJoined) {
+                // Exit club
+                await api.get(`/freelancer/exit-club/?id=${clubId}`);
+            } else {
+                // Join club
+                await api.post(`/freelancer/join-club/?id=${clubId}`);
+            }
             await fetchClubs();
             if (!isCurrentlyJoined) {
                 setActiveTab("my");

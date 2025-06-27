@@ -21,9 +21,10 @@ interface Comment {
 interface EventCommentsProps {
   comments: Comment[];
   onAddReply: (parentId: string, replyText: string) => void;
+  onUserClick: (userId: string) => void;
 }
 
-export function EventComments({ comments, onAddReply }: EventCommentsProps) {
+export function EventComments({ comments, onAddReply, onUserClick }: EventCommentsProps) {
   const [replyText, setReplyText] = useState<string>('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
@@ -40,7 +41,10 @@ export function EventComments({ comments, onAddReply }: EventCommentsProps) {
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1 sm:mb-1">
-                <span className="font-semibold text-sm sm:text-base text-gray-900 truncate">
+                <span 
+                  className="font-semibold text-sm sm:text-base text-gray-900 truncate cursor-pointer hover:text-purple-600 transition-colors duration-200"
+                  onClick={() => onUserClick(comment.user)}
+                >
                   {comment.user_name}
                 </span>
                 <span className="text-xs text-gray-500 flex-shrink-0 ml-1">

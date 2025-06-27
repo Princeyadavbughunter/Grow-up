@@ -121,7 +121,7 @@ export default function NetworkPage() {
 
       // Process following requests (people you are following - pending)
       const processedFollowingRequests = (followersData.following_requests || []).map((following: FollowingRequest) => ({
-        id: following.request_id,
+        id: following.freelancer_id,
         name: following.freelancer_username,
         location: following.freelancer_address,
         imageUrl: following.freelancer_image,
@@ -144,7 +144,7 @@ export default function NetworkPage() {
       
       // Process pending follow requests
       const processedRequests = (followersData.pending_follow_requests || []).map((request: FollowRequest) => ({
-        id: request.request_id,
+        id: request.freelancer_id,
         name: request.follower_username,
         location: request.follower_address,
         imageUrl: request.freelancer_image,
@@ -179,7 +179,9 @@ export default function NetworkPage() {
   };
 
   useEffect(() => {
-    fetchNetworkData();
+    if (authToken) {
+      fetchNetworkData();
+    }
   }, [authToken]);
 
   const handleAcceptRequest = async (requestId: string) => {
