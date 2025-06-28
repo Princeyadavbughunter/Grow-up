@@ -30,6 +30,13 @@ interface Comment {
   user_profile_picture: string;
   comment_text: string;
   created_at: string;
+  user_freelancer_profile: {
+    freelancer_id: string;
+    first_name: string;
+    last_name: string;
+    bio: string;
+    profile_picture: string | null;
+  };
 }
 
 interface Event {

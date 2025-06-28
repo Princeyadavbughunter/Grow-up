@@ -16,6 +16,13 @@ interface Comment {
   comment_text: string;
   created_at: string;
   replies: Comment[];
+  user_freelancer_profile: {
+    freelancer_id: string;
+    first_name: string;
+    last_name: string;
+    bio: string;
+    profile_picture: string | null;
+  };
 }
 
 interface EventCommentsProps {
@@ -33,7 +40,10 @@ export function EventComments({ comments, onAddReply, onUserClick }: EventCommen
       {comments.map((comment) => (
         <div key={comment.id} className="group bg-white border border-gray-100 rounded-lg p-1 sm:p-2 hover:shadow-sm transition-all duration-200 hover:border-purple-200">
           <div className="flex items-start gap-2">
-            <Avatar className="h-6 w-6 sm:h-8 sm:w-8 ring-1 ring-purple-50">
+            <Avatar 
+              className="h-6 w-6 sm:h-8 sm:w-8 ring-1 ring-purple-50 cursor-pointer hover:ring-purple-200 transition-all duration-200"
+              onClick={() => onUserClick(comment.user_freelancer_profile.freelancer_id)}
+            >
               <AvatarImage src={comment.user_profile_picture} alt={comment.user_name} />
               <AvatarFallback className="bg-purple-100 text-purple-700 text-xs sm:text-sm font-medium">
                 {comment.user_name[0]}
@@ -43,7 +53,7 @@ export function EventComments({ comments, onAddReply, onUserClick }: EventCommen
               <div className="flex items-center justify-between mb-1 sm:mb-1">
                 <span 
                   className="font-semibold text-sm sm:text-base text-gray-900 truncate cursor-pointer hover:text-purple-600 transition-colors duration-200"
-                  onClick={() => onUserClick(comment.user)}
+                  onClick={() => onUserClick(comment.user_freelancer_profile.freelancer_id)}
                 >
                   {comment.user_name}
                 </span>
