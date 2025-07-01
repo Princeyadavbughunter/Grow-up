@@ -119,7 +119,7 @@ const CreatePost = (): JSX.Element => {
     };
 
     return (
-        <div className="max-w-lg mx-auto mt-10 bg-white p-6 rounded-lg shadow-md pb-40">
+        <div className="max-w-lg h-[calc(100vh-10rem)] overflow-auto mx-auto mt-10 bg-white p-6 rounded-lg shadow-md pb-40">
             <div className="flex items-center space-x-9">
                 <button
                     onClick={() => router.back()}

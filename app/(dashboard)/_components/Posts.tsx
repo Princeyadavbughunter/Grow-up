@@ -35,6 +35,7 @@ interface Post {
     club_name: string;
     freelancer_profile: string;
     is_liked?: boolean;
+    link: string;
 }
 
 interface Comment {
@@ -195,6 +196,11 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                         </h3>
                         <p className="text-sm text-gray-500">{formattedDate}</p>
                     </div>
+                    {post.link && (
+                        <a href={post.link} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500">
+                            {post.link}
+                        </a>
+                    )}
                 </Link>
                 <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">{post.club_name}</span>
             </div>
