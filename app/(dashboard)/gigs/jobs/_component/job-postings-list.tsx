@@ -27,6 +27,7 @@ interface JobPosting {
     skill_set: string;
     recruiter: string;
     user: string;
+    is_unpaid?: boolean;
 }
 
 interface JobPostingsListProps {

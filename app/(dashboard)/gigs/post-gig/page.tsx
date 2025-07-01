@@ -21,6 +21,7 @@ interface FormData {
   experience: string;
   role: string;
   skill_set: string;
+  is_unpaid: boolean;
 }
 
 const StepForm = () => {
@@ -41,7 +42,8 @@ const StepForm = () => {
     about_role: "",
     experience: "",
     role: "",
-    skill_set: ""
+    skill_set: "",
+    is_unpaid: false
   });
 
   const { profileData } = useAuth()
@@ -77,7 +79,8 @@ const StepForm = () => {
       const dataToSubmit = {
         ...formData,
         role: formData.job_title,
-        skill_set: formData.required_skills
+        skill_set: formData.required_skills,
+        is_unpaid: formData.is_unpaid
       };
       
       const response = await api.post("/company/app/job-posting/", dataToSubmit);
@@ -277,22 +280,38 @@ const StepForm = () => {
 
                 <div className="mt-4 sm:mt-6">
                   <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-700">Add Compensation</h3>
-                  <p className="text-xs text-gray-500 mb-2">Provide the salary range to attract applicants</p>
-                  <div className="flex items-center gap-2">
-                    <div className="relative w-full">
-                      <div className="absolute inset-y-0 left-0 flex items-center pl-2 sm:pl-3 pointer-events-none">
-                        <span className="text-gray-500 text-sm sm:text-base">₹</span>
-                      </div>
-                      <input 
-                        type="text"
-                        name="salary_range"
-                        className="w-full pl-6 sm:pl-8 p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
-                        placeholder="e.g., 20000-40000"
-                        value={formData.salary_range}
-                        onChange={handleInputChange}
+                  <div className="mb-3">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="is_unpaid"
+                        className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        checked={formData.is_unpaid}
+                        onChange={(e) => setFormData({ ...formData, is_unpaid: e.target.checked, salary_range: e.target.checked ? "" : formData.salary_range })}
                       />
-                    </div>
+                      <span className="text-sm text-gray-700">This is an unpaid position</span>
+                    </label>
                   </div>
+                  {!formData.is_unpaid && (
+                    <div>
+                      <p className="text-xs text-gray-500 mb-2">Provide the salary range to attract applicants</p>
+                      <div className="flex items-center gap-2">
+                        <div className="relative w-full">
+                          <div className="absolute inset-y-0 left-0 flex items-center pl-2 sm:pl-3 pointer-events-none">
+                            <span className="text-gray-500 text-sm sm:text-base">₹</span>
+                          </div>
+                          <input 
+                            type="text"
+                            name="salary_range"
+                            className="w-full pl-6 sm:pl-8 p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
+                            placeholder="e.g., 20000-40000"
+                            value={formData.salary_range}
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <button

@@ -31,6 +31,7 @@ interface JobPosting {
     skill_set: string;
     recruiter: string;
     user: string;
+    is_unpaid?: boolean;
 }
 
 export default function ManageJobsPage() {
@@ -202,7 +203,13 @@ export default function ManageJobsPage() {
                                             </div>
                                             <div>
                                                 <span className="font-medium text-sm sm:text-base">Salary Range:</span>
-                                                <p className="text-sm sm:text-base text-gray-700">{selectedJob.salary_range}</p>
+                                                <p className="text-sm sm:text-base text-gray-700">
+                                                    {selectedJob.is_unpaid ? (
+                                                        <span className="text-orange-600 font-medium">Unpaid</span>
+                                                    ) : (
+                                                        selectedJob.salary_range
+                                                    )}
+                                                </p>
                                             </div>
                                         </div>
 

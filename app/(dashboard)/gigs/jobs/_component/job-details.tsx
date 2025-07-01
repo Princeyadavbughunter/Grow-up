@@ -28,7 +28,13 @@ export default function JobDetails({ job }: JobDetailsProps) {
           <span className="text-gray-500">{job.location}</span>
         </div>
         <div className="flex space-x-4">
-          <Badge variant="secondary">{job.salary}</Badge>
+          {job.is_unpaid ? (
+            <Badge variant="secondary" className="text-orange-600 bg-orange-50 border-orange-200">Unpaid</Badge>
+          ) : (
+            job.salary && (
+              <Badge variant="secondary">{job.salary}</Badge>
+            )
+          )}
           <Badge variant="secondary">{job.duration}</Badge>
           <Badge variant="secondary">{job.workType}</Badge>
         </div>

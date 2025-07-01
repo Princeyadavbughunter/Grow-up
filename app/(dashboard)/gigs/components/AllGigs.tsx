@@ -15,6 +15,7 @@ interface Gig {
   salary_range: string;
   employment_type: string;
   is_bookmark: boolean;
+  is_unpaid?: boolean;
 }
 
 interface AllGigsProps {
@@ -161,7 +162,11 @@ const AllGigs = ({
                       </p>
                       <div className="flex justify-between items-center mt-1">
                         <p className="text-xs font-medium text-gray-700">
-                          ₹{gig.salary_range}/month
+                          {gig.is_unpaid ? (
+                            <span className="text-orange-600 font-medium">Unpaid</span>
+                          ) : (
+                            `₹${gig.salary_range}/month`
+                          )}
                         </p>
                         <Badge variant="secondary" className="text-xs px-2 py-0.5 rounded-full">
                           {gig.employment_type}

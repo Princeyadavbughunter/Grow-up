@@ -35,7 +35,11 @@ const Description = ({ selectedGig, showSmaller }: DescriptionProps) => {
                         </div>
                         <div className="flex items-center">
                             <Clock className="h-4 w-4 mr-1" />
-                            {selectedGig.salary_range}/month
+                            {selectedGig.is_unpaid ? (
+                                <span className="text-orange-600 font-medium">Unpaid</span>
+                            ) : (
+                                `${selectedGig.salary_range}/month`
+                            )}
                         </div>
                         <Badge>{selectedGig.employment_type}</Badge>
                     </div>
@@ -64,7 +68,13 @@ const Description = ({ selectedGig, showSmaller }: DescriptionProps) => {
                     <div>
                         <h3 className="font-medium mb-2">Additional Information</h3>
                         <ul className="list-disc pl-4 space-y-2 text-gray-600">
-                            <li>Salary: ₹{selectedGig.salary_range}/month</li>
+                            <li>
+                                Salary: {selectedGig.is_unpaid ? (
+                                    <span className="text-orange-600 font-medium">Unpaid</span>
+                                ) : (
+                                    `₹${selectedGig.salary_range}/month`
+                                )}
+                            </li>
                             <li>Location: {selectedGig.location}</li>
                             <li>Status: {selectedGig.is_active}</li>
                         </ul>

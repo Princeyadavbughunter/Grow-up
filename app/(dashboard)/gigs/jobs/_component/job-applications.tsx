@@ -33,6 +33,7 @@ interface JobPosting {
     employment_type: string;
     experience: string;
     salary_range: string;
+    is_unpaid?: boolean;
 }
 
 interface JobApplicationsResponse {

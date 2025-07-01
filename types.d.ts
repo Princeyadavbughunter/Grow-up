@@ -12,6 +12,7 @@ interface Job {
     description?: string;
     responsibilities?: string[];
     offers?: string[];
+    is_unpaid?: boolean;
   }
 
 
@@ -37,6 +38,7 @@ interface Job {
       recruiter: string;
       user: string;
       is_applied: boolean;
+      is_unpaid?: boolean;
   }
 
   interface ProfileData {

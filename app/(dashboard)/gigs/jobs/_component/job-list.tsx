@@ -175,8 +175,12 @@ export default function JobList({ onSelectJob, selectedJobId }: JobListProps) {
                   {job.company} • {job.location}
                 </p>
                 <div className="mt-2 flex items-center space-x-2">
-                  {job.salary && (
-                    <Badge variant="secondary">{job.salary}</Badge>
+                  {job.is_unpaid ? (
+                    <Badge variant="secondary" className="text-orange-600 bg-orange-50 border-orange-200">Unpaid</Badge>
+                  ) : (
+                    job.salary && (
+                      <Badge variant="secondary">{job.salary}</Badge>
+                    )
                   )}
                   {job.duration && (
                     <Badge variant="secondary">{job.duration}</Badge>
