@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 import { useState, useEffect } from 'react';
-import { Search, Plus, Briefcase } from "lucide-react";
+import { Search, Plus, Briefcase, ChevronLeft } from "lucide-react";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import { useRouter } from 'next/navigation';
 import JobPostingsList from '../_component/job-postings-list';
@@ -103,7 +103,7 @@ export default function ManageJobsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen h-[calc(100vh-10rem)] overflow-y-scroll bg-gray-50">
             {/* Header with navigation */}
             <div className="bg-white border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -138,9 +138,9 @@ export default function ManageJobsPage() {
                 </div>
             </div>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 min-h-0">
                 {!showApplications ? (
-                    <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
+                    <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 h-full lg:h-[calc(100vh-12rem)]">
                         {/* Left Column - Job Postings List (Full width on mobile) */}
                         <div className="w-full lg:w-[400px] lg:flex-shrink-0">
                             <JobPostingsList 
@@ -151,15 +151,15 @@ export default function ManageJobsPage() {
                         </div>
 
                         {/* Right Column - Job Details (Hidden on mobile when no job selected) */}
-                        <div className={`flex-1 ${selectedJob ? 'block' : 'hidden lg:block'}`}>
+                        <div className={`w-full lg:flex-1 ${selectedJob ? 'block' : 'hidden lg:block'}`}>
                             {selectedJob ? (
-                                <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+                                <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 h-auto lg:h-full">
                                     {/* Mobile back button */}
                                     <button
                                         onClick={() => setSelectedJob(null)}
                                         className="lg:hidden mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
                                     >
-                                        <Search className="w-4 h-4 rotate-180" />
+                                        <ChevronLeft className="w-4 h-4" />
                                         Back to Jobs
                                     </button>
 
@@ -177,7 +177,7 @@ export default function ManageJobsPage() {
                                         </div>
                                     </div>
 
-                                    <div className="space-y-4 h-[calc(100vh-26rem)] overflow-y-scroll sm:space-y-6">
+                                    <div className="space-y-4 max-h-[60vh] sm:max-h-[calc(100vh-26rem)] overflow-y-auto sm:space-y-6">
                                         <div>
                                             <h3 className="text-base sm:text-lg font-semibold mb-2">Job Description</h3>
                                             <p className="text-sm sm:text-base text-gray-700 break-words">{selectedJob.job_description}</p>

@@ -53,11 +53,6 @@ const ChatInterface: React.FC = () => {
   const { userId, authToken } = useAuth();
   const { api } = useAuthenticatedApi();
 
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
 
   useEffect(() => {
     if (authToken) {
@@ -124,7 +119,7 @@ const ChatInterface: React.FC = () => {
     setWsError(null);
 
     try {
-      const wsUrl = `wss://backend.growupbuddy.in/ws/chats/${roomId}/?token=${authToken}`;
+      const wsUrl = `wss://backend.growupbuddy.com/ws/chats/${roomId}/?token=${authToken}`;
       console.log("Connecting to WebSocket URL:", wsUrl);
       const ws = new WebSocket(wsUrl);
 
@@ -240,7 +235,7 @@ const ChatInterface: React.FC = () => {
 
   const fetchMessages = async (roomId: string): Promise<void> => {
     try {
-      const response = await api.get(`/individualchats/chatrooms/?room_id=${roomId}`);
+      const response = await api.get(`/individualchats/chatroom/?room_id=${roomId}`);
       setMessages(response.data.results || []);
       connectWebSocket(roomId);
     } catch (error) {

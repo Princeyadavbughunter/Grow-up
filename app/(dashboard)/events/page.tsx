@@ -365,7 +365,7 @@ export default function EventsPage() {
   const currentEvents = events?.[`${activeTab}_events` as keyof EventsData] || [];
 
   return (
-    <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-8 pb-40">
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-8 pb-40 h-full md:h-[calc(100vh-10rem)] overflow-y-scroll md:overflow-y-hidden">
       <EventTabs />
       <EventFilters />
 

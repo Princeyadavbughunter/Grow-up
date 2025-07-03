@@ -110,7 +110,7 @@ export default function JobApplications({ job, onBack }: JobApplicationsProps) {
     }
 
     return (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-4 h-[calc(100vh-17rem)] overflow-y-scroll sm:space-y-6">
             {/* Header */}
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
                 <div className="flex items-center gap-4 mb-4">

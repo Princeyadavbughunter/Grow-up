@@ -11,7 +11,7 @@ interface DescriptionProps {
 const Description = ({ selectedGig, showSmaller }: DescriptionProps) => {
     if (!selectedGig) {
         return (
-            <div className="w-full p-2 sm:p-4">
+            <div className={`w-full ${showSmaller ? 'h-[calc(100vh-19rem)]' : 'h-[calc(100vh-12rem)]'} p-2 sm:p-4`}>
                 <Card className="h-full flex flex-col justify-center items-center p-2 sm:p-4">
                     <p className="text-gray-500">Select a job to view details</p>
                 </Card>
@@ -20,7 +20,7 @@ const Description = ({ selectedGig, showSmaller }: DescriptionProps) => {
     }
 
     return (
-        <div className={`w-full ${showSmaller ? 'h-[calc(100vh-20rem)]' : 'h-[calc(100vh-12rem)]'} overflow-y-scroll rounded-xl p-2 sm:p-4`}>
+        <div className={`w-full ${showSmaller ? 'h-[calc(100vh-19rem)]' : 'h-[calc(100vh-12rem)]'} overflow-y-scroll rounded-xl p-2 sm:p-4`}>
             <Card className="h-full border-none p-2 sm:p-4 rounded-xl flex flex-col">
                 <CardHeader className="sticky top-0 z-10 bg-white pb-4">
                     <CardTitle>{selectedGig.job_title}</CardTitle>

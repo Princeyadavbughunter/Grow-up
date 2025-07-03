@@ -25,6 +25,7 @@ interface FollowRequest {
   follower_bio: string;
   freelancer_image: string;
   requested_at: string;
+  request_id: string;
 }
 
 interface FollowResponse {
@@ -141,6 +142,7 @@ export default function NetworkPage() {
 
       // Combine followers, following requests, and following approved into My Network
       const combinedNetwork = [...processedFollowers, ...processedFollowingRequests, ...processedFollowingApproved];
+
       
       // Process pending follow requests
       const processedRequests = (followersData.pending_follow_requests || []).map((request: FollowRequest) => ({
@@ -150,7 +152,10 @@ export default function NetworkPage() {
         imageUrl: request.freelancer_image,
         isOnline: Math.random() > 0.5,
         summary: request.follower_bio,
+        requestId: request.request_id
       }));
+
+      console.log(processedRequests);
       
       // Process other freelancers (exclude already connected ones)
       const connectedIds = new Set(combinedNetwork.map(f => f.id));
@@ -189,7 +194,7 @@ export default function NetworkPage() {
       await api.patch(`/freelancer/follow/?request_id=${requestId}&action=accept`);
       
       // Remove from invites
-      setInvites(prevInvites => prevInvites.filter(invite => invite.id !== requestId));
+      setInvites(prevInvites => prevInvites.filter(invite => invite.requestId !== requestId));
       
       // Refresh followers list
       await fetchNetworkData();
@@ -203,7 +208,7 @@ export default function NetworkPage() {
     try {
       await api.patch(`/freelancer/follow/?request_id=${requestId}&action=reject`);
       
-      setInvites(prevInvites => prevInvites.filter(invite => invite.id !== requestId));
+      setInvites(prevInvites => prevInvites.filter(invite => invite.requestId !== requestId));
     } catch (error) {
       console.error('Error rejecting follow request:', error);
       setError('Failed to reject request. Please try again.');
@@ -252,7 +257,7 @@ export default function NetworkPage() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 p-4">
+    <div className="flex flex-col h-[calc(100vh-10rem)] md:h-full overflow-y-scroll md:overflow-y-hidden lg:flex-row gap-4 p-4">
       <div className="w-full lg:w-1/3 bg-[#F9FAFF] p-4 lg:h-auto lg:overflow-y-auto rounded-lg">
         <NetworkSection title="My network">
           {myNetwork.length > 0 ? (
@@ -268,16 +273,16 @@ export default function NetworkPage() {
         </NetworkSection>
       </div>
 
-      <div className="w-full lg:w-2/3 p-4 overflow-y-auto lg:min-h-screen scrollbar-[1px] rounded-lg">
+      <div className="w-full lg:w-2/3 p-4 lg:min-h-screen scrollbar-[1px] rounded-lg">
         <NetworkSection title="Invites" showAll={invites.length > 4}>
           {invites.length > 0 ? (
             invites.map((invite) => (
               <NetworkCard
-                key={invite.id}
+                key={invite.requestId}
                 {...invite} 
                 showAccept
-                onAccept={() => handleAcceptRequest(invite.id)}
-                onReject={() => handleRejectRequest(invite.id)}
+                onAccept={() => handleAcceptRequest(invite.requestId)}
+                onReject={() => handleRejectRequest(invite.requestId)}
               />
             ))
           ) : (

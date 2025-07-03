@@ -74,7 +74,7 @@ const GigsPage = () => {
     };
 
     return (
-        <div className='max-w-[1350px] h-[calc(100vh-10rem)] bg-gray-50 md:py-3 sm:py-3 py-2 mx-auto px-2 sm:px-4 md:px-6 lg:px-10'>
+        <div className='max-w-[1350px]  bg-gray-50 md:py-3 sm:py-3 py-2 mx-auto px-2 sm:px-4 md:px-6 lg:px-10'>
             {/* Header with View Applications Button */}
             <div className="mb-3 sm:mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-2 sm:mb-4">
