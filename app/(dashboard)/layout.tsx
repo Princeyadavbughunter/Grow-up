@@ -14,7 +14,7 @@ export default function RootLayout({ children }: LayoutProps) {
                 <div className="sticky top-0 z-50 bg-white shadow">
                     <Navbar />
                 </div>
-                <div className="h-[calc(100vh-10rem)] overflow-y-hidden">
+                <div className="h-[calc(100vh-5rem)] md:h-[calc(100vh-10rem)] overflow-y-hidden">
                     <ProfileRequired>
                         {children}
                     </ProfileRequired>

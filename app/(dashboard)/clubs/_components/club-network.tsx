@@ -111,41 +111,69 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
   }, [authToken, debouncedSearch]);
 
   return (
-    <div className="mt-6 mb-20 overflow-y-scroll w-full">
-      <h2 className="text-lg font-semibold mb-4">
-        {clubData?.club ? `${clubData.club} Members` : title}
-      </h2>
+    <div className="w-full h-[calc(100vh-10rem)] overflow-y-hidden">
+      {title && (
+        <h2 className="text-lg font-semibold mb-4 lg:mb-6">
+          {clubData?.club ? `${clubData.club} Members` : title}
+        </h2>
+      )}
       
-      <div className="relative mb-4">
-        <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+      <div className="relative mb-3 lg:mb-4">
+        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
         <Input
           type="text"
-          placeholder="Search by username"
+          placeholder="Search members..."
           value={searchTerm}
           onChange={handleSearchChange}
-          className="pl-8 pr-4"
+          className="pl-10 pr-4 h-10 text-sm"
         />      
       </div>
       
-      {isLoading && <div className="flex justify-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div></div>}
+      {isLoading && (
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+        </div>
+      )}
       
-      <div className="space-y-6 w-full overflow-x-hidden overflow-y-scroll">
-        {participants.length > 0 ? 
-          participants.map((participant) => (
-            <NetworkCard
-              key={participant.user_id}
-              id={participant.freelancer_id}
-              name={participant.username || "User"}
-              title={participant.position || "Member"}
-              location={participant.city && participant.state ? `${participant.city}, ${participant.state}` : ""}
-              imageUrl={participant.profile_picture || ""}
-              isOnline={false}
-              summary={participant.bio || ""}
-              showFollow={true}
-            />
-          ))
-        : !isLoading && (
-          searchTerm ? <p className="text-sm text-gray-500">No results found</p> : children
+      <div className="w-full h-full pb-12 overflow-y-auto">
+        {participants.length > 0 ? (
+          <div className="space-y-0">
+            {participants.map((participant) => (
+              <NetworkCard
+                key={participant.user_id}
+                id={participant.freelancer_id}
+                name={participant.username || "User"}
+                title={participant.position || "Member"}
+                location={participant.city && participant.state ? `${participant.city}, ${participant.state}` : ""}
+                imageUrl={participant.profile_picture || ""}
+                isOnline={false}
+                summary={participant.bio || ""}
+                showFollow={true}
+              />
+            ))}
+          </div>
+        ) : !isLoading && (
+          <div className="text-center py-8">
+            {searchTerm ? (
+              <div>
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Search className="w-5 h-5 text-gray-400" />
+                </div>
+                <p className="text-sm text-gray-500">No members found matching "{searchTerm}"</p>
+              </div>
+            ) : (
+              children || (
+                <div>
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-gray-500">No members in this club yet</p>
+                </div>
+              )
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -172,29 +200,34 @@ export function NetworkCard({
   const router = useRouter();
   
   return (
-    <div onClick={() => router.push(`/profile/${id}`)} className="flex cursor-pointer flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border-b border-gray-200">
-      <div className="relative">
-        <Avatar className="h-12 w-12">
+    <div onClick={() => router.push(`/profile/${id}`)} className="flex cursor-pointer overflow-scroll items-center gap-2 lg:gap-3 p-2 lg:p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+      <div className="relative flex-shrink-0">
+        <Avatar className="h-8 w-8 lg:h-12 lg:w-12">
           <AvatarImage src={imageUrl} />
-          <AvatarFallback>{nameInitial}</AvatarFallback>
+          <AvatarFallback className="bg-purple-100 text-purple-600 text-xs lg:text-sm font-medium">{nameInitial}</AvatarFallback>
         </Avatar>
+        {isOnline && (
+          <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 lg:w-3 lg:h-3 bg-green-500 border-2 border-white rounded-full"></div>
+        )}
       </div>
-      <div className="overflow-auto ">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="">
-            <div className="flex items-center gap-2">
-              <h3 className="font-medium truncate">{name}</h3>
-            </div>
-            <p className="text-sm text-gray-600 truncate">{title}</p>
-            <p className="text-sm text-gray-500 truncate">{location}</p>
-            {summary && <p className="text-sm text-gray-500 mt-1 truncate">{summary}</p>}
-            {followerCount !== undefined && (
-              <p className="text-xs text-gray-500 mt-1 truncate">
-                {followerCount} {followerCount === 1 ? 'follower' : 'followers'}
-              </p>
-            )}
-          </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-0.5 lg:mb-1">
+          <h3 className="font-medium text-gray-900 truncate text-sm lg:text-base">{name}</h3>
         </div>
+        {location && <p className="text-xs text-gray-500 truncate hidden lg:block">{location}</p>}
+        {summary && (
+          <p className="text-xs text-gray-500 mt-0.5 lg:mt-1 line-clamp-1 hidden lg:block">{summary}</p>
+        )}
+        {followerCount !== undefined && (
+          <p className="text-xs text-gray-400 mt-0.5 lg:mt-1 hidden lg:block">
+            {followerCount} {followerCount === 1 ? 'follower' : 'followers'}
+          </p>
+        )}
+      </div>
+      <div className="flex-shrink-0">
+        <svg className="w-3 h-3 lg:w-4 lg:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
       </div>
     </div>
   );

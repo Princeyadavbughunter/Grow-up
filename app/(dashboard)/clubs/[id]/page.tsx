@@ -25,6 +25,7 @@ const Page = () => {
   const params = useParams();
   const clubId = params?.id as string;
   const [selectedClub, setSelectedClub] = useState<Club | null>(null);
+  const [activeTab, setActiveTab] = useState<'posts' | 'members' | 'clubs'>('posts');
   const { api } = useAuthenticatedApi();
   const { authToken } = useAuth();
 
@@ -53,33 +54,97 @@ const Page = () => {
   }, [clubId, authToken]);
 
   return (
-    <div className="flex flex-col md:flex-row">
-      <div className="w-full bg-[#F9FAFF] p-4 md:p-6 fixed md:relative overflow-y-auto top-0 h-[580px]">
+    <div className="flex flex-col lg:flex-row min-h-screen">
+      {/* Desktop: Left sidebar with clubs list */}
+      <div className="hidden lg:block w-96 bg-[#F9FAFF] p-6 overflow-y-auto h-screen">
         <ClubsList selectedClubId={clubId} setSelectedClubId={() => {}} />
       </div>
 
-      <div className="w-full p-4 overflow-y-auto scrollbar-[1px] h-[580px]">
-        <div className="sticky top-0 z-10 bg-white">
-          <div className="flex items-center justify-between border mx-4 p-4 rounded-xl mt-5">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <span className="text-purple-600 text-xl">
-                  {selectedClub?.name?.[0]?.toUpperCase() || 'C'}
-                </span>
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col lg:flex-row">
+        {/* Posts section */}
+        <div className="flex-1 lg:flex-[2]">
+          {/* Club header - always visible */}
+          <div className="sticky top-0 z-10 bg-white border-b">
+            <div className="flex items-center justify-between border mx-4 p-4 rounded-xl mt-5 mb-2">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <span className="text-purple-600 text-xl">
+                    {selectedClub?.name?.[0]?.toUpperCase() || 'C'}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-semibold">{selectedClub?.name || 'Loading...'}</h3>
+                  <p className="text-sm text-gray-500">{selectedClub?.participants_count || 0} members</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold">{selectedClub?.name || 'Loading...'}</h3>
-                <p className="text-sm text-gray-500">{selectedClub?.participants_count || 0} members</p>
-              </div>
+              <Link className="text-purple-600 text-sm font-medium" href={`/create-post/${clubId}`}>Create Post</Link>
             </div>
-            <Link className="text-purple-600 text-sm font-medium" href={`/create-post/${clubId}`}>Create Post</Link>
+
+            {/* Mobile tabs */}
+            <div className="lg:hidden flex border-b mx-4">
+              <button
+                onClick={() => setActiveTab('posts')}
+                className={`flex-1 py-2 px-4 text-center font-medium transition-colors ${
+                  activeTab === 'posts'
+                    ? 'text-purple-600 border-b-2 border-purple-600 bg-purple-50'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Posts
+              </button>
+              <button
+                onClick={() => setActiveTab('members')}
+                className={`flex-1 py-2 px-4 text-center font-medium transition-colors ${
+                  activeTab === 'members'
+                    ? 'text-purple-600 border-b-2 border-purple-600 bg-purple-50'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Members
+              </button>
+              <button
+                onClick={() => setActiveTab('clubs')}
+                className={`flex-1 py-2 px-4 text-center font-medium transition-colors ${
+                  activeTab === 'clubs'
+                    ? 'text-purple-600 border-b-2 border-purple-600 bg-purple-50'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Clubs
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile: Conditional content based on active tab */}
+          <div className="lg:hidden">
+            {activeTab === 'posts' && (
+              <div className="p-4">
+                <Posts clubId={clubId} />
+              </div>
+            )}
+            {activeTab === 'members' && (
+              <div className="p-4">
+                <NetworkSection title="Members" clubId={clubId} />
+              </div>
+            )}
+            {activeTab === 'clubs' && (
+              <div className="bg-[#F9FAFF] min-h-screen">
+                <ClubsList selectedClubId={clubId} setSelectedClubId={() => {}} />
+              </div>
+            )}
+          </div>
+
+          {/* Desktop: Always show posts */}
+          <div className="hidden lg:block p-4 h-full">
+            <Posts clubId={clubId} />
           </div>
         </div>
-        <Posts clubId={clubId} />
-      </div>
 
-      <div className="w-full bg-[#F9FAFF] p-4 md:p-6 fixed md:relative overflow-y-auto top-0 h-[580px]">
-        <NetworkSection title="Members" clubId={clubId} />
+        {/* Desktop: Right sidebar with members */}
+        <div className="hidden lg:block lg:flex-1 lg:min-w-[320px] bg-[#F9FAFF] p-6 overflow-y-auto h-screen">
+          <NetworkSection title="Members" clubId={clubId} />
+        </div>
       </div>
     </div>
   );
