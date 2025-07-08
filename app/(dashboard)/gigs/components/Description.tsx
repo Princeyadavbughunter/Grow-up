@@ -35,7 +35,7 @@ const Description = ({ selectedGig, showSmaller }: DescriptionProps) => {
                         </div>
                         <div className="flex items-center">
                             <Clock className="h-4 w-4 mr-1" />
-                            {selectedGig.is_unpaid ? (
+                            {selectedGig.is_unpaid || !selectedGig.salary_range || selectedGig.salary_range.trim() === '' ? (
                                 <span className="text-orange-600 font-medium">Unpaid</span>
                             ) : (
                                 `${selectedGig.salary_range}/month`
@@ -69,7 +69,7 @@ const Description = ({ selectedGig, showSmaller }: DescriptionProps) => {
                         <h3 className="font-medium mb-2">Additional Information</h3>
                         <ul className="list-disc pl-4 space-y-2 text-gray-600">
                             <li>
-                                Salary: {selectedGig.is_unpaid ? (
+                                Salary: {selectedGig.is_unpaid || !selectedGig.salary_range || selectedGig.salary_range.trim() === '' ? (
                                     <span className="text-orange-600 font-medium">Unpaid</span>
                                 ) : (
                                     `₹${selectedGig.salary_range}/month`

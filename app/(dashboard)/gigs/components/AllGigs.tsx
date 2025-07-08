@@ -162,7 +162,7 @@ const AllGigs = ({
                       </p>
                       <div className="flex justify-between items-center mt-1">
                         <p className="text-xs font-medium text-gray-700">
-                          {gig.is_unpaid ? (
+                          {gig.is_unpaid || !gig.salary_range || gig.salary_range.trim() === '' ? (
                             <span className="text-orange-600 font-medium">Unpaid</span>
                           ) : (
                             `₹${gig.salary_range}/month`
