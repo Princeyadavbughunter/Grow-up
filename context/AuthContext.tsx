@@ -110,6 +110,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const accessToken = Cookies.get('access_token');
         const refreshToken = Cookies.get('refresh_token');
         const userInfo = Cookies.get('user_id');
+
+        console.log(accessToken, refreshToken, userInfo);
         
         if (accessToken && refreshToken) {
           setAuthToken(accessToken);

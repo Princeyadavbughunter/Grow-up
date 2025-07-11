@@ -111,7 +111,7 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
   }, [authToken, debouncedSearch]);
 
   return (
-    <div className="w-full h-[calc(100vh-10rem)] overflow-y-hidden">
+    <div className="w-full pb-24 h-[calc(100vh-10rem)] overflow-y-hidden">
       {title && (
         <h2 className="text-lg font-semibold mb-4 lg:mb-6">
           {clubData?.club ? `${clubData.club} Members` : title}

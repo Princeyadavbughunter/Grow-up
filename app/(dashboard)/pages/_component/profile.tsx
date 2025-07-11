@@ -109,6 +109,8 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
   return (
     <div className="min-h-screen bg-gray-50 p-4 flex flex-col lg:flex-row gap-4 mx-auto w-full max-w-7xl">
       <div className="rounded-lg bg-white p-6 shadow-sm flex-1">
+        
+        <div className='flex flex-col lg:flex-row gap-4'>
         <div className="mb-6 flex items-center gap-4">
           <button onClick={onBack} className="rounded-full p-2 hover:bg-gray-100">
             <BsArrowLeft className="h-6 w-6" />
@@ -143,6 +145,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
             {pageDetails.followers_count} followers
           </p>
         </div>
+        </div>
 
         {!pageDetails.is_admin && (
           <div className="mb-6 flex flex-col sm:flex-row gap-4">
@@ -176,7 +179,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           ))}
         </div>
 
-        <div className="mb-6 overflow-y-auto">
+        <div className="mb-6 overflow-y-auto h-[calc(100vh-200px)] lg:h-[calc(100vh-520px)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           {renderTabContent()}
         </div>
       </div>

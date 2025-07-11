@@ -102,6 +102,7 @@ export function EventComments({ comments, onAddReply, onUserClick }: EventCommen
           {comment.replies && comment.replies.length > 0 && renderComments(comment.replies)}
         </div>
       ))}
+      <div className="h-16"></div>
     </div>
   );
 

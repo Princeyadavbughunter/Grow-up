@@ -290,7 +290,7 @@ export default function EventsPage() {
     const participants = selectedEvent?.attendees || [];
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 h-[calc(100vh-25rem)] overflow-y-auto overflow-x-hidden">
         <div className="border-[1px] flex items-center rounded-full p-2 w-full">
           <SearchIcon size={18} color="gray" />
           <input 
@@ -309,7 +309,6 @@ export default function EventsPage() {
               </Avatar>
               <div>
                 <div className="font-medium">{participant.first_name} {participant.last_name}</div>
-                <div className="text-sm text-gray-500">{participant.email}</div>
               </div>
             </div>
             <Button onClick={() => router.push(`/profile/${participant.freelancer_profile_id}`)} variant="ghost" size="sm">View Profile</Button>
