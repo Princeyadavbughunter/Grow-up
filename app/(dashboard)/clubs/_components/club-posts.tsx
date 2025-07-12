@@ -204,39 +204,48 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
     return (
         <div className="bg-white rounded-xl p-4 mb-4 shadow-lg">
             <div className="flex items-center justify-between mb-4">
-                <Link href={`/profile/${post.freelancer_profile}`} className="flex items-center gap-3">
-                    <div>
-                        {post.profile_picture ? (
-                            <Image
-                                src={getImageUrl(post.profile_picture)}
-                                alt="Profile"
-                                width={40}
-                                height={40}
-                                className="rounded-full md:w-10 md:h-10 w-8 h-8"
-                            />
-                        ) : (
-                            <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
-                                <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
-                            </div>
-                        )}
-                    </div>
-                    <div>
-                        <h3 className="font-semibold">
-                            {post.first_name && post.last_name 
-                                ? `${post.first_name} ${post.last_name}` 
-                                : post.company_name || 'Anonymous'}
-                        </h3>
-                        <p className="text-sm text-gray-500">{formattedDate}</p>
-                    </div>
+                <div className="flex items-center gap-3">
+                    <Link href={`/profile/${post.freelancer_profile}`} className="flex items-center gap-3">
+                        <div>
+                            {post.profile_picture ? (
+                                <Image
+                                    src={getImageUrl(post.profile_picture)}
+                                    alt="Profile"
+                                    width={40}
+                                    height={40}
+                                    className="rounded-full md:w-10 md:h-10 w-8 h-8"
+                                />
+                            ) : (
+                                <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
+                                    <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <h3 className="font-semibold">
+                                {post.first_name && post.last_name 
+                                    ? `${post.first_name} ${post.last_name}` 
+                                    : post.company_name || 'Anonymous'}
+                            </h3>
+                            <p className="text-sm text-gray-500">{formattedDate}</p>
+                        </div>
+                    </Link>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                    {post.club_name && (
+                        <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">{post.club_name}</span>
+                    )}
                     {post.link && (
-                        <a href={post.link} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500">
+                        <a 
+                            href={post.link} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-sm text-blue-500 hover:text-blue-700 underline break-all max-w-xs text-right"
+                        >
                             {post.link}
                         </a>
                     )}
-                </Link>
-                {post.club_name && (
-                    <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">{post.club_name}</span>
-                )}
+                </div>
             </div>
 
             <div className="flex flex-col gap-3">

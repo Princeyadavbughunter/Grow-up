@@ -53,6 +53,13 @@ const ChatInterface: React.FC = () => {
   const { userId, authToken } = useAuth();
   const { api } = useAuthenticatedApi();
 
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
 
   useEffect(() => {
     if (authToken) {
@@ -354,7 +361,7 @@ const ChatInterface: React.FC = () => {
                           const date = new Date(chatroom.created_at);
                           return isNaN(date.getTime()) ? 'Invalid date' : date.toLocaleDateString();
                         })() 
-                        : 'No date'
+                        : null
                       }
                     </div>
                   </div>
@@ -385,7 +392,7 @@ const ChatInterface: React.FC = () => {
                             const date = new Date(chatroom.created_at);
                             return isNaN(date.getTime()) ? 'Invalid date' : date.toLocaleDateString();
                           })() 
-                          : 'No date'
+                          : null
                         }
                       </div>
                     </div>
@@ -445,7 +452,7 @@ const ChatInterface: React.FC = () => {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 p-3 md:p-4 overflow-y-auto bg-gray-50 min-h-0 flex flex-col">
+            <div className="flex-1 p-3 md:p-4 overflow-y-auto bg-gray-50 flex flex-col">
               {wsError && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-3 md:px-4 py-2 md:py-3 rounded mb-4 text-sm">
                   <p>{wsError}</p>
@@ -457,13 +464,13 @@ const ChatInterface: React.FC = () => {
                   <p className="text-sm md:text-base">No messages yet. Start the conversation!</p>
                 </div>
               ) : (
-                <div className="flex flex-col justify-end min-h-full">
+                <div className="flex flex-col space-y-3 md:space-y-4">
                   {messages.map((message) => {
                     const isCurrentUser = message.user_id === userId;
                     return (
                       <div 
                         key={message.message_id} 
-                        className={`mb-3 md:mb-4 flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                       >
                         <div 
                           className={`max-w-[85%] md:max-w-[70%] rounded-lg p-2 md:p-3 ${

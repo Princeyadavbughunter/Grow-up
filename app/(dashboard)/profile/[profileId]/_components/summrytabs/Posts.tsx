@@ -39,6 +39,7 @@ interface PostType {
   comment_count: number;
   author: string;
   club: string;
+  link?: string;
 }
 
 const Posts: React.FC = () => {
@@ -91,16 +92,30 @@ const Posts: React.FC = () => {
           <div className="space-y-4">
             {posts.map((post) => (
               <div key={post.id} className="bg-white shadow-sm rounded-lg p-4 flex flex-col gap-4 w-full">
-                <div className="flex items-center gap-4">
-                  <img
-                    src={getImageUrl(post.profile_picture)}
-                    alt="Profile Picture"
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                  <span className="font-semibold flex justify-between items-center w-full">
-                    {post.first_name} {post.last_name}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={getImageUrl(post.profile_picture)}
+                      alt="Profile Picture"
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <span className="font-semibold">
+                      {post.first_name} {post.last_name}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
                     <HiDotsVertical className="text-gray-500 cursor-pointer" />
-                  </span>
+                    {post.link && (
+                      <a 
+                        href={post.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-sm text-blue-500 hover:text-blue-700 underline break-all max-w-xs text-right"
+                      >
+                        {post.link}
+                      </a>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="flex flex-col gap-3">
