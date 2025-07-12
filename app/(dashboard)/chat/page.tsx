@@ -235,7 +235,12 @@ const ChatInterface: React.FC = () => {
 
   const fetchMessages = async (roomId: string): Promise<void> => {
     try {
-      const response = await api.get(`/individualchats/chatroom/?room_id=${roomId}`);
+      const response = await api.get(`/individualchats/chatrooms-messages/?room_id=${roomId}`);
+      console.log('API response for messages:', response.data);
+      console.log('Messages array:', response.data.results);
+      if (response.data.results && response.data.results.length > 0) {
+        console.log('First message structure:', response.data.results[0]);
+      }
       setMessages(response.data.results || []);
       connectWebSocket(roomId);
     } catch (error) {
@@ -344,7 +349,13 @@ const ChatInterface: React.FC = () => {
                       <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                     </div>
                     <div className="text-xs text-gray-400 flex-shrink-0">
-                      {new Date(chatroom.created_at).toLocaleDateString()}
+                      {chatroom.created_at && chatroom.created_at.trim() !== '' ? 
+                        (() => {
+                          const date = new Date(chatroom.created_at);
+                          return isNaN(date.getTime()) ? 'Invalid date' : date.toLocaleDateString();
+                        })() 
+                        : 'No date'
+                      }
                     </div>
                   </div>
                 ))
@@ -369,7 +380,13 @@ const ChatInterface: React.FC = () => {
                       <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                       <div className="text-xs text-gray-400 flex items-center">
                         <Clock className="h-3 w-3 mr-1" />
-                        {new Date(chatroom.created_at).toLocaleDateString()}
+                        {chatroom.created_at && chatroom.created_at.trim() !== '' ? 
+                          (() => {
+                            const date = new Date(chatroom.created_at);
+                            return isNaN(date.getTime()) ? 'Invalid date' : date.toLocaleDateString();
+                          })() 
+                          : 'No date'
+                        }
                       </div>
                     </div>
                     <div className="flex gap-1 md:gap-2 flex-shrink-0">
@@ -455,7 +472,15 @@ const ChatInterface: React.FC = () => {
                         >
                           <p className="text-sm md:text-base">{message.message}</p>
                           <div className={`text-xs mt-1 ${isCurrentUser ? 'text-blue-100' : 'text-gray-500'}`}>
-                            {new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            {(() => {
+                              console.log('Message timestamp:', message.timestamp, 'Type:', typeof message.timestamp);
+                              if (!message.timestamp || message.timestamp.trim() === '') {
+                                return 'No time';
+                              }
+                              const date = new Date(message.timestamp);
+                              console.log('Parsed date:', date, 'Is valid:', !isNaN(date.getTime()));
+                              return isNaN(date.getTime()) ? 'Invalid time' : date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            })()}
                           </div>
                         </div>
                       </div>
