@@ -53,12 +53,6 @@ const ChatInterface: React.FC = () => {
   const { userId, authToken } = useAuth();
   const { api } = useAuthenticatedApi();
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
 
 
   useEffect(() => {
@@ -460,11 +454,11 @@ const ChatInterface: React.FC = () => {
               )}
               
               {messages.length === 0 ? (
-                <div className="flex-1 flex items-center justify-center text-gray-500">
+                <div className="flex-1 flex  items-center justify-center text-gray-500">
                   <p className="text-sm md:text-base">No messages yet. Start the conversation!</p>
                 </div>
               ) : (
-                <div className="flex flex-col space-y-3 md:space-y-4">
+                <div className="flex flex-col h-96 space-y-3 md:space-y-4">
                   {messages.map((message) => {
                     const isCurrentUser = message.user_id === userId;
                     return (
