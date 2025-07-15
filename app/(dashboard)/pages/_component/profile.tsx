@@ -159,9 +159,6 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
             >
               {pageDetails.is_following ? 'Unfollow' : 'Follow'}
             </button>
-            <button className="flex-1 rounded-lg border border-[#7052FF] py-3 text-[#7052FF]">
-              Message
-            </button>
           </div>
         )}
 
@@ -179,7 +176,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           ))}
         </div>
 
-        <div className="mb-6 overflow-y-auto h-[calc(100vh-200px)] lg:h-[calc(100vh-520px)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <div className="mb-6 overflow-y-auto h-[calc(100vh-20rem)] lg:h-[calc(100vh-27rem)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           {renderTabContent()}
         </div>
       </div>
