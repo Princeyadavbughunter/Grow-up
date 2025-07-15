@@ -51,7 +51,7 @@ const ChatInterface: React.FC = () => {
     const wsReconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-    const { profileData, authToken } = useAuth();
+    const { userId, authToken } = useAuth();
     const { api } = useAuthenticatedApi();
     const params = useParams();
 
@@ -64,7 +64,7 @@ const ChatInterface: React.FC = () => {
                 const response = await api.post('/individualchats/chatroom/', {
                     name: "Test",
                     participants: [
-                        { id: profileData?.user },
+                        { id: userId },
                         { id: params.id }
                     ]
                 });
@@ -75,16 +75,10 @@ const ChatInterface: React.FC = () => {
             }
         };
 
-        if (authToken && profileData?.user && params.id) {
+        if (authToken && userId && params.id) {
             createRoom();
         }
     }, [authToken, params.id]);
-
-    useEffect(() => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [messages]);
 
     useEffect(() => {
         if (authToken) {
@@ -133,12 +127,16 @@ const ChatInterface: React.FC = () => {
     };
 
     const connectWebSocket = (roomId: string): void => {
+        console.log("Attempting to connect WebSocket for room:", roomId);
+        
         if (wsReconnectTimeoutRef.current) {
+            console.log("Clearing existing reconnect timeout");
             clearTimeout(wsReconnectTimeoutRef.current);
             wsReconnectTimeoutRef.current = null;
         }
 
         if (websocketRef.current) {
+            console.log("Closing existing WebSocket connection");
             websocketRef.current.close();
             websocketRef.current = null;
         }
@@ -147,19 +145,21 @@ const ChatInterface: React.FC = () => {
         setWsError(null);
 
         try {
-            const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/chats/${roomId}/?token=${authToken}`;
+            const wsUrl = `wss://backend.growupbuddy.com/ws/chats/${roomId}/?token=${authToken}`;
+            console.log("Connecting to WebSocket URL:", wsUrl);
             const ws = new WebSocket(wsUrl);
 
             ws.onopen = () => {
-                console.log('WebSocket connection established');
+                console.log('WebSocket connection established successfully');
                 setWsConnected(true);
                 setWsError(null);
             };
 
             ws.onmessage = (event) => {
+                console.log("WebSocket message received:", event.data);
                 try {
                     const message = JSON.parse(event.data);
-                    setMessages(prevMessages => [...prevMessages, message]);
+                    setMessages(prevMessages => [...(prevMessages || []), message]);
                 } catch (error) {
                     console.error('Error parsing WebSocket message:', error);
                 }
@@ -174,7 +174,7 @@ const ChatInterface: React.FC = () => {
             ws.onclose = (event) => {
                 console.log(`WebSocket closed with code: ${event.code}, reason: ${event.reason}`);
                 setWsConnected(false);
-
+                
                 if (selectedChatroom) {
                     wsReconnectTimeoutRef.current = setTimeout(() => {
                         if (selectedChatroom?.id) {
@@ -194,50 +194,64 @@ const ChatInterface: React.FC = () => {
     };
 
     const sendMessage = (): void => {
-        if (!selectedChatroom?.id || !messageInput.trim()) return;
+        console.log("Send message function called");
+        console.log("Selected chatroom:", selectedChatroom);
+        console.log("Message input:", messageInput);
+        console.log("WebSocket state:", websocketRef.current?.readyState);
+        
+        if (!selectedChatroom?.id || !messageInput.trim()) {
+            console.log("Validation failed - chatroom or message empty");
+            return;
+        }
 
         if (!websocketRef.current || websocketRef.current.readyState !== WebSocket.OPEN) {
+            console.log("WebSocket not connected, attempting reconnection");
             console.error('Chat connection is not open');
-
+            
             if (selectedChatroom?.id) {
                 connectWebSocket(selectedChatroom.id);
                 setWsError('Reconnecting to chat server...');
-
+                
                 const tempMessage = messageInput;
                 setTimeout(() => {
                     if (websocketRef.current?.readyState === WebSocket.OPEN) {
+                        console.log("Sending message after reconnection");
                         websocketRef.current.send(JSON.stringify({
                             room_id: selectedChatroom.id,
                             message: tempMessage,
-                            user_id: profileData?.user,
+                            user_id: userId,
                             message_type: "chat"
                         }));
-
+                        
                         const tempMessageObj: Message = {
                             message_id: `temp-${Date.now()}`,
                             message: tempMessage,
-                            user_id: profileData?.user || '',
+                            user_id: userId || '',
                             timestamp: new Date().toISOString(),
                         };
-
+                        
                         setMessages(prevMessages => [...prevMessages, tempMessageObj]);
                         setWsError(null);
+                    } else {
+                        console.log("Failed to reconnect WebSocket");
                     }
                 }, 2000);
             }
-
+            
             setMessageInput('');
             return;
         }
 
         try {
+            console.log("Attempting to send message via WebSocket");
             websocketRef.current.send(JSON.stringify({
                 room_id: selectedChatroom.id,
                 message: messageInput,
-                user_id: profileData?.user,
+                user_id: userId,
                 message_type: "chat"
             }));
-
+            console.log("Message sent successfully");
+            
             setMessageInput('');
         } catch (error) {
             console.error('Error sending message:', error);
@@ -247,7 +261,12 @@ const ChatInterface: React.FC = () => {
 
     const fetchMessages = async (roomId: string): Promise<void> => {
         try {
-            const response = await api.get(`/individualchats/chatroom/?room_id=${roomId}`);
+            const response = await api.get(`/individualchats/chatrooms-messages/?room_id=${roomId}`);
+            console.log('API response for messages:', response.data);
+            console.log('Messages array:', response.data.results);
+            if (response.data.results && response.data.results.length > 0) {
+                console.log('First message structure:', response.data.results[0]);
+            }
             setMessages(response.data.results || []);
             connectWebSocket(roomId);
         } catch (error) {
@@ -261,7 +280,7 @@ const ChatInterface: React.FC = () => {
         fetchMessages(chatroom.id);
         const details = await fetchChatroomDetails(chatroom.id);
         if (details) {
-            setSelectedChatroom(prev => prev ? { ...prev, ...details } : null);
+            setSelectedChatroom(prev => prev ? {...prev, ...details} : null);
         }
     };
 
@@ -273,11 +292,11 @@ const ChatInterface: React.FC = () => {
     const handleChatroomAction = async (roomId: string, accept: boolean): Promise<void> => {
         try {
             await api.patch(`/individualchats/chatroom/?room_id=${roomId}&is_accepted=${accept ? 'True' : 'False'}`);
-
+            
             // Refresh lists
             fetchChatrooms();
             fetchPendingChatrooms();
-
+            
             // If accepted, select the chatroom
             if (accept) {
                 const acceptedRoom = pendingChatrooms.find(room => room.id === roomId);
@@ -290,12 +309,12 @@ const ChatInterface: React.FC = () => {
         }
     };
 
-    const filteredChatrooms = chatrooms.filter(chatroom =>
+    const filteredChatrooms = chatrooms.filter(chatroom => 
         chatroom.name.toLowerCase().includes(searchInput.toLowerCase()) ||
         chatroom.chatting_with_current_user.name.toLowerCase().includes(searchInput.toLowerCase())
     );
-
-    const filteredPendingChatrooms = pendingChatrooms.filter(chatroom =>
+    
+    const filteredPendingChatrooms = pendingChatrooms.filter(chatroom => 
         chatroom.name.toLowerCase().includes(searchInput.toLowerCase()) ||
         chatroom.chatting_with_current_user.name.toLowerCase().includes(searchInput.toLowerCase())
     );
@@ -315,7 +334,7 @@ const ChatInterface: React.FC = () => {
                             className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-4 text-sm md:text-base"
                         />
                     </div>
-
+                    
                     <div className="flex border-b mb-2">
                         <button
                             onClick={() => setTab('active')}
@@ -341,8 +360,8 @@ const ChatInterface: React.FC = () => {
                                 <div className="p-4 text-center text-gray-500">No chats found</div>
                             ) : (
                                 filteredChatrooms.map((chatroom) => (
-                                    <div
-                                        key={chatroom.id}
+                                    <div 
+                                        key={chatroom.id} 
                                         className={`flex items-center p-3 md:p-4 hover:bg-gray-50 cursor-pointer active:bg-gray-100 ${selectedChatroom?.id === chatroom.id ? 'bg-gray-100' : ''}`}
                                         onClick={() => handleChatroomSelect(chatroom)}
                                     >
@@ -356,7 +375,13 @@ const ChatInterface: React.FC = () => {
                                             <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                                         </div>
                                         <div className="text-xs text-gray-400 flex-shrink-0">
-                                            {new Date(chatroom.created_at).toLocaleDateString()}
+                                            {chatroom.created_at && chatroom.created_at.trim() !== '' ? 
+                                                (() => {
+                                                    const date = new Date(chatroom.created_at);
+                                                    return isNaN(date.getTime()) ? 'Invalid date' : date.toLocaleDateString();
+                                                })() 
+                                                : null
+                                            }
                                         </div>
                                     </div>
                                 ))
@@ -381,17 +406,23 @@ const ChatInterface: React.FC = () => {
                                             <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                                             <div className="text-xs text-gray-400 flex items-center">
                                                 <Clock className="h-3 w-3 mr-1" />
-                                                {new Date(chatroom.created_at).toLocaleDateString()}
+                                                {chatroom.created_at && chatroom.created_at.trim() !== '' ? 
+                                                    (() => {
+                                                        const date = new Date(chatroom.created_at);
+                                                        return isNaN(date.getTime()) ? 'Invalid date' : date.toLocaleDateString();
+                                                    })() 
+                                                    : null
+                                                }
                                             </div>
                                         </div>
                                         <div className="flex gap-1 md:gap-2 flex-shrink-0">
-                                            <button
+                                            <button 
                                                 onClick={() => handleChatroomAction(chatroom.id, true)}
                                                 className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 active:bg-green-300"
                                             >
                                                 <Check className="h-4 w-4" />
                                             </button>
-                                            <button
+                                            <button 
                                                 onClick={() => handleChatroomAction(chatroom.id, false)}
                                                 className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 active:bg-red-300"
                                             >
@@ -407,7 +438,7 @@ const ChatInterface: React.FC = () => {
             </div>
 
             {/* Main Chat Area */}
-            <div className={`${!showSidebar ? 'block' : 'hidden'} md:block flex-1 flex flex-col bg-white h-full`}>
+            <div className={`${!showSidebar ? 'block' : 'hidden'} md:block relative flex-1 flex flex-col h-full`}>
                 {!selectedChatroom ? (
                     <div className="flex-1 flex items-center justify-center flex-col text-gray-500 p-4 h-full">
                         <MessageSquare className="h-12 w-12 md:h-16 md:w-16 mb-4 text-gray-300" />
@@ -417,7 +448,7 @@ const ChatInterface: React.FC = () => {
                     <>
                         {/* Chat Header */}
                         <div className="p-3 md:p-4 border-b bg-white flex items-center flex-shrink-0">
-                            <button
+                            <button 
                                 onClick={handleBackToSidebar}
                                 className="md:hidden mr-3 p-2 hover:bg-gray-100 rounded-full"
                             >
@@ -431,8 +462,8 @@ const ChatInterface: React.FC = () => {
                             <div className="min-w-0">
                                 <h2 className="font-medium text-sm md:text-base truncate">{selectedChatroom.chatting_with_current_user.name}</h2>
                                 <p className="text-xs md:text-sm text-gray-500 flex items-center">
-                                    {wsConnected ?
-                                        <span className="text-green-500 flex items-center"><span className="h-2 w-2 bg-green-500 rounded-full mr-1"></span>Online</span> :
+                                    {wsConnected ? 
+                                        <span className="text-green-500 flex items-center"><span className="h-2 w-2 bg-green-500 rounded-full mr-1"></span>Online</span> : 
                                         <span className="text-gray-500 flex items-center"><span className="h-2 w-2 bg-gray-300 rounded-full mr-1"></span>Offline</span>
                                     }
                                 </p>
@@ -440,33 +471,42 @@ const ChatInterface: React.FC = () => {
                         </div>
 
                         {/* Messages Area */}
-                        <div className="flex-1 p-3 md:p-4 overflow-y-auto bg-gray-50 min-h-0 flex flex-col">
+                        <div className=" h-[calc(100vh-20rem)] p-3 md:p-4 overflow-y-auto bg-gray-50 flex flex-col">
                             {wsError && (
                                 <div className="bg-red-100 border border-red-400 text-red-700 px-3 md:px-4 py-2 md:py-3 rounded mb-4 text-sm">
                                     <p>{wsError}</p>
                                 </div>
                             )}
-
+                            
                             {messages.length === 0 ? (
-                                <div className="flex-1 flex items-center justify-center text-gray-500">
+                                <div className="flex-1 flex  items-center justify-center text-gray-500">
                                     <p className="text-sm md:text-base">No messages yet. Start the conversation!</p>
                                 </div>
                             ) : (
-                                <div className="flex flex-col justify-end min-h-full">
+                                <div className="flex flex-col h-96 space-y-1 md:space-y-2">
                                     {messages.map((message) => {
-                                        const isCurrentUser = message.user_id === profileData?.user;
+                                        const isCurrentUser = message.user_id === userId;
                                         return (
-                                            <div
-                                                key={message.message_id}
-                                                className={`mb-3 md:mb-4 flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+                                            <div 
+                                                key={message.message_id} 
+                                                className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                                             >
-                                                <div
-                                                    className={`max-w-[85%] md:max-w-[70%] rounded-lg p-2 md:p-3 ${isCurrentUser ? 'bg-blue-500 text-white' : 'bg-white border'
-                                                        }`}
+                                                <div 
+                                                    className={`max-w-[85%] md:max-w-[70%] rounded-lg mb-2 p-2 md:p-3 ${
+                                                        isCurrentUser ? 'bg-blue-500 text-white' : 'bg-white border'
+                                                    }`}
                                                 >
                                                     <p className="text-sm md:text-base">{message.message}</p>
                                                     <div className={`text-xs mt-1 ${isCurrentUser ? 'text-blue-100' : 'text-gray-500'}`}>
-                                                        {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        {(() => {
+                                                            console.log('Message timestamp:', message.timestamp, 'Type:', typeof message.timestamp);
+                                                            if (!message.timestamp || message.timestamp.trim() === '') {
+                                                                return 'No time';
+                                                            }
+                                                            const date = new Date(message.timestamp);
+                                                            console.log('Parsed date:', date, 'Is valid:', !isNaN(date.getTime()));
+                                                            return isNaN(date.getTime()) ? 'Invalid time' : date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                                                        })()}
                                                     </div>
                                                 </div>
                                             </div>
@@ -478,7 +518,7 @@ const ChatInterface: React.FC = () => {
                         </div>
 
                         {/* Message Input */}
-                        <div className="p-3 md:p-4 border-t bg-white flex-shrink-0">
+                        <div className="absolute bottom-40 left-0 right-0 p-3 md:p-4 border-t bg-white">
                             <div className="flex gap-2">
                                 <input
                                     type="text"
@@ -493,7 +533,12 @@ const ChatInterface: React.FC = () => {
                                     }}
                                 />
                                 <button
-                                    onClick={sendMessage}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        console.log("Send button clicked");
+                                        sendMessage();
+                                    }}
+                                    type="button"
                                     className="bg-blue-500 text-white rounded-lg px-3 md:px-4 py-2 md:py-3 hover:bg-blue-600 active:bg-blue-700 flex-shrink-0"
                                     disabled={!wsConnected}
                                 >
