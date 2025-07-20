@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react'
 
 const TeamMemberCard = () => {
@@ -51,8 +53,8 @@ const TeamMemberCard = () => {
                   src={member.image}
                   alt={member.name}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTVFN0VCIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzciIHI9IjEyIiBmaWxsPSIjOUM5Q0EzIi8+CjxwYXRoIGQ9Ik0yMCA3MEMyMCA2My4zNzI2IDI1LjM3MjYgNTggMzIgNThIMzZDNDIuNjI3NCA1OCA0OCA2My4zNzI2IDQ4IDcwVjc4SDIwVjcwWiIgZmlsbD0iIzlDOUNBMyIvPgo8cGF0aCBkPSJNNTIgNzBDNTIgNjMuMzcyNiA1Ny4zNzI2IDU4IDY0IDU4SDY4Qzc0LjYyNzQgNTggODAgNjMuMzcyNiA4MCA3MFY3OEg1MlY3MFoiIGZpbGw9IiM5QzlDQTMiLz4KPC9zdmc+';
+                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                    e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTVFN0VCIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzciIHI9IjEyIiBmaWxsPSIjOUM5Q0EzIi8+CjxwYXRoIGQ9Ik0yMCA3MEMyMCA2My4zNzI2IDI1LjM3MjYgNTggMzIgNThIMzZDNDIuNjI3NCA1OCA0OCA2My4zNzI2IDQ4IDcwVjc4SDIwVjcwWiIgZmlsbD0iIzlDOUNBMyIvPgo8cGF0aCBkPSJNNTIgNzBDNTIgNjMuMzcyNiA1Ny4zNzI2IDU4IDY0IDU4SDY4Qzc0LjYyNzQgNTggODAgNjMuMzcyNiA4MCA3MFY3OEg1MlY3MFoiIGZpbGw9IiM5QzlDQTMiLz4KPC9zdmc+';
                   }}
                 />
               </div>
