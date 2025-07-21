@@ -53,12 +53,6 @@ const ChatInterface: React.FC = () => {
   const { userId, authToken } = useAuth();
   const { api } = useAuthenticatedApi();
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
 
 
   useEffect(() => {
@@ -419,7 +413,7 @@ const ChatInterface: React.FC = () => {
       </div>
 
       {/* Main Chat Area */}
-      <div className={`${!showSidebar ? 'block' : 'hidden'} md:block flex-1 flex flex-col bg-white h-full`}>
+      <div className={`${!showSidebar ? 'block' : 'hidden'} md:block relative flex-1 flex flex-col h-full`}>
         {!selectedChatroom ? (
           <div className="flex-1 flex items-center justify-center flex-col text-gray-500 p-4 h-full">
             <MessageSquare className="h-12 w-12 md:h-16 md:w-16 mb-4 text-gray-300" />
@@ -452,7 +446,7 @@ const ChatInterface: React.FC = () => {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 p-3 md:p-4 overflow-y-auto bg-gray-50 flex flex-col">
+            <div className=" h-[calc(100vh-20rem)] p-3 md:p-4 overflow-y-auto bg-gray-50 flex flex-col">
               {wsError && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-3 md:px-4 py-2 md:py-3 rounded mb-4 text-sm">
                   <p>{wsError}</p>
@@ -460,11 +454,11 @@ const ChatInterface: React.FC = () => {
               )}
               
               {messages.length === 0 ? (
-                <div className="flex-1 flex items-center justify-center text-gray-500">
+                <div className="flex-1 flex  items-center justify-center text-gray-500">
                   <p className="text-sm md:text-base">No messages yet. Start the conversation!</p>
                 </div>
               ) : (
-                <div className="flex flex-col space-y-3 md:space-y-4">
+                <div className="flex flex-col h-96 space-y-1 md:space-y-2">
                   {messages.map((message) => {
                     const isCurrentUser = message.user_id === userId;
                     return (
@@ -473,7 +467,7 @@ const ChatInterface: React.FC = () => {
                         className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                       >
                         <div 
-                          className={`max-w-[85%] md:max-w-[70%] rounded-lg p-2 md:p-3 ${
+                          className={`max-w-[85%] md:max-w-[70%] rounded-lg mb-2 p-2 md:p-3 ${
                             isCurrentUser ? 'bg-blue-500 text-white' : 'bg-white border'
                           }`}
                         >
@@ -499,7 +493,7 @@ const ChatInterface: React.FC = () => {
             </div>
 
             {/* Message Input */}
-            <div className="p-3 md:p-4 border-t bg-white flex-shrink-0">
+            <div className="absolute bottom-40 left-0 right-0 p-3 md:p-4 border-t bg-white">
               <div className="flex gap-2">
                 <input
                   type="text"

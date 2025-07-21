@@ -362,7 +362,7 @@ const ChatInterface = () => {
                             {page.followers_count} followers
                             {page.is_admin && (
                               <span className="ml-2 text-blue-500 flex items-center">
-                                <RiBroadcastFill className="mr-1" /> Admin
+                              Admin
                               </span>
                             )}
                           </p>

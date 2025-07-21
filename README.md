@@ -5,9 +5,9 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 First, run the development server:
  
 ```bash  
-npm run dev 
+npm run dev  
 # or 
-yarn dev
+yarn dev 
 # or
 pnpm dev   
 # or
@@ -38,5 +38,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 # growup-buddy
 # growup-buddy
 
-xyz    
+xyzz
+abc
 

@@ -141,7 +141,10 @@ export default function NetworkPage() {
       }));
 
       // Combine followers, following requests, and following approved into My Network
-      const combinedNetwork = [...processedFollowers, ...processedFollowingRequests, ...processedFollowingApproved];
+      const combinedNetwork = [...processedFollowers, ...processedFollowingRequests, ...processedFollowingApproved]
+        .filter((user, index, self) => 
+          index === self.findIndex(u => u.id === user.id)
+        );
 
       
       // Process pending follow requests
