@@ -39,7 +39,18 @@ interface Message {
   message_id: string;
   message: string;
   user_id: string;
+  username: string;
   timestamp: string;
+  image_url: string | null;
+  audio_url: string | null;
+  is_sender: boolean;
+}
+
+interface MessagesResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Message[];
 }
 
 interface ChatroomDetails {
@@ -599,32 +610,27 @@ const ChatInterface: React.FC = () => {
                   }
                 </p>
               </div>
-              <button
-                onClick={openNoteDialog}
-                className="p-2 hover:bg-gray-100 rounded-full"
-                title="Chat Notes"
-              >
-                <FileText className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Chatroom Note Display */}
-            {chatroomNote && (
-              <div className="p-3 md:p-4 border-b bg-yellow-50">
-                <div className="flex items-start gap-2">
-                  <FileText className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1">
-                    <div className="text-xs font-medium text-yellow-800 mb-1">Chat Note:</div>
-                    <p className="text-sm text-yellow-700">{chatroomNote}</p>
+              <div className="flex items-center gap-2">
+                {chatroomNote && (
+                  <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-md border border-yellow-200">
+                    <FileText className="h-3 w-3 text-yellow-600" />
+                    <span className="text-xs text-yellow-700 truncate max-w-32">{chatroomNote}</span>
                     {chatroomNotes.length > 1 && (
-                      <div className="text-xs text-yellow-600 mt-1">
-                        {chatroomNotes.length} notes in this chat
-                      </div>
+                      <span className="text-xs text-yellow-600 ml-1">
+                        ({chatroomNotes.length})
+                      </span>
                     )}
                   </div>
-                </div>
+                )}
+                <button
+                  onClick={openNoteDialog}
+                  className="p-2 hover:bg-gray-100 rounded-full"
+                  title="Chat Notes"
+                >
+                  <FileText className="h-4 w-4" />
+                </button>
               </div>
-            )}
+            </div>
 
             {/* Messages Area */}
             <div className=" h-[calc(100vh-20rem)] p-3 md:p-4 overflow-y-auto bg-gray-50 flex flex-col">
@@ -641,7 +647,7 @@ const ChatInterface: React.FC = () => {
               ) : (
                 <div className="flex flex-col h-96 space-y-1 md:space-y-2">
                   {messages.map((message) => {
-                    const isCurrentUser = message.user_id === userId;
+                    const isCurrentUser = message.is_sender;
                     return (
                       <div 
                         key={message.message_id} 
@@ -684,17 +690,6 @@ const ChatInterface: React.FC = () => {
                               </DropdownMenu>
                             )}
                           </div>
-                          {/* Hover Delete Button */}
-                          {isCurrentUser && (
-                            <button
-                              onClick={() => deleteMessage(message.message_id)}
-                              disabled={deletingMessage === message.message_id}
-                              className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 text-white rounded-full p-1 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Delete message"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          )}
                         </div>
                       </div>
                     );
