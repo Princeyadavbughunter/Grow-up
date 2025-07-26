@@ -2,8 +2,23 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
 import { BiSearch } from 'react-icons/bi';
-import { Send, Check, X, MessageSquare, Clock, ArrowLeft } from 'lucide-react';
+import { Send, Check, X, MessageSquare, Clock, ArrowLeft, MoreVertical, FileText } from 'lucide-react';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Participant {
   id: string;
@@ -33,6 +48,15 @@ interface ChatroomDetails {
   participants: Participant[];
 }
 
+interface Note {
+  id: string;
+  user_id: string;
+  username: string;
+  note: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const ChatInterface: React.FC = () => {
   const [searchInput, setSearchInput] = useState<string>('');
   const [messageInput, setMessageInput] = useState<string>('');
@@ -45,6 +69,12 @@ const ChatInterface: React.FC = () => {
   const [wsConnected, setWsConnected] = useState<boolean>(false);
   const [wsError, setWsError] = useState<string | null>(null);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
+  const [deletingMessage, setDeletingMessage] = useState<string | null>(null);
+  const [noteDialogOpen, setNoteDialogOpen] = useState<boolean>(false);
+  const [noteText, setNoteText] = useState<string>('');
+  const [savingNote, setSavingNote] = useState<boolean>(false);
+  const [chatroomNote, setChatroomNote] = useState<string>('');
+  const [chatroomNotes, setChatroomNotes] = useState<Note[]>([]);
   
   const websocketRef = useRef<WebSocket | null>(null);
   const wsReconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -76,6 +106,9 @@ const ChatInterface: React.FC = () => {
       const response = await api.get('/individualchats/chatroom/');
       setChatrooms(response.data.results);
       setLoading(false);
+      
+      // Fetch notes for all chatrooms
+      await fetchAllChatroomNotes();
     } catch (error) {
       console.error('Error fetching chatrooms:', error);
       setLoading(false);
@@ -236,16 +269,45 @@ const ChatInterface: React.FC = () => {
 
   const fetchMessages = async (roomId: string): Promise<void> => {
     try {
-      const response = await api.get(`/individualchats/chatrooms-messages/?room_id=${roomId}`);
-      console.log('API response for messages:', response.data);
-      console.log('Messages array:', response.data.results);
-      if (response.data.results && response.data.results.length > 0) {
-        console.log('First message structure:', response.data.results[0]);
+      // Fetch messages and notes in parallel
+      const [messagesResponse, notesResponse] = await Promise.all([
+        api.get(`/individualchats/chatrooms-messages/?room_id=${roomId}`),
+        api.get(`/individualchats/chatroom-notes/?chatroom_id=${roomId}`)
+      ]);
+      
+      console.log('API response for messages:', messagesResponse.data);
+      console.log('API response for notes:', notesResponse.data);
+      console.log('Messages array:', messagesResponse.data.results);
+      
+      if (messagesResponse.data.results && messagesResponse.data.results.length > 0) {
+        console.log('First message structure:', messagesResponse.data.results[0]);
       }
-      setMessages(response.data.results || []);
+      
+      setMessages(messagesResponse.data.results || []);
+      
+      // Handle notes array
+      const notes = notesResponse.data || [];
+      setChatroomNotes(notes);
+      
+      // Get the most recent note (last in array) or empty string
+      const latestNote = notes.length > 0 ? notes[notes.length - 1].note : '';
+      setChatroomNote(latestNote);
+      
       connectWebSocket(roomId);
+      
+      console.log('Messages and notes fetched successfully for room:', roomId);
     } catch (error) {
-      console.error('Error fetching messages:', error);
+      console.error('Error fetching messages and notes:', error);
+      
+      // Fallback: try to fetch messages only if the combined request fails
+      try {
+        const messagesResponse = await api.get(`/individualchats/chatrooms-messages/?room_id=${roomId}`);
+        setMessages(messagesResponse.data.results || []);
+        connectWebSocket(roomId);
+        console.log('Messages fetched successfully (fallback)');
+      } catch (fallbackError) {
+        console.error('Error fetching messages (fallback):', fallbackError);
+      }
     }
   };
 
@@ -293,6 +355,100 @@ const ChatInterface: React.FC = () => {
     chatroom.name.toLowerCase().includes(searchInput.toLowerCase()) ||
     chatroom.chatting_with_current_user.name.toLowerCase().includes(searchInput.toLowerCase())
   );
+
+  const deleteMessage = async (messageId: string): Promise<void> => {
+    if (!selectedChatroom?.id) return;
+    
+    setDeletingMessage(messageId);
+    try {
+      await api.delete(`/individualchats/chatrooms-messages/?id=${messageId}`);
+      
+      // Remove the message from local state
+      setMessages(prevMessages => prevMessages.filter(msg => msg.message_id !== messageId));
+      
+      console.log('Message deleted successfully');
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      setWsError('Failed to delete message');
+    } finally {
+      setDeletingMessage(null);
+    }
+  };
+
+  const openNoteDialog = (): void => {
+    setNoteText(chatroomNote);
+    setNoteDialogOpen(true);
+  };
+
+  const saveNote = async (): Promise<void> => {
+    if (!selectedChatroom?.id) return;
+    
+    setSavingNote(true);
+    try {
+      // Always create a new note (POST request)
+      await api.post(`/individualchats/chatroom-notes/?chatroom_id=${selectedChatroom.id}`, {
+        note: noteText
+      });
+      
+      // Refresh notes after saving
+      await fetchChatroomNote();
+      
+      setNoteDialogOpen(false);
+      setNoteText('');
+      console.log('Chatroom note saved successfully');
+    } catch (error) {
+      console.error('Error saving chatroom note:', error);
+      setWsError('Failed to save note');
+    } finally {
+      setSavingNote(false);
+    }
+  };
+
+  const fetchAllChatroomNotes = async (): Promise<void> => {
+    try {
+      // Fetch notes for all chatrooms
+      const notesPromises = chatrooms.map(async (chatroom) => {
+        try {
+          const response = await api.get(`/individualchats/chatroom-notes/?chatroom_id=${chatroom.id}`);
+          return {
+            chatroomId: chatroom.id,
+            notes: response.data || []
+          };
+        } catch (error) {
+          console.error(`Error fetching note for chatroom ${chatroom.id}:`, error);
+          return {
+            chatroomId: chatroom.id,
+            notes: []
+          };
+        }
+      });
+      
+      const notesData = await Promise.all(notesPromises);
+      console.log('All chatroom notes fetched:', notesData);
+    } catch (error) {
+      console.error('Error fetching all chatroom notes:', error);
+    }
+  };
+
+  const fetchChatroomNote = async (): Promise<void> => {
+    if (!selectedChatroom?.id) return;
+    
+    try {
+      const response = await api.get(`/individualchats/chatroom-notes/?chatroom_id=${selectedChatroom.id}`);
+      const notes = response.data || [];
+      setChatroomNotes(notes);
+      
+      // Get the most recent note (last in array) or empty string
+      const latestNote = notes.length > 0 ? notes[notes.length - 1].note : '';
+      setChatroomNote(latestNote);
+      
+      console.log('Chatroom notes fetched for:', selectedChatroom.id, notes);
+    } catch (error) {
+      console.error('Error fetching chatroom notes:', error);
+      setChatroomNote('');
+      setChatroomNotes([]);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -434,7 +590,7 @@ const ChatInterface: React.FC = () => {
                 alt={selectedChatroom.chatting_with_current_user.name}
                 className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0"
               />
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <h2 className="font-medium text-sm md:text-base truncate">{selectedChatroom.chatting_with_current_user.name}</h2>
                 <p className="text-xs md:text-sm text-gray-500 flex items-center">
                   {wsConnected ? 
@@ -443,7 +599,32 @@ const ChatInterface: React.FC = () => {
                   }
                 </p>
               </div>
+              <button
+                onClick={openNoteDialog}
+                className="p-2 hover:bg-gray-100 rounded-full"
+                title="Chat Notes"
+              >
+                <FileText className="h-4 w-4" />
+              </button>
             </div>
+
+            {/* Chatroom Note Display */}
+            {chatroomNote && (
+              <div className="p-3 md:p-4 border-b bg-yellow-50">
+                <div className="flex items-start gap-2">
+                  <FileText className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="text-xs font-medium text-yellow-800 mb-1">Chat Note:</div>
+                    <p className="text-sm text-yellow-700">{chatroomNote}</p>
+                    {chatroomNotes.length > 1 && (
+                      <div className="text-xs text-yellow-600 mt-1">
+                        {chatroomNotes.length} notes in this chat
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Messages Area */}
             <div className=" h-[calc(100vh-20rem)] p-3 md:p-4 overflow-y-auto bg-gray-50 flex flex-col">
@@ -464,25 +645,56 @@ const ChatInterface: React.FC = () => {
                     return (
                       <div 
                         key={message.message_id} 
-                        className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} group`}
                       >
                         <div 
                           className={`max-w-[85%] md:max-w-[70%] rounded-lg mb-2 p-2 md:p-3 ${
                             isCurrentUser ? 'bg-blue-500 text-white' : 'bg-white border'
-                          }`}
+                          } relative group`}
                         >
                           <p className="text-sm md:text-base">{message.message}</p>
-                          <div className={`text-xs mt-1 ${isCurrentUser ? 'text-blue-100' : 'text-gray-500'}`}>
-                            {(() => {
-                              console.log('Message timestamp:', message.timestamp, 'Type:', typeof message.timestamp);
-                              if (!message.timestamp || message.timestamp.trim() === '') {
-                                return 'No time';
-                              }
-                              const date = new Date(message.timestamp);
-                              console.log('Parsed date:', date, 'Is valid:', !isNaN(date.getTime()));
-                              return isNaN(date.getTime()) ? 'Invalid time' : date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                            })()}
+                          <div className={`text-xs mt-1 ${isCurrentUser ? 'text-blue-100' : 'text-gray-500'} flex items-center justify-between`}>
+                            <span>
+                              {(() => {
+                                console.log('Message timestamp:', message.timestamp, 'Type:', typeof message.timestamp);
+                                if (!message.timestamp || message.timestamp.trim() === '') {
+                                  return 'No time';
+                                }
+                                const date = new Date(message.timestamp);
+                                console.log('Parsed date:', date, 'Is valid:', !isNaN(date.getTime()));
+                                return isNaN(date.getTime()) ? 'Invalid time' : date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                              })()}
+                            </span>
+                            {isCurrentUser && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button className="opacity-0 group-hover:opacity-100 transition-opacity ml-2 p-1 hover:bg-black/10 rounded">
+                                    <MoreVertical className="h-3 w-3" />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => deleteMessage(message.message_id)}
+                                    disabled={deletingMessage === message.message_id}
+                                    className="text-red-600 cursor-pointer"
+                                  >
+                                    {deletingMessage === message.message_id ? 'Deleting...' : 'Delete'}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            )}
                           </div>
+                          {/* Hover Delete Button */}
+                          {isCurrentUser && (
+                            <button
+                              onClick={() => deleteMessage(message.message_id)}
+                              disabled={deletingMessage === message.message_id}
+                              className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 text-white rounded-full p-1 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Delete message"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
@@ -524,6 +736,48 @@ const ChatInterface: React.FC = () => {
           </>
         )}
       </div>
+
+        {/* Note Dialog */}
+        <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>
+                {chatroomNote ? 'Edit Chat Note' : 'Add Chat Note'}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <label htmlFor="note" className="text-sm font-medium">
+                  Note
+                </label>
+                <Textarea
+                  id="note"
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value)}
+                  placeholder="Enter your note for this chat..."
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setNoteDialogOpen(false);
+                  setNoteText('');
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={saveNote}
+                disabled={savingNote || !noteText.trim()}
+              >
+                {savingNote ? 'Saving...' : 'Save Note'}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
     </div>
   );
 };
