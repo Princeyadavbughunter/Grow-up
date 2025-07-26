@@ -121,7 +121,7 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
     }
 
     return (
-        <div className="p-4">
+        <div className="p-4 h-[calc(100vh-10rem)] overflow-y-auto">
             <div className="flex flex-wrap items-center gap-4 mb-4 border-b">
                 <button
                     onClick={() => setActiveTab("all")}

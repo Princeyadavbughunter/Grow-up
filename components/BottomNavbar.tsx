@@ -27,7 +27,7 @@ const BottomNavbar = () => {
             href={path}
             icon={<Icon size={20} />}
             label={label}
-            active={pathname === path}
+            active={pathname === path || (path !== '/' && pathname.startsWith(path))}
           />
         ))}
       </div>
