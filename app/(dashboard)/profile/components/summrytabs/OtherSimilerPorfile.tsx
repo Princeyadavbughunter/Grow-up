@@ -31,18 +31,32 @@ interface SimilarProfile {
   requestSent: boolean;
 }
 
-const OtherSimilarProfile: React.FC = () => {
+interface OtherSimilarProfileProps {
+  freelancerId?: string;
+}
+
+const OtherSimilarProfile: React.FC<OtherSimilarProfileProps> = ({ freelancerId }) => {
     const [similarProfiles, setSimilarProfiles] = useState<SimilarProfile[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const { api } = useAuthenticatedApi()
-    const { isAuthenticated } = useAuth()
+    const { isAuthenticated, profileData } = useAuth()
     const router = useRouter()
 
     useEffect(() => {
         const fetchSimilarProfiles = async (): Promise<void> => {
             try {
                 setLoading(true)
-                const response = await api.get('/freelancer/unfollowed-freelancers/')
+                
+                // Use the freelancerId prop if provided, otherwise use the current user's ID
+                const targetFreelancerId = freelancerId || profileData?.id
+                
+                if (!targetFreelancerId) {
+                    console.error('No freelancer ID available')
+                    setSimilarProfiles([])
+                    return
+                }
+
+                const response = await api.get(`/freelancer/freelancers-similar/?freelancer_id=${targetFreelancerId}`)
                 
                 // Map the actual API response to our component structure
                 const processedProfiles: SimilarProfile[] = response.data.map((freelancer: Freelancer) => ({
@@ -68,7 +82,7 @@ const OtherSimilarProfile: React.FC = () => {
         if (isAuthenticated) {
             fetchSimilarProfiles()
         }
-    }, [isAuthenticated])
+    }, [isAuthenticated, freelancerId, profileData?.id])
 
     const handleConnect = async (freelancerId: string): Promise<void> => {
         try {

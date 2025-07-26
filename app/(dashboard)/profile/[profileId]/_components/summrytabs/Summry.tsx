@@ -56,10 +56,11 @@ interface FreelancerProfile {
 }
 
 interface SummryProps {
-    profileData: FreelancerProfile | null;
+    profileData: FreelancerProfile;
+    profileId?: string;
 }
 
-const Summry: React.FC<SummryProps> = ({ profileData }) => {
+const Summry: React.FC<SummryProps> = ({ profileData, profileId }) => {
     const [activeJobTypeTab, setActiveJobTypeTab] = useState<string>("About");
 
     const skillsArray = profileData?.skills ? profileData.skills.split(',').map(skill => skill.trim()) : [];
@@ -139,7 +140,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                 </div>
 
                 <div className="w-1/2">
-                    <OtherSimilerPorfile />
+                    <OtherSimilerPorfile freelancerId={profileId} />
                     <Clubs />
                 </div>
             </div>

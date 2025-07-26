@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck 
 "use client";
 import React, { useState, useEffect } from "react";
 import ProfileData from "./_components/ProfileData";
@@ -51,7 +51,7 @@ const Page = ({ params }: any) => {
       ) : (
         <>
           <ProfileData profileData={profileData} />
-          <Summry profileData={profileData} />
+          <Summry profileData={profileData} profileId={params.profileId} />
         </>
       )}
     </div>

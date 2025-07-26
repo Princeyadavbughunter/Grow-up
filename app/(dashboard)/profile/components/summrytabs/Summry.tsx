@@ -146,7 +146,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                 </div>
 
                 <div className="w-1/2">
-                    <OtherSimilerPorfile />
+                    <OtherSimilerPorfile freelancerId={profileData?.id} />
                     <Clubs />
                 </div>
             </div>
