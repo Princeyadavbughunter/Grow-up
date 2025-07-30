@@ -4,9 +4,19 @@ import { HiOutlineStar } from "react-icons/hi2";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 
 interface WorkExperience {
-  // Define work experience properties if needed
   id: string;
-  // Other properties
+  company_name: string;
+  position: string;
+  start_date: string;
+  end_date: string | null;
+  description: string;
+  location: string;
+  created_at: string;
+  updated_at: string;
+  currently_working: boolean;
+  job_location: string;
+  job_title: string;
+  freelancer: string;
 }
 
 interface ProfileData {
@@ -48,7 +58,6 @@ interface ProfileData {
   soft_skills: string;
   position: string;
   user: string;
-  work_experience: WorkExperience[];
 }
 
 interface Step {
@@ -58,6 +67,8 @@ interface Step {
 
 const ProgressProfile: React.FC = () => {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [workExperiences, setWorkExperiences] = useState<WorkExperience[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const { authToken } = useAuth();
   const { api } = useAuthenticatedApi();
 
@@ -72,21 +83,40 @@ const ProgressProfile: React.FC = () => {
     }
   };
 
+  const fetchWorkExperiences = async (): Promise<void> => {
+    try {
+      const response = await api.get('/freelancer/work-experience/');
+      setWorkExperiences(response.data || []);
+    } catch (error) {
+      console.error('Error fetching work experiences:', error);
+      setWorkExperiences([]);
+    }
+  };
+
   useEffect(() => {
     if (authToken) {
-      fetchProfileData();
+      const fetchData = async () => {
+        setLoading(true);
+        await Promise.all([fetchProfileData(), fetchWorkExperiences()]);
+        setLoading(false);
+      };
+      fetchData();
     }
   }, [authToken]);
 
-  if (!profileData) {
+  if (loading) {
     return <div className="px-4 py-5 border border-gray-200 rounded-xl text-center text-gray-500">Loading profile data...</div>;
   }
 
-  // Define steps and check completion based on profile data
+  if (!profileData) {
+    return <div className="px-4 py-5 border border-gray-200 rounded-xl text-center text-gray-500">No profile data found</div>;
+  }
+
+  // Define steps and check completion based on profile data and work experiences
   const steps: Step[] = [
     { 
       label: "Personal Info", 
-      completed: !!(profileData.first_name && profileData.last_name && profileData.date_of_birth) 
+      completed: !!(profileData.first_name && profileData.last_name) 
     },
     { 
       label: "Bio", 
@@ -99,7 +129,7 @@ const ProgressProfile: React.FC = () => {
     },
     { 
       label: "Work Experience", 
-      completed: profileData.work_experience && profileData.work_experience.length > 0 
+      completed: workExperiences.length > 0 
     },
     {
       label: "Skills",

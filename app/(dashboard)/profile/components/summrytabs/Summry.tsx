@@ -1,8 +1,14 @@
+// @ts-nocheck
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
 import { CiEdit } from 'react-icons/ci'
 import { IoMdAdd } from 'react-icons/io'
 import { CiCreditCard1 } from 'react-icons/ci'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/context/AuthContext";
 import OtherSimilerPorfile from './OtherSimilerPorfile'
 import Clubs from './Clubs'
 import Posts from './Posts'
@@ -49,7 +55,7 @@ interface FreelancerProfile {
     medium_account: string | null;
     soft_skills: string;
     position: string;
-    user: string;
+    user: string; 
     work_experience: any[];
     facebook_account?: string | null;
     linkedin_account?: string | null;
@@ -61,9 +67,78 @@ interface SummryProps {
     profileData: FreelancerProfile | null;
 }
 
+interface SummaryFormData {
+    bio: string;
+    skills: string;
+}
+
 const Summry: React.FC<SummryProps> = ({ profileData }) => {
     // @ts-ignore
     const [activeJobTypeTab, setActiveJobTypeTab] = useState('About');
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isEditingSkills, setIsEditingSkills] = useState<boolean>(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const { apiCaller, refreshProfile } = useAuth();
+
+    const [formData, setFormData] = useState<SummaryFormData>({
+        bio: profileData?.bio || "",
+        skills: profileData?.skills || "",
+    });
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        try {
+            const formDataToSend = new FormData();
+            
+            // Add text fields
+            Object.entries(formData).forEach(([key, value]) => {
+                formDataToSend.append(key, value as string);
+            });
+
+            if (profileData) {
+                await apiCaller.patch(`/freelancer/freelancer-profile/?id=${profileData.id}`, formDataToSend, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+            }
+            
+            await refreshProfile();
+            setIsEditing(false);
+            setIsEditingSkills(false);
+        } catch (error) {
+            console.error("Error updating summary:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const openEditModal = () => {
+        const resetFormData: SummaryFormData = {
+            bio: profileData?.bio || "",
+            skills: profileData?.skills || "",
+        };
+        
+        setFormData(resetFormData);
+        setIsEditing(true);
+    };
+
+    const openEditSkillsModal = () => {
+        const resetFormData: SummaryFormData = {
+            bio: profileData?.bio || "",
+            skills: profileData?.skills || "",
+        };
+        
+        setFormData(resetFormData);
+        setIsEditingSkills(true);
+    };
 
     const skillsArray = profileData?.skills ? profileData.skills.split(',').map(skill => skill.trim()) : [];
 
@@ -88,7 +163,13 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                     {activeJobTypeTab === "About" && (
                     <div className='flex flex-col'>
                         <div>
-                            <p className='flex items-center py-4 font-semibold gap-5'>Summary <CiEdit /></p>
+                            <p className='flex items-center py-4 font-semibold gap-5'>
+                                Summary 
+                                <CiEdit 
+                                    className="cursor-pointer hover:text-[#7052FF] transition-colors" 
+                                    onClick={openEditModal}
+                                />
+                            </p>
                             <div className="bg-[#F6F8FF] shadow-sm rounded-lg p-4">
                                 <p>MY Journey</p>
 
@@ -116,7 +197,10 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                             <div className="flex items-center gap-4 mb-4">
                                 <h2 className="text-lg font-bold">My Skills</h2>
                                 <div className="flex items-center gap-2">
-                                    <IoMdAdd className="text-xl cursor-pointer" />
+                                    <IoMdAdd 
+                                        className="text-xl cursor-pointer hover:text-[#7052FF] transition-colors" 
+                                        onClick={openEditSkillsModal}
+                                    />
                                     <CiCreditCard1 className="text-xl cursor-pointer" />
                                 </div>
                             </div>
@@ -150,6 +234,104 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                     <Clubs />
                 </div>
             </div>
+
+            {/* Edit Summary Modal */}
+            <Dialog open={isEditing} onOpenChange={setIsEditing}>
+                <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Edit Summary</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit}>
+                        <div className="grid gap-4 py-4">
+                            <div className="flex flex-col space-y-1.5">
+                                <Label htmlFor="bio">Bio</Label>
+                                <Textarea 
+                                    id="bio" 
+                                    name="bio" 
+                                    value={formData.bio} 
+                                    onChange={handleInputChange}
+                                    rows={4}
+                                    placeholder="Tell us about yourself and your journey..."
+                                />
+                            </div>
+                            
+                            <div className="flex flex-col space-y-1.5">
+                                <Label htmlFor="skills">Skills (comma-separated)</Label>
+                                <Input 
+                                    id="skills" 
+                                    name="skills" 
+                                    value={formData.skills} 
+                                    onChange={handleInputChange}
+                                    placeholder="React, Node.js, JavaScript, Python..."
+                                />
+                                <p className="text-sm text-gray-500">
+                                    Separate multiple skills with commas
+                                </p>
+                            </div>
+                        </div>
+                        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+                            <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => setIsEditing(false)}
+                                className="w-full sm:w-auto"
+                            >
+                                Cancel
+                            </Button>
+                            <Button 
+                                type="submit" 
+                                disabled={isSubmitting}
+                                className="bg-[#7052FF] hover:bg-[#5a42cc] w-full sm:w-auto"
+                            >
+                                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Edit Skills Modal */}
+            <Dialog open={isEditingSkills} onOpenChange={setIsEditingSkills}>
+                <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Edit Skills</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit}>
+                        <div className="grid gap-4 py-4">
+                            <div className="flex flex-col space-y-1.5">
+                                <Label htmlFor="skills">Skills (comma-separated)</Label>
+                                <Input 
+                                    id="skills" 
+                                    name="skills" 
+                                    value={formData.skills} 
+                                    onChange={handleInputChange}
+                                    placeholder="React, Node.js, JavaScript, Python, Flutter..."
+                                />
+                                <p className="text-sm text-gray-500">
+                                    Add your technical skills and programming languages
+                                </p>
+                            </div>
+                        </div>
+                        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+                            <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => setIsEditingSkills(false)}
+                                className="w-full sm:w-auto"
+                            >
+                                Cancel
+                            </Button>
+                            <Button 
+                                type="submit" 
+                                disabled={isSubmitting}
+                                className="bg-[#7052FF] hover:bg-[#5a42cc] w-full sm:w-auto"
+                            >
+                                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

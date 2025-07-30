@@ -2,7 +2,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { IoMdLocate } from "react-icons/io";
 import { FaLongArrowAltLeft, FaCheckCircle } from "react-icons/fa";
 import { HiArrowNarrowRight } from "react-icons/hi";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
@@ -108,20 +107,7 @@ const StepForm = () => {
     }));
   };
 
-  const detectLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // This would typically involve a reverse geocoding API call
-          // For demonstration, we'll set a placeholder value
-          setFormData(prev => ({...prev, location: "Current Location"}));
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-        }
-      );
-    }
-  };
+
 
   const StepProgressBar = () => {
     const steps = [
@@ -346,24 +332,14 @@ const StepForm = () => {
 
                 <div className="mt-4 sm:mt-6">
                   <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-700">Add Workplace Location</h3>
-                  <div className="relative">
-                    <input
-                      name="location"
-                      type="text"
-                      className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
-                      placeholder="e.g., Mumbai, Delhi, Remote"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                    />
-                    <button 
-                      type="button"
-                      onClick={detectLocation}
-                      className="text-purple-600 flex items-center gap-1 mt-2 text-xs sm:text-sm hover:text-purple-700"
-                    >
-                      <IoMdLocate size={14} className="sm:w-4 sm:h-4" />
-                      Auto-detect my location
-                    </button>
-                  </div>
+                  <input
+                    name="location"
+                    type="text"
+                    className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
+                    placeholder="e.g., Mumbai, Delhi, Remote"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                  />
                 </div>
 
                 <div className="mt-4 sm:mt-6">
