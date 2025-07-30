@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
 import { CiEdit } from 'react-icons/ci'
 import { IoMdAdd } from 'react-icons/io'
-import { CiCreditCard1 } from 'react-icons/ci'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -201,7 +200,6 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                                         className="text-xl cursor-pointer hover:text-[#7052FF] transition-colors" 
                                         onClick={openEditSkillsModal}
                                     />
-                                    <CiCreditCard1 className="text-xl cursor-pointer" />
                                 </div>
                             </div>
 
