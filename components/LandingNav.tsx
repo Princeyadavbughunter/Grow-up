@@ -7,7 +7,7 @@ const LandingNav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
+    setIsMenuOpen(prev => !prev)
   }
 
   return (
@@ -33,16 +33,16 @@ const LandingNav = () => {
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-gray-700 hover:text-purple-600 transition-colors duration-200">
+            <Link href="/talent" className="text-gray-700 hover:text-purple-600 transition-colors duration-200">
               Hire talent
             </Link>
-            <Link href="/" className="text-gray-700 hover:text-purple-600 transition-colors duration-200">
+            <Link href="/events-page" className="text-gray-700 hover:text-purple-600 transition-colors duration-200">
               Events
             </Link>
-            <Link href="/" className="text-gray-700 hover:text-purple-600 transition-colors duration-200">
+            <Link href="/gigs-page" className="text-gray-700 hover:text-purple-600 transition-colors duration-200">
               Gigs
             </Link>
-            <Link href="/" className="text-gray-700 hover:text-purple-600 transition-colors duration-200">
+            <Link href="/explore" className="text-gray-700 hover:text-purple-600 transition-colors duration-200">
               Community
             </Link>
           </div>
@@ -85,28 +85,28 @@ const LandingNav = () => {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
             <Link 
-              href="/" 
+              href="/talent" 
               className="block px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
               onClick={() => setIsMenuOpen(false)}
             >
               Hire talent
             </Link>
             <Link 
-              href="/" 
+              href="/events-page" 
               className="block px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
               onClick={() => setIsMenuOpen(false)}
             >
               Events
             </Link>
             <Link 
-              href="/" 
+              href="/gigs-page" 
               className="block px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
               onClick={() => setIsMenuOpen(false)}
             >
               Gigs
             </Link>
             <Link 
-              href="/" 
+              href="/explore" 
               className="block px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
               onClick={() => setIsMenuOpen(false)}
             >
