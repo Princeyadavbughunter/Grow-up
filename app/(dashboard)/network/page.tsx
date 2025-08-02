@@ -110,6 +110,8 @@ export default function NetworkPage() {
       const freelancersResponse = await api.get('/freelancer/freelancer-profile/');
       const freelancersData: Freelancer[] = freelancersResponse.data;
       
+
+      
       // Process approved followers (people who follow you)
       const processedFollowers = (followersData.approved_followers || []).map((follower: Follower) => ({
         id: follower.profile_id,
@@ -177,7 +179,32 @@ export default function NetworkPage() {
 
       setMyNetwork(combinedNetwork);
       setInvites(processedRequests);
-      setNearNetwork(processedFreelancers);
+      
+      // Use similar profiles data for Near My Network section
+      if (profileData?.id) {
+        try {
+          const similarResponse = await api.get(`/freelancer/freelancers-similar/?freelancer_id=${profileData.id}`);
+          const similarData = similarResponse.data;
+          
+          const processedSimilarProfiles: NetworkUser[] = similarData.map((freelancer: any) => ({
+            id: freelancer.id,
+            name: `${freelancer.first_name} ${freelancer.last_name}`.trim(),
+            location: `${freelancer.city || ''}, ${freelancer.state || ''}`.replace(/^,\s*|,\s*$/g, '') || freelancer.address || "Unknown",
+            imageUrl: freelancer.profile_picture || "",
+            isOnline: Math.random() > 0.5,
+            followerCount: freelancer.follower_count || 0,
+            summary: freelancer.bio || undefined,
+            requestSent: freelancer.follow_request_sent || false
+          }));
+          
+          setNearNetwork(processedSimilarProfiles.slice(0, 5));
+        } catch (error) {
+          console.error('Error fetching similar profiles:', error);
+          setNearNetwork(processedFreelancers);
+        }
+      } else {
+        setNearNetwork(processedFreelancers);
+      }
     } catch (error) {
       console.error('Error fetching network data:', error);
       setError('Failed to load network data. Please try again.');
@@ -234,6 +261,8 @@ export default function NetworkPage() {
       setError('Failed to send follow request. Please try again.');
     }
   };
+
+
 
   if (loading) {
     return (
@@ -310,6 +339,8 @@ export default function NetworkPage() {
             )}
           </div>
         </NetworkSection>
+
+
       </div>
     </div>
   );

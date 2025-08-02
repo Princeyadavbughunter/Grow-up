@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 const routes = [
-  { path: '/', icon: Globe, label: 'Explore' },
+  { path: '/explore', icon: Globe, label: 'Explore' },
   { path: '/gigs', icon: Users, label: 'Gigs' },
   { path: '/network', icon: Network, label: 'Network' },
   { path: '/events', icon: Calendar, label: 'Events' },

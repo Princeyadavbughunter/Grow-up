@@ -2,10 +2,10 @@
 import Clubs from "@/app/(dashboard)/_components/Clubs";
 import Posts from "@/app/(dashboard)/_components/Posts";
 import UpcomingEvents from "@/app/(dashboard)/_components/UpcomingEvents";
-import ProgressProfile from "../(dashboard)/_components/ProgressProfile";
-import PostButton from "../(dashboard)/profile/create/_components/PostButton";
+import ProgressProfile from "../_components/ProgressProfile";
+import PostButton from "../profile/create/_components/PostButton";
 
-const Explore = () => {
+const Home = () => {
   return (
     <div className="max-w-7xl mx-auto h-[calc(100vh-10rem)] grid grid-cols-1 lg:grid-cols-7 gap-4 p-4 md:p-6 lg:p-8">
       {/* Left sidebar - hidden on mobile, shown on lg+ */}
@@ -37,4 +37,4 @@ const Explore = () => {
   );
 };
 
-export default Explore;
+export default Home;
