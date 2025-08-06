@@ -276,7 +276,7 @@ const ChatInterface = () => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-10rem)] bg-gray-50">
+    <div className="flex overflow-x-hidden flex-col h-[calc(100vh-10rem)] bg-gray-50">
 
           <div className='p-2 border-b'>
             <h1 className="text-lg mb-2 md:text-xl font-bold">
