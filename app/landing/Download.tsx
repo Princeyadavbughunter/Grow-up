@@ -1,5 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const Download = () => {
   const features = [
@@ -97,12 +98,14 @@ const Download = () => {
 
       {/* Call to Action Section */}
       <div className="text-center mt-12 sm:mt-16 md:mt-20 lg:mt-24">
-        <button className="inline-flex items-center justify-center gap-3 bg-[#7052FF] hover:bg-[#5a42d4] active:bg-[#4a36b8] text-white font-semibold text-base sm:text-lg md:text-xl px-8 sm:px-10 md:px-12 py-4 sm:py-5 md:py-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#7052FF] focus:ring-opacity-50">
-          <span>Get Started Today</span>
-          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-          </svg>
-        </button>
+        <Link href="/auth/google">
+          <button className="inline-flex items-center justify-center gap-3 bg-[#7052FF] hover:bg-[#5a42d4] active:bg-[#4a36b8] text-white font-semibold text-base sm:text-lg md:text-xl px-8 sm:px-10 md:px-12 py-4 sm:py-5 md:py-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#7052FF] focus:ring-opacity-50">
+            <span>Get Started Today</span>
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+            </svg>
+          </button>
+        </Link>
       </div>
     </div>
   )

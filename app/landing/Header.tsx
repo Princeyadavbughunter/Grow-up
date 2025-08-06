@@ -1,5 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const Header = () => {
   return (
@@ -55,9 +56,11 @@ const Header = () => {
           </p>
           
           {/* CTA Button */}
-          <button className='bg-[#7052FF] hover:bg-[#5a42d4] active:bg-[#4a36b8] transition-all duration-200 mt-4 sm:mt-6 lg:mt-8 rounded-lg text-white text-base sm:text-lg lg:text-xl xl:text-2xl font-semibold py-3 sm:py-4 lg:py-5 px-6 sm:px-8 lg:px-10 xl:px-12 shadow-lg hover:shadow-xl transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#7052FF] focus:ring-opacity-50'>
-            Join now
-          </button>
+          <Link href="/auth/google">
+            <button className='bg-[#7052FF] hover:bg-[#5a42d4] active:bg-[#4a36b8] transition-all duration-200 mt-4 sm:mt-6 lg:mt-8 rounded-lg text-white text-base sm:text-lg lg:text-xl xl:text-2xl font-semibold py-3 sm:py-4 lg:py-5 px-6 sm:px-8 lg:px-10 xl:px-12 shadow-lg hover:shadow-xl transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#7052FF] focus:ring-opacity-50'>
+              Join now
+            </button>
+          </Link>
         </div>
       </div>
       

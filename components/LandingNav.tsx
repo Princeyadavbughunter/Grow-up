@@ -49,10 +49,10 @@ const LandingNav = () => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/signin" className="text-purple-600 hover:text-purple-800 transition-colors duration-200">
+            <Link href="/auth/google" className="text-purple-600 hover:text-purple-800 transition-colors duration-200">
               Sign in
             </Link>
-            <Link href="/login" className="bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition-colors duration-200">
+            <Link href="/auth/google" className="bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition-colors duration-200">
               Login
             </Link>
           </div>
@@ -117,14 +117,14 @@ const LandingNav = () => {
             <div className="pt-4 pb-3 border-t border-gray-200">
               <div className="flex items-center px-3 space-y-3 flex-col">
                 <Link 
-                  href="/signin" 
+                  href="/auth/google" 
                   className="w-full text-center py-2 text-purple-600 hover:text-purple-800 transition-colors duration-200"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Sign in
                 </Link>
                 <Link 
-                  href="/login" 
+                  href="/auth/google" 
                   className="w-full bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition-colors duration-200 text-center"
                   onClick={() => setIsMenuOpen(false)}
                 >

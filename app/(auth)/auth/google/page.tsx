@@ -114,7 +114,7 @@ const AccountCreationContent = () => {
                     }
                 }
 
-                router.push('/');
+                router.push('/explore');
             } else {
                 console.error("Authentication response missing tokens:", response.data);
             }
