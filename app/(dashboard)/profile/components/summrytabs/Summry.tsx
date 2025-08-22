@@ -224,7 +224,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
 
                     {activeJobTypeTab === "Porfolio" && <Portfolios profileData={profileData} />}
 
-                    {activeJobTypeTab === "Post" && <Posts />}
+                    {activeJobTypeTab === "Post" && <Posts profileId={profileData?.id} />}
                 </div>
 
                 <div className="w-1/2">

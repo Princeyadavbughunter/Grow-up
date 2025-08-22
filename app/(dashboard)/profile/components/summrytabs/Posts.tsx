@@ -78,7 +78,11 @@ interface CommentReply {
     author: string;
 }
 
-const Posts = () => {
+interface PostsProps {
+    profileId?: string;
+}
+
+const Posts = ({ profileId }: PostsProps) => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const { api } = useAuthenticatedApi();
@@ -87,8 +91,10 @@ const Posts = () => {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await api.get('/post/app/posts/');
-                setPosts(response.data.response || []);
+                if (profileId) {
+                    const response = await api.get(`/post/app/freelancer-posts/?freelancer_id=${profileId}`);
+                    setPosts(response.data || []);
+                }
             } catch (error) {
                 console.error('Error fetching posts:', error);
             } finally {
@@ -96,10 +102,10 @@ const Posts = () => {
             }
         };
 
-        if (authToken) {
+        if (authToken && profileId) {
             fetchPosts();
         }
-    }, [authToken]);
+    }, [authToken, profileId]);
 
     const handleLikePost = async (postId: string) => {
         try {

@@ -42,7 +42,11 @@ interface PostType {
   link?: string;
 }
 
-const Posts: React.FC = () => {
+interface PostsProps {
+  profileId?: string;
+}
+
+const Posts: React.FC<PostsProps> = ({ profileId }) => {
   // @ts-ignore
   const [posts, setPosts] = useState<PostType[]>([]);
   // @ts-ignore
@@ -53,8 +57,10 @@ const Posts: React.FC = () => {
   useEffect(() => {
     const fetchPosts = async (): Promise<void> => {
       try {
-        const response = await api.get('/post/app/posts/');
-        setPosts(response.data.response);
+        if (profileId) {
+          const response = await api.get(`/post/app/freelancer-posts/?freelancer_id=${profileId}`);
+          setPosts(response.data);
+        }
       } catch (error) {
         console.error('Error fetching posts:', error);
       } finally {
@@ -62,10 +68,10 @@ const Posts: React.FC = () => {
       }
     };
 
-    if (authToken) {
+    if (authToken && profileId) {
       fetchPosts();
     }
-  }, [authToken]);
+  }, [authToken, profileId]);
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
