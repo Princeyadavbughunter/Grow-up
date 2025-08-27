@@ -66,7 +66,7 @@ const Download = () => {
 
               {/* Image Container */}
               <div className="flex-shrink-0 w-full lg:w-auto flex justify-center items-center p-4 sm:p-6 md:p-8">
-                <div className="relative w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[400px] aspect-[3/4] bg-[#FFF7E3] rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 shadow-md">
+                <div className="relative  w-[280px] sm:w-[320px] md:w-[360px] lg:w-[400px] aspect-[3/4] bg-[#FFF7E3] rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 shadow-md">
                   <Image 
                     src={feature.image} 
                     alt={feature.imageAlt}

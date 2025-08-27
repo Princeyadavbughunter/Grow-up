@@ -7,13 +7,10 @@ const Future = () => {
       id: 1,
       title: 'Monetize Your Skills',
       description: 'Find gigs that match your skills and start earning with GrowUp Buddy.',
-      buttonText: 'View',
       icon: '/landing-icon.png',
-      bgColor: 'bg-white',
-      borderColor: 'border-purple-600',
-      textColor: 'text-gray-900',
-      buttonColor: 'bg-purple-600 text-white',
-      textBtnHover: 'hover:bg-purple-700',
+      bgColor: 'bg-purple-600',
+      borderColor: 'border-transparent',
+      textColor: 'text-white',
     },
     {
       id: 2,
@@ -23,7 +20,6 @@ const Future = () => {
       bgColor: 'bg-purple-600',
       borderColor: 'border-transparent',
       textColor: 'text-white',
-      buttonText: '',
     },
     {
       id: 3,
@@ -33,7 +29,6 @@ const Future = () => {
       bgColor: 'bg-purple-600',
       borderColor: 'border-transparent',
       textColor: 'text-white',
-      buttonText: '',
     },
   ]
 
@@ -55,7 +50,7 @@ const Future = () => {
         {cards.map((card) => (
           <div
             key={card.id}
-            className={`group relative rounded-2xl sm:rounded-3xl border-2 ${card.bgColor} ${card.borderColor} shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105`}
+            className={`group relative rounded-2xl sm:rounded-3xl border-2 ${card.bgColor} ${card.borderColor} shadow-lg hover:shadow-xl hover:bg-white hover:border-purple-600 transition-all duration-300 transform hover:-translate-y-2 hover:scale-105`}
           >
             <div className="flex flex-col items-center text-center p-6 sm:p-8 lg:p-10">
               
@@ -72,26 +67,25 @@ const Future = () => {
               </div>
               
               {/* Title */}
-              <h3 className={`text-xl sm:text-2xl lg:text-3xl font-bold ${card.textColor} mb-3 sm:mb-4 lg:mb-5 leading-tight`}>
+              <h3 className={`text-xl sm:text-2xl lg:text-3xl font-bold ${card.textColor} group-hover:text-gray-900 mb-3 sm:mb-4 lg:mb-5 leading-tight transition-colors duration-300`}>
                 {card.title}
               </h3>
-              
+
               {/* Description */}
-              <p className={`text-base sm:text-lg lg:text-xl ${card.textColor} leading-relaxed mb-6 sm:mb-8 lg:mb-10 max-w-sm`}>
+              <p className={`text-base sm:text-lg lg:text-xl ${card.textColor} group-hover:text-gray-900 leading-relaxed mb-6 sm:mb-8 lg:mb-10 max-w-sm transition-colors duration-300`}>
                 {card.description}
               </p>
-              
-              {/* Button (if exists) */}
-              {card.buttonText && (
-                <button
-                  className={`inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold ${card.buttonColor} ${card.textBtnHover} transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 shadow-md hover:shadow-lg`}
-                >
-                  {card.buttonText}
-                  <span className="transition-transform duration-300 group-hover:translate-x-1">
-                    →
-                  </span>
-                </button>
-              )}
+
+              {/* Button (appears on hover) */}
+              <button
+                className={`opacity-0 group-hover:opacity-100 inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 shadow-md hover:shadow-lg`}
+              >
+                View
+                <span className="transition-transform duration-300 group-hover:translate-x-1">
+                  →
+                </span>
+              </button>
+
             </div>
             
             {/* Hover Effect Overlay */}
