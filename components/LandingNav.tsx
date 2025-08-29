@@ -2,10 +2,11 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 const LandingNav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-
+  const router = useRouter()
   const toggleMenu = () => {
     setIsMenuOpen(prev => !prev)
   }
@@ -15,7 +16,7 @@ const LandingNav = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2 flex-shrink-0">
+          <div onClick={() => router.push('/')} className="flex cursor-pointer items-center space-x-2 flex-shrink-0">
             <div className="w-8 h-8 sm:w-10 sm:h-10">
               <Image 
                 src='/logo_grow_up_buddy.png' 

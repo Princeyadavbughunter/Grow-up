@@ -2,12 +2,12 @@ import React from 'react'
 
 const Banner = () => {
   return (
-    <div className="flex flex-col items-center py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+    <div className="flex flex-col items-center pb-12 sm:pb-16 md:pb-20 lg:pb-24 xl:pb-32 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       {/* Decorative dashed border */}
       <div className="border-t border-dashed border-gray-400 w-16 sm:w-20 md:w-24 lg:w-32 mb-6 sm:mb-8 md:mb-10 lg:mb-12" />
       
       {/* Main heading */}
-      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[48px] font-bold text-[#5A4862] text-center leading-tight max-w-4xl mx-auto mb-8 sm:mb-10 md:mb-12 lg:mb-16 xl:mb-[70px]">
+      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[58px] font-bold text-[#5A4862] text-center leading-tight max-w-6xl mx-auto mb-8 sm:mb-10 md:mb-12 lg:mb-16 xl:mb-[70px]">
         Don't miss out on our next event!
       </h1>
       

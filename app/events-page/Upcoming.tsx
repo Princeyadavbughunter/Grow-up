@@ -67,7 +67,7 @@ const Upcoming = () => {
       </h1>
 
       {/* Events grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 md:gap-10 lg:gap-12 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 sm:gap-8 md:gap-10 lg:gap-12 max-w-7xl mx-auto">
         {eventCards.map((card, index) => (
           <div 
             key={index} 

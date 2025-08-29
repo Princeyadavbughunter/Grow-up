@@ -114,7 +114,7 @@ const LandingTestimonials = () => {
         >
           {testimonials.map((testimonial, index) => (
             <SwiperSlide key={index}>
-              <div className={`relative rounded-2xl sm:rounded-3xl ${testimonial.bgColor} border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group overflow-hidden h-full`}>
+              <div className={`relative rounded-2xl mb-10 sm:rounded-3xl ${testimonial.bgColor} border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group overflow-hidden h-full`}>
                 
                 {/* LinkedIn Icon */}
                 <div className="flex justify-end p-4 sm:p-6">

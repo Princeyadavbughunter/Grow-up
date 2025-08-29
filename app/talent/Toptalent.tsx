@@ -18,7 +18,7 @@ const Toptalent = () => {
       </div>
       <div className='flex items-center justify-center'>
         {/* Image container */}
-        <Image src={'/mobile.png'} width={296} height={810} alt="iPhone Image" className='object-contain sm:mb-[250px] sm:pr-8 sm:mr-[100px] h-full' />
+        <Image src={'/mobile.png'} width={296} height={810} alt="iPhone Image" className='object-contain relative z-30 sm:mb-[250px] sm:pr-8 sm:mr-[100px] h-full' />
       </div>
       <div className='sm:hidden my-[10px] block'>
           <h1 className='font-bold text-center max-w-[450px] mx-auto text-white text-[36px]'>Top talent, just <span className='text-[#7052FF]'>60 seconds</span> away</h1>

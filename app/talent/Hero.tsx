@@ -1,23 +1,44 @@
 import React from 'react'
+import { Button } from '@/components/ui/button'
+import { ArrowRight, Sparkles, TrendingUp } from 'lucide-react'
 
 const Hero = () => {
   return (
-    <div className="max-w-7xl mx-auto py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-      {/* Main heading */}
-      <h1 className="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[40px] text-center text-[#4A4A4A] max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-[500px] mx-auto leading-tight mb-4 sm:mb-5 md:mb-6 lg:mb-8 xl:mb-[15px]">
-        Empower your journey to grow with
-      </h1>
-      
-      {/* Subtitle */}
-      <p className="text-[#5A4862] text-base sm:text-lg md:text-xl lg:text-2xl xl:text-[20px] text-center leading-relaxed opacity-90 max-w-2xl mx-auto mb-8 sm:mb-10 md:mb-12 lg:mb-14 xl:mb-[46px]">
-        Unlock your potential and accelerate your professional growth
-      </p>
-      
-      {/* CTA Button */}
-      <div className="flex justify-center mb-12 sm:mb-16 md:mb-20 lg:mb-24 xl:mb-[77px]">
-        <button className="px-6 sm:px-8 md:px-10 lg:px-12 xl:px-16 py-3 sm:py-4 md:py-5 lg:py-6 xl:py-4 bg-[#7052FF] hover:bg-[#5d42e6] active:bg-[#4a35cc] text-white font-bold rounded-lg sm:rounded-xl md:rounded-2xl text-base sm:text-lg md:text-xl lg:text-2xl xl:text-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl active:scale-95 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/30">
-          Hire Now
-        </button>
+    <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+      {/* Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-white to-blue-50"></div>
+
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-200/30 to-blue-200/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-pink-200/20 to-purple-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-12 sm:py-16 md:py-20 lg:py-24">
+        {/* Badge */}
+        <div className="flex justify-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-purple-200 shadow-sm">
+            <Sparkles className="w-4 h-4 text-purple-600" />
+            <span className="text-sm font-medium text-purple-700">Professional Growth Platform</span>
+          </div>
+        </div>
+
+        {/* Main heading */}
+        <h1 className="font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center text-gray-900 max-w-4xl mx-auto leading-tight mb-6 sm:mb-8">
+          Empower your journey to{' '}
+          <span className="relative inline-block">
+            <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-purple-800 bg-clip-text text-transparent">
+              grow
+            </span>
+            <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+          </span>
+          {' '}with
+        </h1>
+
+        {/* Subtitle */}
+        <p className="text-gray-600 text-lg sm:text-xl md:text-2xl text-center leading-relaxed max-w-3xl mx-auto mb-8 sm:mb-10 md:mb-12">
+          Unlock your potential and accelerate your professional growth with our comprehensive platform designed for modern careers.
+        </p>
       </div>
     </div>
   )
