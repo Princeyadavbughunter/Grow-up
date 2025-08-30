@@ -111,7 +111,7 @@ const GigsPage = () => {
             </div>
 
             {/* Main Gigs Content */}
-            <div className=' gap-2 sm:gap-4 md:gap-6 lg:gap-8 grid lg:grid-cols-3'>
+            <div className=' overflow-y-auto md:overflow-y-hidden h-[calc(100vh-10rem)] gap-2 sm:gap-4 md:gap-6 lg:gap-8 grid lg:grid-cols-3'>
                 <AllGigs
                     gigs={gigs}
                     onSelectGig={handleGigSelect}

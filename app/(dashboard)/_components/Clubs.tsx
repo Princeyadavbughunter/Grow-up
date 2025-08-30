@@ -40,19 +40,32 @@ const Clubs = () => {
                 </Link>
             </div>
 
-            {clubs.map((club) => (
-                <ClubCard key={club.id} club={club} refresh={fetchClubs} />
-            ))}
+            {/* Mobile: Horizontal scrollable container */}
+            <div className="block lg:hidden">
+                <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+                    {clubs.map((club) => (
+                        <ClubCard key={club.id} club={club} refresh={fetchClubs} isMobile={true} />
+                    ))}
+                </div>
+            </div>
+
+            {/* Desktop: Vertical stack */}
+            <div className="hidden lg:block">
+                {clubs.map((club) => (
+                    <ClubCard key={club.id} club={club} refresh={fetchClubs} isMobile={false} />
+                ))}
+            </div>
         </div>
     );
 };
 
 interface ClubCardProps {
     club: Club;
-    refresh: any
+    refresh: any;
+    isMobile: boolean;
 }
 
-const ClubCard = ({ club, refresh }: ClubCardProps) => {
+const ClubCard = ({ club, refresh, isMobile }: ClubCardProps) => {
     const [isJoined, setIsJoined] = useState(false);
     const { api } = useAuthenticatedApi();
 
@@ -73,32 +86,32 @@ const ClubCard = ({ club, refresh }: ClubCardProps) => {
     };
 
     return (
-        <div className="bg-white rounded-xl mb-4 shadow-sm">
+        <div className={`bg-white rounded-xl shadow-sm ${isMobile ? 'mb-0 w-64 flex-shrink-0' : 'mb-4'}`}>
             <Link href={`/clubs/${club.id}`} >
-                <div className="p-4 flex flex-col" >
+                <div className={`flex flex-col ${isMobile ? 'p-3' : 'p-4'}`} >
 
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <span className="text-purple-600 text-xl">{club.name[0]}</span>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className={`bg-purple-100 rounded-lg flex items-center justify-center ${isMobile ? 'w-10 h-10' : 'w-12 h-12'}`}>
+                                <span className={`text-purple-600 ${isMobile ? 'text-lg' : 'text-xl'}`}>{club.name[0]}</span>
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <h3 className={`font-semibold ${isMobile ? 'text-sm' : ''} truncate`}>{club.name}</h3>
+                                <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>{club.participants_count} members</p>
+                            </div>
+                        </div>
+                        <button
+                            className={`text-purple-600 hover:text-purple-800 whitespace-nowrap ${isMobile ? 'text-xs' : 'text-sm md:text-base'} ${club.is_user_member ? "font-bold" : ""}`}
+                            onClick={(e) => {e.preventDefault(); handleClick()}}
+                        >
+                            {club.is_user_member ? "Joined" : "Join"}
+                        </button>
                     </div>
-                    <div>
-                        <h3 className="font-semibold">{club.name}</h3>
-                        <p className="text-sm text-gray-500">{club.participants_count} members</p>
-                    </div>
+                    <p className={`text-gray-600 mt-2 flex-grow ${isMobile ? 'text-xs line-clamp-2' : 'text-sm'}`}>
+                        {club.description.substring(0, isMobile ? 80 : 150)}{club.description.length > (isMobile ? 80 : 150) ? '...' : ''}
+                        <button className="text-purple-600 ml-1">Read More...</button>
+                    </p>
                 </div>
-                <button
-                    className={`text-purple-600 hover:text-purple-800 text-sm md:text-base ${club.is_user_member ? "font-bold" : ""}`}
-                    onClick={(e) => {e.preventDefault(); handleClick()}}
-                >
-                    {club.is_user_member ? "Joined" : "Join"}
-                </button>
-            </div>
-            <p className="text-sm text-gray-600 mt-2 flex-grow">
-                {club.description.substring(0, 150)}{club.description.length > 150 ? '...' : ''}
-                <button className="text-purple-600 ml-1">Read More...</button>
-            </p>
-            </div>
             </Link>
         </div>
     );

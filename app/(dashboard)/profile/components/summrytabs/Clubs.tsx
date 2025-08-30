@@ -51,7 +51,41 @@ const Clubs = () => {
                         View all
                     </Link>
                 </div>
-                <div className="space-y-4">
+                {/* Mobile: Horizontal scrollable container */}
+                <div className="block lg:hidden">
+                    <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+                        {clubs && clubs.length > 0 ? (
+                            clubs.map((club) => (
+                                <div
+                                    key={club.id}
+                                    className="flex gap-2 items-center justify-between p-3 border rounded-lg hover:shadow-sm transition-shadow w-64 flex-shrink-0 min-h-[100px]"
+                                >
+                                    <div className="flex-shrink-0">
+                                        <FaLaptopCode color='#7052FF' size={32} />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="text-sm font-bold truncate">{club.name}</h4>
+                                        <p className="text-xs text-gray-500">{club.participants_count} members</p>
+                                        <p className="text-xs text-gray-400 line-clamp-2">{club.description}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => handleJoin(club.id)}
+                                        className="text-xs font-semibold text-[#7052FF] hover:bg-[#7052FF] hover:text-white px-3 py-1 border border-[#7052FF] rounded-full transition-colors whitespace-nowrap"
+                                    >
+                                        Join
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4 text-gray-500 text-center w-full">
+                                No clubs available to join. Explore more or check back later.
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Desktop: Vertical stack */}
+                <div className="hidden lg:block space-y-4">
                     {clubs && clubs.length > 0 ? (
                         clubs.map((club) => (
                             <div
@@ -66,7 +100,7 @@ const Clubs = () => {
                                     <p className="text-xs text-gray-500">{club.participants_count} members</p>
                                     <p className="text-xs text-gray-400 truncate">{club.description}</p>
                                 </div>
-                                <button 
+                                <button
                                     onClick={() => handleJoin(club.id)}
                                     className="text-sm font-semibold text-[#7052FF] hover:bg-[#7052FF] hover:text-white px-4 py-1 border border-[#7052FF] rounded-full transition-colors"
                                 >
