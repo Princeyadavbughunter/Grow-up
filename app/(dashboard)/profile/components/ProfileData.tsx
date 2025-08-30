@@ -545,7 +545,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
           className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-gray-300 flex-shrink-0"
         />
         <div className="flex-1 text-center sm:text-left">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
+          <div className="flex flex-row sm:items-center gap-2 sm:gap-4 mb-2">
             <h3 className="font-medium text-xl sm:text-2xl">{fullName}</h3>
             <button 
               onClick={openEditModal}
