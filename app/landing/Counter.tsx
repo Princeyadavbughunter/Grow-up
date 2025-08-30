@@ -31,7 +31,7 @@ const Counter = () => {
       label: 'Total Earnings',
       suffix: '+',
       icon: '💰',
-      prefix: '$'
+      prefix: '₹'
     }
   ]
 

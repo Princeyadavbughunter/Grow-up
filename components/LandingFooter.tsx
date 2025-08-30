@@ -7,10 +7,9 @@ const LandingFooter = () => {
     {
       title: 'Quick Links',
       links: [
-        { name: 'Hire talent', href: '/hire' },
-        { name: 'Clubs', href: '/clubs' },
-        { name: 'Gigs', href: '/gigs' },
-        { name: 'Events', href: '/events' },
+        { name: 'Hire talent', href: '/talent' },
+        { name: 'Gigs', href: '/gigs-page' },
+        { name: 'Events', href: '/events-page' },
         { name: 'Community', href: '/community' },
       ],
     },
@@ -69,19 +68,6 @@ const LandingFooter = () => {
             
             {/* App Store Buttons */}
             <div className="flex flex-col sm:flex-row justify-center lg:justify-end items-center gap-4 sm:gap-6">
-              <a 
-                href="#" 
-                className="group transform hover:scale-105 transition-all duration-300 hover:shadow-lg"
-                aria-label="Download on Google Play Store"
-              >
-                <Image 
-                  src="/playstore.png" 
-                  alt="Download on Google Play Store" 
-                  width={160} 
-                  height={48}
-                  className="w-36 sm:w-40 h-auto group-hover:brightness-110 transition-all duration-300"
-                />
-              </a>
               <a 
                 href="#" 
                 className="group transform hover:scale-105 transition-all duration-300 hover:shadow-lg"
