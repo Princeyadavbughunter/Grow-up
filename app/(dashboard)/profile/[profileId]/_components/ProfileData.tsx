@@ -81,13 +81,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   };
 
   const getFollowButtonContent = () => {
-    if (isFollowing) {
-      return {
-        icon: <FaUserCheck />,
-        text: "Following",
-        className: "bg-green-600 hover:bg-green-700 text-white"
-      };
-    } else if (followRequestSent) {
+    if (followRequestSent) {
       return {
         icon: <FaClock />,
         text: "Request Sent",
@@ -169,27 +163,44 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start">
-        <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto">
-          <ImUsers /> {follower_count || 0} Followers
-        </Button>
         {userProfileData?.id !== profileData.id && (
           isFollowing ? (
-            <Button 
-              onClick={handleOpenInbox}
-              className="bg-green-600 hover:bg-green-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto transition-colors"
-            >
-              <BsChatDots /> Open Inbox
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <Button
+                onClick={handleFollowAction}
+                disabled={isLoading}
+                className="bg-gray-600 hover:bg-gray-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto transition-colors disabled:opacity-50"
+              >
+                <FaUserCheck />
+                {isLoading ? "Loading..." : "Unfollow"}
+              </Button>
+              <Button
+                onClick={handleOpenInbox}
+                className="bg-green-600 hover:bg-green-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto transition-colors"
+              >
+                <BsChatDots /> Open Inbox
+              </Button>
+            </div>
           ) : (
-            <Button 
-              onClick={handleFollowAction}
-              disabled={isLoading}
-              className={`${followButtonContent.className} font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto transition-colors disabled:opacity-50`}
-            >
-              {followButtonContent.icon} 
-              {isLoading ? "Loading..." : followButtonContent.text}
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto">
+                <ImUsers /> {follower_count || 0} Followers
+              </Button>
+              <Button
+                onClick={handleFollowAction}
+                disabled={isLoading}
+                className={`${followButtonContent.className} font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto transition-colors disabled:opacity-50`}
+              >
+                {followButtonContent.icon}
+                {isLoading ? "Loading..." : followButtonContent.text}
+              </Button>
+            </div>
           )
+        )}
+        {userProfileData?.id === profileData.id && (
+          <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto">
+            <ImUsers /> {follower_count || 0} Followers
+          </Button>
         )}
       </div>
     </div>

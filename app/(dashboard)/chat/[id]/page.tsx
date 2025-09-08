@@ -483,9 +483,11 @@ const ChatInterface: React.FC = () => {
         chatroom.chatting_with_current_user.name.toLowerCase().includes(searchInput.toLowerCase())
     );
     
-    const filteredPendingChatrooms = pendingChatrooms.filter(chatroom => 
-        chatroom.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-        chatroom.chatting_with_current_user.name.toLowerCase().includes(searchInput.toLowerCase())
+    const filteredPendingChatrooms = pendingChatrooms.filter(chatroom =>
+        !chatroom.is_accepted && (
+            chatroom.name.toLowerCase().includes(searchInput.toLowerCase()) ||
+            chatroom.chatting_with_current_user.name.toLowerCase().includes(searchInput.toLowerCase())
+        )
     );
 
     return (
