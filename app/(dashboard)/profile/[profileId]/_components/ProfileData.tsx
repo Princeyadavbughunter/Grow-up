@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { IoLocationSharp } from "react-icons/io5";
 import { FaLinkedin, FaInstagramSquare, FaUserPlus, FaUserCheck, FaClock } from "react-icons/fa";
 import { TiSocialFacebook, TiSocialTwitter } from "react-icons/ti";
+import { FiUser } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { ImUsers } from "react-icons/im";
 import { BsChatDots } from "react-icons/bs";
@@ -52,7 +53,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   const skillsArray = skills ? skills.split(',') : [];
   const fullName = `${first_name} ${last_name}`;
   const location = `${address ? address + ', ' : ''}${city ? city + ', ' : ''}${state || ''}`;
-  const profileImageUrl = profile_picture || "https://via.placeholder.com/80";
+  const profileImageUrl = profile_picture;
 
   const handleFollowAction = async () => {
     if (isLoading) return;
@@ -105,11 +106,17 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   return (
     <div className="py-4">
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 py-6">
-        <img
-          src={profileImageUrl}
-          alt="Profile"
-          className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-gray-300 flex-shrink-0"
-        />
+        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-gray-300 flex-shrink-0 flex items-center justify-center bg-gray-100">
+          {profileImageUrl ? (
+            <img
+              src={profileImageUrl}
+              alt="Profile"
+              className="w-full h-full rounded-full object-cover"
+            />
+          ) : (
+            <FiUser className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" />
+          )}
+        </div>
         <div className="flex-1 text-center sm:text-left">
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
             <h3 className="font-medium text-xl sm:text-2xl">{fullName}</h3>

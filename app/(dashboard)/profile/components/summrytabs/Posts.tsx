@@ -59,7 +59,7 @@ interface Comment {
     is_take_down: boolean;
     comment_reply_count: number;
     post: string;
-    author: string;
+    author: string; 
 }
 
 interface CommentReply {
@@ -129,36 +129,31 @@ const Posts = ({ profileId }: PostsProps) => {
     };
 
     return (
-        <div className='my-8'>
-            <div>
-                <div className="flex items-center gap-4 mb-4">
-                    <h2 className="text-lg font-bold">Posts</h2>
+        <div className="p-4 mt-10 h-[calc(100vh-10rem)] overflow-y-scroll">
+
+            {loading ? (
+                <div className="text-center py-10">Loading posts...</div>
+            ) : (
+                <div>
+                    {posts.length > 0 ? (
+                        posts.map((post: Post) => (
+                            <PostCard
+                                key={post.id}
+                                post={post}
+                                onLike={handleLikePost}
+                            />
+                        ))
+                    ) : (
+                        <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4 text-gray-500 text-center">
+                            No posts available. Be the first to post!
+                        </div>
+                    )}
                 </div>
+            )}
 
-                {loading ? (
-                    <div className="text-center py-10">Loading posts...</div>
-                ) : (
-                    <div className="space-y-4">
-                        {posts.length > 0 ? (
-                            posts.map((post: Post) => (
-                                <PostCard
-                                    key={post.id}
-                                    post={post}
-                                    onLike={handleLikePost}
-                                />
-                            ))
-                        ) : (
-                            <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4 text-gray-500 text-center">
-                                No posts available. Be the first to post!
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                <Link href={`/clubs`} className="text-center flex justify-center mt-4">
-                    <button className="text-blue-600 hover:underline">See more posts</button>
-                </Link>
-            </div>
+            <Link href={`/clubs`} className="text-center flex justify-center mt-4">
+                <button className="text-blue-600 hover:underline">See more posts</button>
+            </Link>
         </div>
     );
 };
@@ -214,7 +209,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
     };
 
     return (
-        <div className="bg-white shadow-sm rounded-lg p-4 mb-4">
+        <div className="bg-white rounded-xl p-4 mb-4 shadow-lg">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                     <Link href={`/profile/${post.freelancer_profile}`} className="flex items-center gap-3">
@@ -225,33 +220,29 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                                     alt="Profile"
                                     width={40}
                                     height={40}
-                                    className="rounded-full object-cover"
+                                    className="rounded-full md:w-10 md:h-10 w-8 h-8"
                                 />
                             ) : (
-                                <div className="rounded-full bg-gray-200 flex items-center justify-center w-10 h-10">
-                                    <FiUser className="text-gray-600 w-5 h-5" />
+                                <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
+                                    <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
                                 </div>
                             )}
                         </div>
                         <div>
                             <h3 className="font-semibold">
-                                {post.first_name && post.last_name 
-                                    ? `${post.first_name} ${post.last_name}` 
-                                    : post.company_name || 'Anonymous'}
+                                {post.first_name || post.company_name || 'Anonymous'}
                             </h3>
                             <p className="text-sm text-gray-500">{formattedDate}</p>
                         </div>
                     </Link>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                    {post.club_name && (
-                        <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">{post.club_name}</span>
-                    )}
+                    <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">{post.club_name}</span>
                     {post.link && (
-                        <a 
-                            href={post.link} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
+                        <a
+                            href={post.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="text-sm text-blue-500 hover:text-blue-700 underline break-all max-w-xs text-right"
                         >
                             {post.link}
@@ -260,42 +251,20 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                 </div>
             </div>
 
-            <div className="flex flex-col gap-3">
-                <h3 className="font-medium">{post.title}</h3>
-                {post.content && <p className="text-gray-800">{post.content}</p>}
-                
-                {/* Display images if available */}
-                {post.images && post.images.length > 0 && (
-                    <div className="grid grid-cols-1 gap-2 mt-2">
-                        {post.images.map((image: ImageData) => (
-                            <Image
-                                key={image.id}
-                                src={getImageUrl(image.file)}
-                                alt="Post image"
-                                width={800}
-                                height={600}
-                                className="rounded-lg w-full object-cover max-h-80"
-                            />
-                        ))}
-                    </div>
-                )}
-                
-                {/* Display videos if available */}
-                {post.videos && post.videos.length > 0 && (
-                    <div className="grid grid-cols-1 gap-2 mt-2">
-                        {post.videos.map((video: VideoType, index: number) => (
-                            <video 
-                                key={video.id || index} 
-                                src={getImageUrl(video.file)} 
-                                controls 
-                                className="rounded-lg w-full"
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
+            <p className="mb-4">{post.title}</p>
+            {post.content && <p className="mb-4">{post.content}</p>}
 
-            <div className="flex items-center justify-between mt-4 text-gray-500">
+            {post.images && post.images.length > 0 && (
+                <Image
+                    src={getImageUrl(post.images[0].file)}
+                    alt="Post"
+                    width={800}
+                    height={600}
+                    className="rounded-xl mb-4"
+                />
+            )}
+
+            <div className="flex items-center justify-between text-gray-500">
                 <button
                     className={`flex items-center gap-2 ${post.is_liked ? 'text-red-500' : 'text-gray-500'}`}
                     onClick={() => onLike(post.id)}
@@ -304,7 +273,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                     <span>{post.like_count}</span>
                 </button>
                 <button
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 text-sm md:text-base"
                     onClick={handleCommentToggle}
                 >
                     <span>💬</span>
@@ -312,7 +281,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                 </button>
                 <button>
                     <span>📤</span>
-                </button>
+                </button> {/* Share button - consider adding functionality */}
             </div>
 
             {showComments && (
@@ -333,7 +302,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                             placeholder="Add a comment..."
-                            className="flex-1 border rounded-lg px-3 py-2 text-sm"
+                            className="flex-1 border rounded-lg px-3 py-2 text-sm md:text-base"
                         />
                         <button
                             type="submit"
@@ -404,7 +373,7 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
         <div className="border-l-2 border-gray-200 pl-4">
             <div className="flex items-start gap-3">
                 <Image
-                    src={getImageUrl(comment.profile_picture) || "https://randomuser.me/portraits/men/2.jpg"}
+                    src={comment.profile_picture || "https://randomuser.me/portraits/men/2.jpg"}
                     alt="User"
                     width={32}
                     height={32}
@@ -450,7 +419,7 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
                             {replies.map(reply => (
                                 <div key={reply.id} className="flex items-start gap-2">
                                     <Image
-                                        src={getImageUrl(reply.profile_picture) || "https://randomuser.me/portraits/men/2.jpg"}
+                                        src={reply.profile_picture || "https://randomuser.me/portraits/men/2.jpg"}
                                         alt="User"
                                         width={24}
                                         height={24}

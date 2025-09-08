@@ -47,9 +47,7 @@ interface PostsProps {
 }
 
 const Posts: React.FC<PostsProps> = ({ profileId }) => {
-  // @ts-ignore
   const [posts, setPosts] = useState<PostType[]>([]);
-  // @ts-ignore
   const [loading, setLoading] = useState<boolean>(true);
   const { api } = useAuthenticatedApi();
   const { authToken } = useAuth();
@@ -83,115 +81,72 @@ const Posts: React.FC<PostsProps> = ({ profileId }) => {
   };
 
   return (
-    <div>
-      <div className="mb-28">
-        <div className="flex items-center gap-4 mb-4">
-          <h2 className="text-lg font-bold">Posts</h2>
-          <div className="flex items-center gap-2">
-            <CiEdit className="text-xl cursor-pointer" />
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="text-center py-10">Loading posts...</div>
-        ) : (
-          <div className="space-y-4">
-            {posts.map((post) => (
-              <div key={post.id} className="bg-white shadow-sm rounded-lg p-4 flex flex-col gap-4 w-full">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={getImageUrl(post.profile_picture)}
-                      alt="Profile Picture"
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                    <span className="font-semibold">
-                      {post.first_name} {post.last_name}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <HiDotsVertical className="text-gray-500 cursor-pointer" />
-                    {post.link && (
-                      <a 
-                        href={post.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="text-sm text-blue-500 hover:text-blue-700 underline break-all max-w-xs text-right"
-                      >
-                        {post.link}
-                      </a>
-                    )}
+    <div className="p-4 mt-10 h-[calc(100vh-10rem)] overflow-y-scroll">
+      {loading ? (
+        <div className="text-center py-10">Loading posts...</div>
+      ) : (
+        <div>
+          {posts.map((post) => (
+            <div key={post.id} className="bg-white rounded-xl p-4 mb-4 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={post.profile_picture}
+                    alt="Profile Picture"
+                    className="w-10 h-10 rounded-full md:w-10 md:h-10 w-8 h-8"
+                  />
+                  <div>
+                    <h3 className="font-semibold">
+                      {post.first_name || post.company_name || 'Anonymous'}
+                    </h3>
+                    <p className="text-sm text-gray-500">{formatDate(post.created_at)}</p>
                   </div>
                 </div>
-                
-                <div className="flex flex-col gap-3">
-                  <h3 className="font-medium">{post.title}</h3>
-                  <p className="text-gray-800">{post.content}</p>
-                  
-                  {/* Display images if available */}
-                  {post.images && post.images.length > 0 && (
-                    <div className="grid grid-cols-1 gap-2 mt-2">
-                      {post.images.map((image) => (
-                        <img 
-                          key={image.id} 
-                          src={getImageUrl(image.file)} 
-                          alt="Post image" 
-                          className="rounded-lg w-full object-cover max-h-80"
-                        />
-                      ))}
-                    </div>
+                <div className="flex flex-col items-end gap-2">
+                  {post.link && (
+                    <a
+                      href={post.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-500 hover:text-blue-700 underline break-all max-w-xs text-right"
+                    >
+                      {post.link}
+                    </a>
                   )}
-                  
-                  {/* Display videos if available */}
-                  {post.videos && post.videos.length > 0 && (
-                    <div className="grid grid-cols-1 gap-2 mt-2">
-                      {post.videos.map((video, index) => (
-                        <video 
-                          key={video.id || index} 
-                          src={getImageUrl(video.file)} 
-                          controls 
-                          className="rounded-lg w-full"
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between mt-2 w-full">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1 text-red-600">
-                      <FaHeart />
-                      <span>{post.like_count}</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-gray-600">
-                      <FaCommentDots />
-                      <span>{post.comment_count}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <FaEye />
-                      <span>0</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <FaShare />
-                      <span>0</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="text-xs text-gray-500">
-                  Posted on {formatDate(post.created_at)}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
 
-        <div className="text-center mt-4">
-          <button className="text-blue-600 hover:underline">See more posts</button>
+              <p className="mb-4">{post.title}</p>
+              {post.content && <p className="mb-4">{post.content}</p>}
+
+              {post.images && post.images.length > 0 && (
+                <img
+                  src={post.images[0].file}
+                  alt="Post"
+                  className="rounded-xl mb-4 w-full object-cover"
+                />
+              )}
+
+              <div className="flex items-center justify-between text-gray-500">
+                <button className="flex items-center gap-2 text-red-600">
+                  <FaHeart />
+                  <span>{post.like_count}</span>
+                </button>
+                <button className="flex items-center gap-2 text-sm md:text-base">
+                  <FaCommentDots />
+                  <span>{post.comment_count}</span>
+                </button>
+                <button>
+                  <FaShare />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
+      )}
+
+      <div className="text-center mt-4">
+        <button className="text-blue-600 hover:underline">See more posts</button>
       </div>
     </div>
   );

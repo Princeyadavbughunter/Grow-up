@@ -26,7 +26,9 @@ const Home = () => {
       
       {/* Right sidebar - shown below posts on mobile, right column on lg+ */}
       <div className="lg:h-fit lg:sticky lg:top-4 lg:col-span-2 space-y-4">
+        <div className="h-[calc(100vh-200px)] pb-10 lg:h-[calc(100vh-136px)] overflow-y-auto" >
         <Clubs />
+        </div>
         {/* Show profile components on mobile below clubs */}
         <div className="lg:hidden space-y-4">
           <UpcomingEvents />
