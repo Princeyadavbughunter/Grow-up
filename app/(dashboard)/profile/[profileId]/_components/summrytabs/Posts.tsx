@@ -93,7 +93,7 @@ const Posts: React.FC<PostsProps> = ({ profileId }) => {
                   <img
                     src={post.profile_picture}
                     alt="Profile Picture"
-                    className="w-10 h-10 rounded-full md:w-10 md:h-10 w-8 h-8"
+                    className="rounded-full md:w-10 md:h-10 w-8 h-8"
                   />
                   <div>
                     <h3 className="font-semibold">
