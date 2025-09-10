@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, memo, useCallback, useMemo } from 'react';
 import { X, Copy, Check, Share2 } from 'lucide-react';
 
 interface SharePopupProps {
@@ -9,11 +9,14 @@ interface SharePopupProps {
     postTitle: string;
 }
 
-const SharePopup = ({ isOpen, onClose, postId, postTitle }: SharePopupProps) => {
+const SharePopup = memo(({ isOpen, onClose, postId, postTitle }: SharePopupProps) => {
     const [copied, setCopied] = useState(false);
-    const shareUrl = `https://growupbuddy.com/post/${postId}`;
 
-    const handleCopyUrl = async () => {
+    // Memoize share URL to prevent recalculation
+    const shareUrl = useMemo(() => `https://growupbuddy.com/post/${postId}`, [postId]);
+
+    // Memoize handleCopyUrl to prevent recreation
+    const handleCopyUrl = useCallback(async () => {
         try {
             await navigator.clipboard.writeText(shareUrl);
             setCopied(true);
@@ -30,9 +33,10 @@ const SharePopup = ({ isOpen, onClose, postId, postTitle }: SharePopupProps) => 
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         }
-    };
+    }, [shareUrl]);
 
-    const handleShare = async () => {
+    // Memoize handleShare to prevent recreation
+    const handleShare = useCallback(async () => {
         if (navigator.share) {
             try {
                 await navigator.share({
@@ -47,7 +51,7 @@ const SharePopup = ({ isOpen, onClose, postId, postTitle }: SharePopupProps) => 
             // Fallback to copy URL
             handleCopyUrl();
         }
-    };
+    }, [postTitle, shareUrl, handleCopyUrl]);
 
     if (!isOpen) return null;
 
@@ -154,6 +158,8 @@ const SharePopup = ({ isOpen, onClose, postId, postTitle }: SharePopupProps) => 
             </div>
         </div>
     );
-};
+});
+
+SharePopup.displayName = 'SharePopup';
 
 export default SharePopup;

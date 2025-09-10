@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiUser } from 'react-icons/fi';
@@ -77,31 +77,43 @@ interface PostDetailProps {
     onLike: (postId: string) => void;
 }
 
-const PostDetail = ({ post, onLike }: PostDetailProps) => {
+const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
     const [showComments, setShowComments] = useState(true);
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState('');
     const [showSharePopup, setShowSharePopup] = useState(false);
     const { api } = useAuthenticatedApi();
-    const formattedDate = new Date(post.created_at).toLocaleString();
 
-    const fetchComments = async () => {
+    // Memoize formatted date to prevent recalculation on every render
+    const formattedDate = useMemo(() =>
+        new Date(post.created_at).toLocaleString(),
+        [post.created_at]
+    );
+
+    // Memoize fetchComments function to prevent recreation on every render
+    const fetchComments = useCallback(async () => {
         try {
             const response = await api.get(`/post/app/comments/?post_id=${post.id}`);
             setComments(response.data.response);
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
-    };
+    }, [api, post.id]);
 
-    const handleCommentToggle = () => {
-        setShowComments(!showComments);
-        if (!showComments) {
-            fetchComments();
-        }
-    };
+    // Memoize handleCommentToggle to prevent recreation
+    const handleCommentToggle = useCallback(() => {
+        setShowComments(prev => {
+            if (prev) {
+                return false;
+            } else {
+                fetchComments();
+                return true;
+            }
+        });
+    }, [fetchComments]);
 
-    const handleAddComment = async (e: React.FormEvent) => {
+    // Memoize handleAddComment to prevent recreation
+    const handleAddComment = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newComment.trim()) return;
 
@@ -117,12 +129,12 @@ const PostDetail = ({ post, onLike }: PostDetailProps) => {
         } catch (error) {
             console.error('Error adding comment:', error);
         }
-    };
+    }, [api, post.id, newComment, fetchComments]);
 
-    // Load comments on mount
+    // Load comments on mount - only run when post.id changes
     useEffect(() => {
         fetchComments();
-    }, []);
+    }, [fetchComments]);
 
     return (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -288,37 +300,53 @@ const PostDetail = ({ post, onLike }: PostDetailProps) => {
             />
         </div>
     );
-};
+});
+
+PostDetail.displayName = 'PostDetail';
 
 interface CommentItemProps {
     comment: Comment;
     api: any;
 }
 
-const CommentItem = ({ comment, api }: CommentItemProps) => {
+const CommentItem = memo(({ comment, api }: CommentItemProps) => {
     const [showReplyForm, setShowReplyForm] = useState(false);
     const [newReply, setNewReply] = useState('');
     const [replies, setReplies] = useState<CommentReply[]>([]);
     const [showReplies, setShowReplies] = useState(false);
-    const formattedDate = new Date(comment.created_at).toLocaleString();
 
-    const fetchReplies = async () => {
+    // Memoize formatted date
+    const formattedDate = useMemo(() =>
+        new Date(comment.created_at).toLocaleString(),
+        [comment.created_at]
+    );
+
+    // Memoize fetchReplies function
+    const fetchReplies = useCallback(async () => {
         try {
             const response = await api.get(`/post/app/comments-replies/?id=${comment.id}`);
             setReplies(response.data.response);
         } catch (error) {
             console.error('Error fetching replies:', error);
         }
-    };
+    }, [api, comment.id]);
 
-    const handleReplyToggle = () => {
-        setShowReplies(!showReplies);
-        if (!showReplies && comment.comment_reply_count > 0) {
-            fetchReplies();
-        }
-    };
+    // Memoize handleReplyToggle
+    const handleReplyToggle = useCallback(() => {
+        setShowReplies(prev => {
+            if (prev) {
+                return false;
+            } else {
+                if (comment.comment_reply_count > 0) {
+                    fetchReplies();
+                }
+                return true;
+            }
+        });
+    }, [comment.comment_reply_count, fetchReplies]);
 
-    const handleAddReply = async (e: React.FormEvent) => {
+    // Memoize handleAddReply
+    const handleAddReply = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newReply.trim()) return;
 
@@ -336,7 +364,7 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
         } catch (error) {
             console.error('Error adding reply:', error);
         }
-    };
+    }, [api, comment.id, newReply, fetchReplies]);
 
     return (
         <div className="border-l-4 border-gray-200 pl-4">
@@ -421,6 +449,8 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
             </div>
         </div>
     );
-};
+});
+
+CommentItem.displayName = 'CommentItem';
 
 export default PostDetail;

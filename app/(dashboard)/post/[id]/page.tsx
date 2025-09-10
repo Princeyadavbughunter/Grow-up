@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 import PostDetail from '../_components/PostDetail';
@@ -71,14 +71,14 @@ const PostDetailPage = () => {
         fetchPostDetails();
     }, [authToken, params.id, api]);
 
-    const handleLikePost = async (postId: string) => {
+    const handleLikePost = useCallback(async (postId: string) => {
         if (!post) return;
 
         try {
             const response = await api.post(`/post/app/toggle-like/?post_id=${postId}`);
             const { post: updatedPost, is_like } = response.data;
-            
-            setPost(prevPost => 
+
+            setPost(prevPost =>
                 prevPost ? {
                     ...prevPost,
                     like_count: updatedPost.like_count,
@@ -88,7 +88,7 @@ const PostDetailPage = () => {
         } catch (error) {
             console.error('Error toggling like:', error);
         }
-    };
+    }, [post, api]);
 
     if (loading) {
         return (
