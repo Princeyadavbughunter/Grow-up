@@ -5,6 +5,8 @@ import { CiEdit } from 'react-icons/ci';
 import { FaHeart, FaCommentDots, FaEye, FaShare } from 'react-icons/fa';
 import { HiDotsVertical } from 'react-icons/hi';
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
+import Link from 'next/link';
+import SharePopup from '../../../../post/_components/SharePopup';
 
 interface ImageType {
   id: string;
@@ -49,6 +51,8 @@ interface PostsProps {
 const Posts: React.FC<PostsProps> = ({ profileId }) => {
   const [posts, setPosts] = useState<PostType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showSharePopup, setShowSharePopup] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<PostType | null>(null);
   const { api } = useAuthenticatedApi();
   const { authToken } = useAuth();
 
@@ -116,16 +120,18 @@ const Posts: React.FC<PostsProps> = ({ profileId }) => {
                 </div>
               </div>
 
-              <p className="mb-4">{post.title}</p>
-              {post.content && <p className="mb-4">{post.content}</p>}
+              <Link href={`/post/${post.id}`} className="block hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors">
+                <p className="mb-4">{post.title}</p>
+                {post.content && <p className="mb-4">{post.content}</p>}
 
-              {post.images && post.images.length > 0 && (
-                <img
-                  src={post.images[0].file}
-                  alt="Post"
-                  className="rounded-xl mb-4 w-full object-cover"
-                />
-              )}
+                {post.images && post.images.length > 0 && (
+                  <img
+                    src={post.images[0].file}
+                    alt="Post"
+                    className="rounded-xl mb-4 w-full object-cover"
+                  />
+                )}
+              </Link>
 
               <div className="flex items-center justify-between text-gray-500">
                 <button className="flex items-center gap-2 text-red-600">
@@ -136,7 +142,13 @@ const Posts: React.FC<PostsProps> = ({ profileId }) => {
                   <FaCommentDots />
                   <span>{post.comment_count}</span>
                 </button>
-                <button>
+                <button
+                  onClick={() => {
+                    setSelectedPost(post);
+                    setShowSharePopup(true);
+                  }}
+                  className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded transition-colors"
+                >
                   <FaShare />
                 </button>
               </div>
@@ -148,6 +160,19 @@ const Posts: React.FC<PostsProps> = ({ profileId }) => {
       <div className="text-center mt-4">
         <button className="text-blue-600 hover:underline">See more posts</button>
       </div>
+
+      {/* Share Popup */}
+      {selectedPost && (
+        <SharePopup
+          isOpen={showSharePopup}
+          onClose={() => {
+            setShowSharePopup(false);
+            setSelectedPost(null);
+          }}
+          postId={selectedPost.id}
+          postTitle={selectedPost.title}
+        />
+      )}
     </div>
   );
 };

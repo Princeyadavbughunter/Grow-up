@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import Link from 'next/link';
 import { FiUser } from 'react-icons/fi';
+import SharePopup from '../post/_components/SharePopup';
 
 interface ImageData {
     id: string;
@@ -134,6 +135,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
     const [showComments, setShowComments] = useState(false);
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState('');
+    const [showSharePopup, setShowSharePopup] = useState(false);
     const { api } = useAuthenticatedApi();
     const formattedDate = new Date(post.created_at).toLocaleString();
 
@@ -214,18 +216,20 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                 </div>
             </div>
 
-            <p className="mb-4">{post.title}</p>
-            {post.content && <p className="mb-4">{post.content}</p>}
+            <Link href={`/post/${post.id}`} className="block hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors">
+                <p className="mb-4">{post.title}</p>
+                {post.content && <p className="mb-4">{post.content}</p>}
 
-            {post.images && post.images.length > 0 && (
-                <Image
-                    src={post.images[0].file}
-                    alt="Post"
-                    width={800}
-                    height={600}
-                    className="rounded-xl mb-4"
-                />
-            )}
+                {post.images && post.images.length > 0 && (
+                    <Image
+                        src={post.images[0].file}
+                        alt="Post"
+                        width={800}
+                        height={600}
+                        className="rounded-xl mb-4"
+                    />
+                )}
+            </Link>
 
             <div className="flex items-center justify-between text-gray-500">
                 <button
@@ -242,9 +246,12 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                     <span>💬</span>
                     <span>{post.comment_count}</span>
                 </button>
-                <button>
+                <button
+                    onClick={() => setShowSharePopup(true)}
+                    className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded transition-colors"
+                >
                     <span>📤</span>
-                </button> {/* Share button - consider adding functionality */}
+                </button>
             </div>
 
             {showComments && (
@@ -276,6 +283,14 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                     </form>
                 </div>
             )}
+
+            {/* Share Popup */}
+            <SharePopup
+                isOpen={showSharePopup}
+                onClose={() => setShowSharePopup(false)}
+                postId={post.id}
+                postTitle={post.title}
+            />
         </div>
     );
 };

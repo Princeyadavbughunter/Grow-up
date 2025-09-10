@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import Link from 'next/link';
 import { FiUser } from 'react-icons/fi';
+import SharePopup from '../../post/_components/SharePopup';
 
 interface ImageData {
     id: string;
@@ -160,6 +161,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
     const [showComments, setShowComments] = useState(false);
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState('');
+    const [showSharePopup, setShowSharePopup] = useState(false);
     const { api } = useAuthenticatedApi();
     const formattedDate = new Date(post.created_at).toLocaleString();
 
@@ -248,40 +250,42 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                 </div>
             </div>
 
-            <div className="flex flex-col gap-3">
-                <h3 className="font-medium">{post.title}</h3>
-                {post.content && <p className="text-gray-800">{post.content}</p>}
-                
-                {/* Display images if available */}
-                {post.images && post.images.length > 0 && (
-                    <div className="grid grid-cols-1 gap-2 mt-2">
-                        {post.images.map((image: ImageData) => (
-                            <Image
-                                key={image.id}
-                                src={getImageUrl(image.file)}
-                                alt="Post image"
-                                width={800}
-                                height={600}
-                                className="rounded-lg w-full object-cover max-h-80"
-                            />
-                        ))}
-                    </div>
-                )}
-                
-                {/* Display videos if available */}
-                {post.videos && post.videos.length > 0 && (
-                    <div className="grid grid-cols-1 gap-2 mt-2">
-                        {post.videos.map((video: VideoType, index: number) => (
-                            <video 
-                                key={video.id || index} 
-                                src={getImageUrl(video.file)} 
-                                controls 
-                                className="rounded-lg w-full"
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
+            <Link href={`/post/${post.id}`} className="block hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors">
+                <div className="flex flex-col gap-3">
+                    <h3 className="font-medium">{post.title}</h3>
+                    {post.content && <p className="text-gray-800">{post.content}</p>}
+                    
+                    {/* Display images if available */}
+                    {post.images && post.images.length > 0 && (
+                        <div className="grid grid-cols-1 gap-2 mt-2">
+                            {post.images.map((image: ImageData) => (
+                                <Image
+                                    key={image.id}
+                                    src={getImageUrl(image.file)}
+                                    alt="Post image"
+                                    width={800}
+                                    height={600}
+                                    className="rounded-lg w-full object-cover max-h-80"
+                                />
+                            ))}
+                        </div>
+                    )}
+                    
+                    {/* Display videos if available */}
+                    {post.videos && post.videos.length > 0 && (
+                        <div className="grid grid-cols-1 gap-2 mt-2">
+                            {post.videos.map((video: VideoType, index: number) => (
+                                <video 
+                                    key={video.id || index} 
+                                    src={getImageUrl(video.file)} 
+                                    controls 
+                                    className="rounded-lg w-full"
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </Link>
 
             <div className="flex items-center justify-between mt-4 text-gray-500">
                 <button
@@ -298,7 +302,10 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                     <span>💬</span>
                     <span>{post.comment_count}</span>
                 </button>
-                <button>
+                <button
+                    onClick={() => setShowSharePopup(true)}
+                    className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded transition-colors"
+                >
                     <span>📤</span>
                 </button>
             </div>
@@ -332,6 +339,14 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                     </form>
                 </div>
             )}
+
+            {/* Share Popup */}
+            <SharePopup
+                isOpen={showSharePopup}
+                onClose={() => setShowSharePopup(false)}
+                postId={post.id}
+                postTitle={post.title}
+            />
         </div>
     );
 };
