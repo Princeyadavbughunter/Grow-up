@@ -2,8 +2,8 @@ import React from 'react'
 
 const Talentpool = () => {
   return (
-     <div className='sm:px-6'>
-            <div className='bg-[#23282C] py-6 mb-[47px] sm:m-8 sm:p-8 rounded-3xl'>
+     <div className='w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24'>
+            <div className='bg-[#23282C] py-6 sm:p-8 rounded-3xl'>
                 <h1 className='font-bold text-white sm:text-[48px] text-[24px] text-center'>Our Talent Pool Includes</h1>
                 <p className='sm:text-[16px] text-[14px] max-w-[400px] mx-auto sm:mt-[30px] text-center text-white'><span className='font-bold'>Just launched,</span> trusted us for their hiring needs from Our Community</p>
                 <div className='sm:px-[138px] mt-[37px]'>

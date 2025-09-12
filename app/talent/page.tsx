@@ -12,7 +12,7 @@ import WhyUs from './WhyUs'
 
 const page = () => {
   return (
-    <div>
+    <div className="font-work-sans">
          <LandingNav/>
           <Hero/>
           <Toptalent/>

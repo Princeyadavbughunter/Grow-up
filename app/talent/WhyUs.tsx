@@ -40,7 +40,7 @@ const WhyUs = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+    <div className="max-w-7xl mx-auto py-10 sm:py-8 md:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col lg:flex-row justify-center  gap-8 sm:gap-12 md:gap-16 lg:gap-20 xl:gap-[112px]">
         
         {/* Title Section */}
@@ -101,13 +101,13 @@ const WhyUs = () => {
                     </div>
 
                     {/* Hover Effect Indicator */}
-                    <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {/* <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
                         <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               );
@@ -138,11 +138,11 @@ const WhyUs = () => {
                   </p>
                 </div>
 
-                {/* Hover Effect Indicator */}
-                <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                {/* Hover Effect Indicator - more subtle */}
+                <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-60 transition-opacity duration-200">
+                  <div className="w-6 h-6 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
                     </svg>
                   </div>
                 </div>
@@ -150,57 +150,51 @@ const WhyUs = () => {
             </div>
           </div>
 
-          {/* Navigation Controls */}
-          <div className="flex justify-center items-center mt-8 gap-6">
+          {/* Navigation Controls - more subtle */}
+          <div className="flex justify-center items-center mt-6 gap-4">
             {/* Previous Button */}
             <button
               onClick={prevCard}
-              className="group relative w-12 h-12 rounded-full bg-gradient-to-r from-gray-100 to-gray-200 hover:from-[#7052FF] hover:to-[#E11D48] flex items-center justify-center transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/30 shadow-lg hover:shadow-xl hover:scale-110 transform-gpu"
+              className="group relative w-10 h-10 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/20 shadow-sm hover:shadow-md hover:scale-105 transform-gpu"
               aria-label="Previous card"
             >
-              <svg className="w-6 h-6 text-gray-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              <svg className="w-4 h-4 text-gray-500 group-hover:text-[#7052FF] transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#7052FF]/20 to-[#E11D48]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
 
-            {/* Dots Indicator */}
-            <div className="flex gap-3">
+            {/* Dots Indicator - more subtle */}
+            <div className="flex gap-2">
               {cards.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentCard(index)}
-                  className={`relative w-3 h-3 rounded-full transition-all duration-300 transform-gpu hover:scale-125 ${
+                  className={`w-2 h-2 rounded-full transition-all duration-200 transform hover:scale-110 ${
                     index === currentCard
-                      ? 'bg-gradient-to-r from-[#7052FF] to-[#E11D48] shadow-lg scale-110'
+                      ? 'bg-[#7052FF] shadow-sm scale-110'
                       : 'bg-gray-300 hover:bg-gray-400'
                   }`}
                   aria-label={`Go to card ${index + 1}`}
-                >
-                  {index === currentCard && (
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#7052FF] to-[#E11D48] animate-ping opacity-30"></div>
-                  )}
-                </button>
+                />
               ))}
             </div>
 
             {/* Next Button */}
             <button
               onClick={nextCard}
-              className="group relative w-12 h-12 rounded-full bg-gradient-to-r from-gray-100 to-gray-200 hover:from-[#7052FF] hover:to-[#E11D48] flex items-center justify-center transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/30 shadow-lg hover:shadow-xl hover:scale-110 transform-gpu"
+              className="group relative w-10 h-10 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/20 shadow-sm hover:shadow-md hover:scale-105 transform-gpu"
               aria-label="Next card"
             >
-              <svg className="w-6 h-6 text-gray-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              <svg className="w-4 h-4 text-gray-500 group-hover:text-[#7052FF] transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#7052FF]/20 to-[#E11D48]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
           </div>
 
-          {/* Auto-advance hint */}
-          <div className="text-center mt-6 hidden sm:block">
-            <p className="text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-full inline-block border border-gray-200">
-              <span className="inline-block mr-2">💡</span>
+          {/* Auto-advance hint - more subtle */}
+          <div className="text-center mt-4 hidden sm:block">
+            <p className="text-xs text-gray-400 bg-gray-50/50 px-3 py-1.5 rounded-full inline-block">
+              <span className="inline-block mr-1.5 text-xs">💡</span>
               Click on cards or use controls to navigate
             </p>
           </div>

@@ -2,58 +2,66 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 
 const LandingNav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const router = useRouter()
+  const pathname = usePathname()
   const toggleMenu = () => {
     setIsMenuOpen(prev => !prev)
   }
 
   return (
-    <nav className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav className="bg-white">
+      <div className="max-w-[1400px] mx-auto px-20 lg:px-8=24">
+        <div className="flex items-center justify-between py-6">
           {/* Logo */}
-          <div onClick={() => router.push('/')} className="flex cursor-pointer items-center space-x-2 flex-shrink-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10">
+          <div onClick={() => router.push('/')} className="flex cursor-pointer items-center space-x-3 flex-shrink-0">
+            <div className="w-10 h-10">
               <Image 
-                src='/logo_grow_up_buddy.png' 
+                src='/logo.svg' 
                 alt='GrowUp Buddy Logo' 
                 width={40} 
                 height={40}
                 className="w-full h-full object-contain"
               />
             </div>
-            <span className="text-lg sm:text-xl font-bold text-gray-900">
-              <span className="hidden sm:inline">GrowUp Buddy</span>
-              <span className="sm:hidden">GrowUp</span>
+            <span className="text-2xl font-bold text-gray-900">
+              GrowUp Buddy
             </span>
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center space-x-6">
-            <Link href="/talent" className="text-gray-700 hover:text-purple-600 transition-colors duration-200">
+          <div className="hidden md:flex items-center space-x-8">
+            <Link href="/talent" className={`font-semibold transition-colors duration-200 ${
+              pathname === '/talent' ? 'text-[#7052FF]' : 'text-gray-600 hover:text-[#7052FF]'
+            }`}>
               Hire talent
             </Link>
-            <Link href="/events-page" className="text-gray-700 hover:text-purple-600 transition-colors duration-200">
+            <Link href="/events-page" className={`font-semibold transition-colors duration-200 ${
+              pathname === '/events-page' ? 'text-[#7052FF]' : 'text-gray-600 hover:text-[#7052FF]'
+            }`}>
               Events
             </Link>
-            <Link href="/gigs-page" className="text-gray-700 hover:text-purple-600 transition-colors duration-200">
+            <Link href="/gigs-page" className={`font-semibold transition-colors duration-200 ${
+              pathname === '/gigs-page' ? 'text-[#7052FF]' : 'text-gray-600 hover:text-[#7052FF]'
+            }`}>
               Gigs
             </Link>
-            <Link href="/explore" className="text-gray-700 hover:text-purple-600 transition-colors duration-200">
-              Community
+            <Link href="/explore" className={`font-semibold transition-colors duration-200 ${
+              pathname === '/explore' ? 'text-[#7052FF]' : 'text-gray-600 hover:text-[#7052FF]'
+            }`}>
+              Club
             </Link>
           </div>
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/auth/google" className="text-purple-600 hover:text-purple-800 transition-colors duration-200">
+            <Link href="/auth/google" className="text-purple-600 hover:text-purple-800 font-medium transition-colors duration-200">
               Sign in
             </Link>
-            <Link href="/auth/google" className="bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition-colors duration-200">
+            <Link href="/auth/google" className="bg-purple-600 text-white px-6 py-3 rounded-full hover:bg-purple-700 font-medium transition-all duration-200 shadow-sm hover:shadow-md">
               Login
             </Link>
           </div>
@@ -87,31 +95,47 @@ const LandingNav = () => {
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
             <Link 
               href="/talent" 
-              className="block px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
+              className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
+                pathname === '/talent' 
+                  ? 'text-[#7052FF] bg-purple-50' 
+                  : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Hire talent
             </Link>
             <Link 
               href="/events-page" 
-              className="block px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
+              className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
+                pathname === '/events-page' 
+                  ? 'text-[#7052FF] bg-purple-50' 
+                  : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Events
             </Link>
             <Link 
               href="/gigs-page" 
-              className="block px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
+              className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
+                pathname === '/gigs-page' 
+                  ? 'text-[#7052FF] bg-purple-50' 
+                  : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Gigs
             </Link>
             <Link 
               href="/explore" 
-              className="block px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
+              className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
+                pathname === '/explore' 
+                  ? 'text-[#7052FF] bg-purple-50' 
+                  : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
-              Community
+              Club
             </Link>
             
             {/* Mobile Auth Buttons */}

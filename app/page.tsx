@@ -47,15 +47,17 @@ const Home = () => {
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-white font-work-sans">
         <LandingNav/>
         <Header/>
-        <Community/>
-        <Future/>
-        <Download/>
-        <LandingTestimonials/>
-        <Counter/>
-        <LandingFaqs/>
+        <div className="space-y-8 sm:space-y-12 md:space-y-16"> 
+          <Community/>
+          <Future/>
+          <Download/>
+          <LandingTestimonials/>
+          <Counter/>
+          <LandingFaqs/>
+        </div>
         <LandingFooter/>
     </div>
   )

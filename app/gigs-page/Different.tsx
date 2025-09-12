@@ -30,7 +30,7 @@ const Different = () => {
   ];
 
   return (
-    <section className="relative flex justify-center items-center py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 md:px-8 lg:px-12 overflow-hidden">
+    <section className="relative flex justify-center items-center py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/6 w-80 h-80 bg-gradient-to-r from-[#7052FF]/8 to-[#E11D48]/8 rounded-full blur-3xl animate-pulse"></div>

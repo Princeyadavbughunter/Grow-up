@@ -89,11 +89,11 @@ const Counter = () => {
   }, [isVisible])
 
   return (
-    <div className="w-full py-12 sm:py-16 md:py-20 lg:py-24">
+    <div className="w-full py-8 sm:py-12 md:py-16 lg:py-20">
       
       {/* Header Section */}
-      <div className="text-center mb-12 sm:mb-16 md:mb-20 px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-[#4A4A4A] leading-tight max-w-4xl mx-auto">
+      <div className="text-center mb-8 sm:mb-12 md:mb-16 px-4 sm:px-6 lg:px-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#4A4A4A] leading-tight max-w-4xl mx-auto">
           <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             Some Numbers That Matter
           </span>
@@ -103,8 +103,7 @@ const Counter = () => {
       {/* Counter Background Section */}
       <div 
         ref={counterRef}
-        className="relative bg-cover bg-center bg-no-repeat min-h-[400px] sm:min-h-[500px] md:min-h-[600px] flex items-center justify-center overflow-hidden"
-        style={{ backgroundImage: "url('/counter-bg.png')" }}
+        className="relative bg-slate-800 min-h-[300px] sm:min-h-[350px] md:min-h-[400px] flex items-center justify-center overflow-hidden"
       >
         
         {/* Overlay for better text readability */}
@@ -114,7 +113,7 @@ const Counter = () => {
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 md:gap-16 lg:gap-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10 lg:gap-12">
             {stats.map((stat, index) => (
               <div 
                 key={stat.id}
@@ -125,21 +124,21 @@ const Counter = () => {
               >
                 
                 {/* Icon */}
-                <div className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="text-2xl sm:text-3xl md:text-4xl mb-3 sm:mb-4 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
                   {stat.icon}
                 </div>
                 
                 {/* Number */}
-                <div className="mb-3 sm:mb-4 md:mb-6">
-                  <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-[#7052FF] leading-none group-hover:text-[#5a42d4] transition-colors duration-300">
-                    {stat.prefix && <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">{stat.prefix}</span>}
+                <div className="mb-2 sm:mb-3 md:mb-4">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#7052FF] leading-none group-hover:text-[#5a42d4] transition-colors duration-300">
+                    {stat.prefix && <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl">{stat.prefix}</span>}
                     {formatNumber(counters[stat.id])}
                     {stat.suffix}
                   </h2>
                 </div>
                 
                 {/* Label */}
-                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-medium leading-relaxed group-hover:text-gray-200 transition-colors duration-300 max-w-xs mx-auto">
+                <p className="text-sm sm:text-base md:text-lg text-white font-medium leading-relaxed group-hover:text-gray-200 transition-colors duration-300 max-w-xs mx-auto">
                   {stat.label}
                 </p>
                 
@@ -158,7 +157,7 @@ const Counter = () => {
       </div>
 
       {/* Additional spacing after component */}
-      <div className="mt-12 sm:mt-16 md:mt-20 lg:mt-24"></div>
+      <div className="mt-8 sm:mt-12 md:mt-16 lg:mt-20"></div>
 
       <style jsx>{`
         @keyframes fadeInUp {
