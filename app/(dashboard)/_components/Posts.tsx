@@ -5,7 +5,9 @@ import Image from "next/image";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import Link from 'next/link';
 import { FiUser } from 'react-icons/fi';
+import { MessageSquare, FileText, Users } from 'lucide-react';
 import SharePopup from '../post/_components/SharePopup';
+import EmptyState from '@/components/ui/empty-state';
 
 interface ImageData {
     id: string;
@@ -74,16 +76,23 @@ interface CommentReply {
 
 const Posts = () => {
     const [posts, setPosts] = useState<Post[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
     const { api } = useAuthenticatedApi();
     const { authToken } = useAuth();
 
     useEffect(() => {
         const fetchPosts = async () => {
             try {
+                setLoading(true);
+                setError(null);
                 const response = await api.get('/post/app/posts/');
-                setPosts(response.data.response);
+                setPosts(response.data.response || []);
             } catch (error) {
                 console.error('Error fetching posts:', error);
+                setError('Failed to load posts. Please try again.');
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -112,6 +121,66 @@ const Posts = () => {
             console.error('Error toggling like:', error);
         }
     };
+
+    if (loading) {
+        return (
+            <div className="p-4 h-[calc(100vh-18rem)] overflow-y-scroll">
+                <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="bg-white rounded-xl p-4 shadow-lg animate-pulse">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                                <div className="flex-1">
+                                    <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                                    <div className="h-3 bg-gray-200 rounded w-16"></div>
+                                </div>
+                            </div>
+                            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                            <div className="h-32 bg-gray-200 rounded-xl mb-4"></div>
+                            <div className="flex items-center gap-4">
+                                <div className="h-6 bg-gray-200 rounded w-12"></div>
+                                <div className="h-6 bg-gray-200 rounded w-12"></div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-4 h-[calc(100vh-18rem)] overflow-y-scroll">
+                <EmptyState
+                    variant="error"
+                    title="Unable to load posts"
+                    description={error}
+                    onRetry={() => window.location.reload()}
+                />
+            </div>
+        );
+    }
+
+    if (!posts || posts.length === 0) {
+        return (
+            <div className="p-4 h-[calc(100vh-18rem)] overflow-y-scroll">
+                <EmptyState
+                    icon={<FileText className="w-6 h-6 text-gray-400" />}
+                    title="No posts yet"
+                    description="Be the first to share something with your community! Create a post to start the conversation."
+                    action={
+                        <Link
+                            href="/create-post"
+                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                        >
+                            Create First Post
+                        </Link>
+                    }
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="p-4 h-[calc(100vh-18rem)] overflow-y-scroll">
@@ -257,13 +326,22 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
             {showComments && (
                 <div className="mt-4 border-t pt-4">
                     <div className="space-y-4 mb-4">
-                        {comments.map(comment => (
-                            <CommentItem
-                                key={comment.id}
-                                comment={comment}
-                                api={api}
+                        {comments.length > 0 ? (
+                            comments.map(comment => (
+                                <CommentItem
+                                    key={comment.id}
+                                    comment={comment}
+                                    api={api}
+                                />
+                            ))
+                        ) : (
+                            <EmptyState
+                                icon={<MessageSquare className="w-5 h-5 text-gray-400" />}
+                                title="No comments yet"
+                                description="Be the first to share your thoughts on this post."
+                                className="py-4"
                             />
-                        ))}
+                        )}
                     </div>
 
                     <form onSubmit={handleAddComment} className="flex gap-2">
@@ -390,28 +468,37 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
 
                     {showReplies && (
                         <div className="mt-2 space-y-3">
-                            {replies.map(reply => (
-                                <div key={reply.id} className="flex items-start gap-2">
-                                    <Image
-                                        src={reply.profile_picture || "https://randomuser.me/portraits/men/2.jpg"}
-                                        alt="User"
-                                        width={24}
-                                        height={24}
-                                        className="rounded-full"
-                                    />
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <h5 className="font-medium text-xs">
-                                                {reply.first_name || reply.company_name || 'Anonymous'}
-                                            </h5>
-                                            <span className="text-xs text-gray-500">
-                                                {new Date(reply.created_at).toLocaleString()}
-                                            </span>
+                            {replies.length > 0 ? (
+                                replies.map(reply => (
+                                    <div key={reply.id} className="flex items-start gap-2">
+                                        <Image
+                                            src={reply.profile_picture || "https://randomuser.me/portraits/men/2.jpg"}
+                                            alt="User"
+                                            width={24}
+                                            height={24}
+                                            className="rounded-full"
+                                        />
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <h5 className="font-medium text-xs">
+                                                    {reply.first_name || reply.company_name || 'Anonymous'}
+                                                </h5>
+                                                <span className="text-xs text-gray-500">
+                                                    {new Date(reply.created_at).toLocaleString()}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm">{reply.content}</p>
                                         </div>
-                                        <p className="text-sm">{reply.content}</p>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <EmptyState
+                                    icon={<MessageSquare className="w-4 h-4 text-gray-400" />}
+                                    title="No replies yet"
+                                    description="Start a conversation by replying to this comment."
+                                    className="py-2"
+                                />
+                            )}
                         </div>
                     )}
                 </div>

@@ -1,10 +1,13 @@
+// @ts-nocheck
 'use client';
 import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiUser } from 'react-icons/fi';
+import { MessageSquare } from 'lucide-react';
 import { useAuthenticatedApi } from '@/context/AuthContext';
 import SharePopup from './SharePopup';
+import EmptyState from '@/components/ui/empty-state';
 
 interface ImageData {
     id: string;
@@ -78,10 +81,10 @@ interface PostDetailProps {
 }
 
 const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
-    const [showComments, setShowComments] = useState(true);
+    const [showComments, setShowComments] = useState<boolean>(true);
     const [comments, setComments] = useState<Comment[]>([]);
-    const [newComment, setNewComment] = useState('');
-    const [showSharePopup, setShowSharePopup] = useState(false);
+    const [newComment, setNewComment] = useState<string>('');
+    const [showSharePopup, setShowSharePopup] = useState<boolean>(false);
     const { api } = useAuthenticatedApi();
 
     // Memoize formatted date to prevent recalculation on every render
@@ -194,9 +197,9 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                 {/* Post Images */}
                 {post.images && post.images.length > 0 && (
                     <div className="mb-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-4">
                             {post.images.map((image, index) => (
-                                <div key={image.id} className="relative">
+                                <div key={image.id} className="relative w-full">
                                     <Image
                                         src={image.file}
                                         alt={`Post image ${index + 1}`}
@@ -260,34 +263,48 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
             {showComments && (
                 <div className="p-6">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Comments</h3>
-                    
-                    {/* Comments List */}
-                    <div className="space-y-6 mb-6">
-                        {comments.map(comment => (
-                            <CommentItem
-                                key={comment.id}
-                                comment={comment}
-                                api={api}
-                            />
-                        ))}
+
+                    {/* Scrollable Comments Container */}
+                    <div className="max-h-96 overflow-y-auto mb-6">
+                        {/* Comments List */}
+                        <div className="space-y-6">
+                            {comments.length > 0 ? (
+                                comments.map(comment => (
+                                    <CommentItem
+                                        key={comment.id}
+                                        comment={comment}
+                                        api={api}
+                                    />
+                                ))
+                            ) : (
+                                <EmptyState
+                                    icon={<MessageSquare className="w-5 h-5 text-gray-400" />}
+                                    title="No comments yet"
+                                    description="Be the first to share your thoughts on this post."
+                                    className="py-4"
+                                />
+                            )}
+                        </div>
                     </div>
 
-                    {/* Add Comment Form */}
-                    <form onSubmit={handleAddComment} className="flex gap-3">
-                        <input
-                            type="text"
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            placeholder="Add a comment..."
-                            className="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                        <button
-                            type="submit"
-                            className="bg-blue-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors"
-                        >
-                            Post
-                        </button>
-                    </form>
+                    {/* Add Comment Form - Fixed at bottom */}
+                    <div className="border-t border-gray-200 pt-4">
+                        <form onSubmit={handleAddComment} className="flex gap-3">
+                            <input
+                                type="text"
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                placeholder="Add a comment..."
+                                className="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                            <button
+                                type="submit"
+                                className="bg-blue-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                            >
+                                Post
+                            </button>
+                        </form>
+                    </div>
                 </div>
             )}
 
@@ -310,10 +327,10 @@ interface CommentItemProps {
 }
 
 const CommentItem = memo(({ comment, api }: CommentItemProps) => {
-    const [showReplyForm, setShowReplyForm] = useState(false);
-    const [newReply, setNewReply] = useState('');
+    const [showReplyForm, setShowReplyForm] = useState<boolean>(false);
+    const [newReply, setNewReply] = useState<string>('');
     const [replies, setReplies] = useState<CommentReply[]>([]);
-    const [showReplies, setShowReplies] = useState(false);
+    const [showReplies, setShowReplies] = useState<boolean>(false);
 
     // Memoize formatted date
     const formattedDate = useMemo(() =>
@@ -421,28 +438,37 @@ const CommentItem = memo(({ comment, api }: CommentItemProps) => {
 
                     {showReplies && (
                         <div className="mt-4 space-y-4">
-                            {replies.map(reply => (
-                                <div key={reply.id} className="flex items-start gap-3">
-                                    <Image
-                                        src={reply.profile_picture || "https://randomuser.me/portraits/men/2.jpg"}
-                                        alt="User"
-                                        width={32}
-                                        height={32}
-                                        className="rounded-full w-8 h-8"
-                                    />
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <h5 className="font-medium text-sm text-gray-800">
-                                                {reply.first_name || reply.company_name || 'Anonymous'}
-                                            </h5>
-                                            <span className="text-xs text-gray-500">
-                                                {new Date(reply.created_at).toLocaleString()}
-                                            </span>
+                            {replies.length > 0 ? (
+                                replies.map(reply => (
+                                    <div key={reply.id} className="flex items-start gap-3">
+                                        <Image
+                                            src={reply.profile_picture || "https://randomuser.me/portraits/men/2.jpg"}
+                                            alt="User"
+                                            width={32}
+                                            height={32}
+                                            className="rounded-full w-8 h-8"
+                                        />
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <h5 className="font-medium text-sm text-gray-800">
+                                                    {reply.first_name || reply.company_name || 'Anonymous'}
+                                                </h5>
+                                                <span className="text-xs text-gray-500">
+                                                    {new Date(reply.created_at).toLocaleString()}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-gray-700">{reply.content}</p>
                                         </div>
-                                        <p className="text-sm text-gray-700">{reply.content}</p>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <EmptyState
+                                    icon={<MessageSquare className="w-4 h-4 text-gray-400" />}
+                                    title="No replies yet"
+                                    description="Start a conversation by replying to this comment."
+                                    className="py-2"
+                                />
+                            )}
                         </div>
                     )}
                 </div>

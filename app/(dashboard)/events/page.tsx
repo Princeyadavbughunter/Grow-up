@@ -7,11 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SearchIcon, MapPin, Calendar, Clock, User } from "lucide-react";
+import { SearchIcon, MapPin, Calendar, Clock, User, CalendarDays, MessageSquare, Users } from "lucide-react";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EventComments } from './_components/EventComments';
 import { useRouter } from "next/navigation";
+import EmptyState from "@/components/ui/empty-state";
 
 interface Attendee {
   id: string;
@@ -86,19 +87,26 @@ export default function EventsPage() {
   const [selectedFilter, setSelectedFilter] = useState<string>("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [newComment, setNewComment] = useState<string>("");
+  const [eventsLoading, setEventsLoading] = useState<boolean>(true);
+  const [eventsError, setEventsError] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const url = selectedFilter 
+        setEventsLoading(true);
+        setEventsError(null);
+        const url = selectedFilter
           ? `/company/app/event-api/?category_name=${selectedFilter}`
           : "/company/app/event-api/";
         const response = await api.get(url);
         setEvents(response.data);
       } catch (error) {
         console.error("Error fetching events:", error);
+        setEventsError("Failed to load events. Please try again.");
+      } finally {
+        setEventsLoading(false);
       }
     };
     if (authToken) {
@@ -300,20 +308,29 @@ export default function EventsPage() {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
           />
         </div>
-        {participants.map((participant) => (
-          <div key={participant.id} className="flex flex-col md:flex-row items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarImage src={participant.profile_picture} />
-                <AvatarFallback>{participant.first_name[0]}</AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="font-medium">{participant.first_name} {participant.last_name}</div>
+        {participants.length > 0 ? (
+          participants.map((participant) => (
+            <div key={participant.id} className="flex flex-col md:flex-row items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <Avatar>
+                  <AvatarImage src={participant.profile_picture} />
+                  <AvatarFallback>{participant.first_name[0]}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="font-medium">{participant.first_name} {participant.last_name}</div>
+                </div>
               </div>
+              <Button onClick={() => router.push(`/profile/${participant.freelancer_profile_id}`)} variant="ghost" size="sm">View Profile</Button>
             </div>
-            <Button onClick={() => router.push(`/profile/${participant.freelancer_profile_id}`)} variant="ghost" size="sm">View Profile</Button>
-          </div>
-        ))}
+          ))
+        ) : (
+          <EmptyState
+            icon={<Users className="w-5 h-5 text-gray-400" />}
+            title="No participants yet"
+            description="Be the first to join this event! Register now to connect with others."
+            className="py-4"
+          />
+        )}
       </div>
     );
   };
@@ -372,14 +389,51 @@ export default function EventsPage() {
         <div className="w-full lg:w-1/3">
           <ScrollArea className="h-[calc(100vh-20rem)]" ref={scrollContainerRef}>
             <div className="pr-4 space-y-4">
-              {currentEvents && currentEvents.length > 0 ? (
+              {eventsLoading ? (
+                // Loading skeleton
+                Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index} className="bg-white rounded-3xl p-4 shadow-lg animate-pulse">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="w-20 h-6 bg-gray-200 rounded-full"></div>
+                      <div className="w-16 h-6 bg-gray-200 rounded-full"></div>
+                    </div>
+                    <div className="w-full h-32 bg-gray-200 rounded-xl mb-4"></div>
+                    <div className="space-y-2">
+                      <div className="w-3/4 h-4 bg-gray-200 rounded"></div>
+                      <div className="w-1/2 h-4 bg-gray-200 rounded"></div>
+                      <div className="w-2/3 h-4 bg-gray-200 rounded"></div>
+                    </div>
+                    <div className="w-full h-10 bg-gray-200 rounded-full mt-3"></div>
+                  </div>
+                ))
+              ) : eventsError ? (
+                <EmptyState
+                  variant="error"
+                  title="Unable to load events"
+                  description={eventsError}
+                  onRetry={() => window.location.reload()}
+                />
+              ) : currentEvents && currentEvents.length > 0 ? (
                 currentEvents.map(event => (
                   <EventCard key={event.id} event={event} />
                 ))
               ) : (
-                <div className="text-center py-10">
-                  <p className="text-gray-500">No events found for the selected filter. Try another filter or clear it.</p>
-                </div>
+                <EmptyState
+                  icon={<CalendarDays className="w-6 h-6 text-gray-400" />}
+                  title="No events found"
+                  description="No events match your current filter. Try selecting a different category or check back later for new events."
+                  action={
+                    selectedFilter ? (
+                      <Button
+                        onClick={() => setSelectedFilter("")}
+                        variant="outline"
+                        className="mt-2"
+                      >
+                        Clear Filter
+                      </Button>
+                    ) : null
+                  }
+                />
               )}
             </div>
           </ScrollArea>
@@ -447,13 +501,18 @@ export default function EventsPage() {
                     </form>
                     
                     {selectedEvent?.comments && selectedEvent.comments.length > 0 ? (
-                      <EventComments 
-                        comments={selectedEvent.comments} 
+                      <EventComments
+                        comments={selectedEvent.comments}
                         onAddReply={handleAddReply}
                         onUserClick={(userId) => router.push(`/profile/${userId}`)}
                       />
                     ) : (
-                      <p className="text-center text-gray-500">No comments yet</p>
+                      <EmptyState
+                        icon={<MessageSquare className="w-5 h-5 text-gray-400" />}
+                        title="No comments yet"
+                        description="Be the first to share your thoughts about this event!"
+                        className="py-4"
+                      />
                     )}
                   </div>
                 </TabsContent>
@@ -464,7 +523,12 @@ export default function EventsPage() {
             </div>
           </>
         ) : (
-          <div className="p-4 text-center text-gray-500">Select an event to view details.</div>
+          <EmptyState
+            icon={<CalendarDays className="w-6 h-6 text-gray-400" />}
+            title="Select an event"
+            description="Choose an event from the list to view its details, participants, and join the conversation."
+            className="flex-1"
+          />
         )}
       </div>
     </div>

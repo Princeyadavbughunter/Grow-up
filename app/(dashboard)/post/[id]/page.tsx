@@ -138,7 +138,7 @@ const PostDetailPage = () => {
             </div>
 
             {/* Post Content */}
-            <div className="max-w-4xl h-[calc(100vh-10rem)] overflow-y-auto mx-auto px-4 py-6">
+            <div className="max-w-4xl h-[calc(100vh-15rem)] overflow-y-auto mx-auto px-4 py-6">
                 <PostDetail post={post} onLike={handleLikePost} />
             </div>
         </div>
