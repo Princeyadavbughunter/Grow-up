@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiUser } from 'react-icons/fi';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Heart, Share } from 'lucide-react';
 import { useAuthenticatedApi } from '@/context/AuthContext';
 import SharePopup from './SharePopup';
 import EmptyState from '@/components/ui/empty-state';
@@ -230,30 +230,30 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                 )}
 
                 {/* Post Actions */}
-                <div className="flex items-center justify-between text-gray-500 pt-4 border-t border-gray-200">
+                <div className="flex items-center gap-4 text-gray-500 pt-4 border-t border-gray-200">
                     <button
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                            post.is_liked 
-                                ? 'text-red-500 bg-red-50' 
+                            post.is_liked
+                                ? 'text-red-500 bg-red-50'
                                 : 'text-gray-500 hover:bg-gray-100'
                         }`}
                         onClick={() => onLike(post.id)}
                     >
-                        <span className="text-xl">❤️</span>
+                        <Heart className={`w-5 h-5 ${post.is_liked ? 'fill-current' : ''}`} />
                         <span className="font-medium">{post.like_count}</span>
                     </button>
                     <button
                         className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                         onClick={handleCommentToggle}
                     >
-                        <span className="text-xl">💬</span>
+                        <MessageSquare className="w-5 h-5" />
                         <span className="font-medium">{post.comment_count}</span>
                     </button>
-                    <button 
+                    <button
                         className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                         onClick={() => setShowSharePopup(true)}
                     >
-                        <span className="text-xl">📤</span>
+                        <Share className="w-5 h-5" />
                         <span className="font-medium">{post.share_count}</span>
                     </button>
                 </div>
