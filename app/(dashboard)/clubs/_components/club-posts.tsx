@@ -265,7 +265,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                                     alt="Post image"
                                     width={800}
                                     height={600}
-                                    className="rounded-lg w-full object-cover max-h-80"
+                                    className="rounded-lg w-full object-cover"
                                 />
                             ))}
                         </div>
