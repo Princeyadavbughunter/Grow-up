@@ -11,7 +11,7 @@ import LandingTestimonials from '@/components/LandingTestimonials'
 
 const page = () => {
   return (
-    <div>
+    <div className="font-work-sans">
           <LandingNav/>
           <Hero/>
           <Featuredgig/>

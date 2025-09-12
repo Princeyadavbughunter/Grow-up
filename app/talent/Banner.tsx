@@ -2,7 +2,7 @@ import React from 'react'
 
 const Banner = () => {
   return (
-    <div className='relative flex flex-col items-center justify-center py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 md:px-8'>
+    <div className='relative flex flex-col items-center justify-center py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8'>
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-[#7052FF]/10 to-[#E11D48]/10 rounded-full blur-3xl animate-pulse"></div>

@@ -7,7 +7,7 @@ import PostButton from "../profile/create/_components/PostButton";
 
 const Home = () => {
   return (
-    <div className="max-w-7xl overflow-y-auto md:overflow-y-hidden mx-auto h-[calc(100vh-10rem)] grid grid-cols-1 lg:grid-cols-7 gap-4 p-4 md:p-6 lg:p-8">
+    <div className="max-w-7xl font-work-sans overflow-y-auto md:overflow-y-hidden mx-auto h-[calc(100vh-10rem)] grid grid-cols-1 lg:grid-cols-7 gap-4 p-4 md:p-6 lg:p-8">
       {/* Left sidebar - hidden on mobile, shown on lg+ */}
       <div className="hidden lg:block h-fit lg:sticky lg:top-4 lg:col-span-2">
         <UpcomingEvents />

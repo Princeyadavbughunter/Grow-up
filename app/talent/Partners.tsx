@@ -5,17 +5,17 @@ const Partners = () => {
   return (
     <div className="pt-12 sm:pt-16 md:pt-20 lg:pt-24 xl:pt-32 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       {/* Main heading */}
-      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[40px] text-[#696C78] text-center font-medium mb-4 sm:mb-5 md:mb-6 lg:mb-8 xl:mb-[24px] leading-tight">
-        <span className="text-[#7052FF]">50+</span> Partners
+      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[40px] text-[#4A4A4A]  text-center font-medium mb-4 sm:mb-5 md:mb-6 lg:mb-8 xl:mb-[24px] leading-tight">
+        <span className="text-[#7052FF] font-semibold">50+</span> Partners
       </h1>
       
       {/* Subtitle */}
-      <p className="text-center text-[#4A4A4A] text-sm sm:text-base md:text-lg lg:text-xl xl:text-xl mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-[89px] leading-relaxed max-w-3xl mx-auto">
+      <p className="text-center text-[#4A4A4A] text-sm sm:text-base md:text-lg lg:text-xl xl:text-xl mb-8 sm:mb-8 md:mb-8 lg:mb-12 xl:mb-[48px] leading-relaxed max-w-3xl mx-auto">
         <span className="font-bold">Just launched,</span> trusted us for their hiring needs from Our Community
       </p>
       
       {/* Companies logos with animation */}
-      <div className="relative overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-r from-gray-50 to-white p-4 sm:p-6 md:p-8 shadow-sm mb-12 sm:mb-16 md:mb-20 lg:mb-24 xl:mb-32">
+      <div className="relative overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-r from-gray-50 to-white p-4 sm:p-6 md:p-8 shadow-sm mb-6 sm:mb-8 md:mb-12 lg:mb-16 xl:mb-20">
         <div className="animate-slideX flex items-center justify-center">
           {/* First set of logos */}
           <img

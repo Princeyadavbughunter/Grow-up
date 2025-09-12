@@ -11,8 +11,8 @@ const Toptalent = () => {
       ];
 
   return (
-    <div className='sm:max-w-[1400px] mx-auto sm:py-[60px]'>
-    <div className='py-6 bg-[#23282C] sm:rounded-[80px] rounded-[40px] sm:px-[50px] mx-[10px] mt-[100px] flex items-center sm:justify-between sm:flex-row flex-col sm:mx-[40px]  sm:h-[400px]'>
+    <div className='w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24'>
+    <div className='py-6 bg-[#23282C] sm:rounded-[80px] rounded-[40px] sm:px-[50px] flex items-center sm:justify-between sm:flex-row flex-col sm:h-[400px]'>
       <div className='hidden sm:block'>
           <h1 className='font-bold max-w-[450px] mx-auto text-white text-[36px]'>Top talent, just <span className='text-[#7052FF]'>60 seconds</span> away</h1>
       </div>
@@ -25,20 +25,20 @@ const Toptalent = () => {
       </div>
       <div className=''>
         <div className="relative">
-          {/* Vertical line */}
-          <div className="absolute left-2.5 top-2 bottom-2 w-0.5 bg-gray-600"></div>
+          {/* Vertical line - more subtle */}
+          <div className="absolute left-2 top-2 bottom-2 w-0.5 bg-gray-500 opacity-60"></div>
   
-          {/* Timeline items */}
-          <div className="space-y-8">
+          {/* Timeline items - more subtle spacing */}
+          <div className="space-y-6">
             {timelineData.map((item, index) => (
               <div key={index} className="flex items-center">
                 <div className="relative">
-                  {/* Circle point */}
-                  <div className="w-5 h-5 rounded-full bg-gray-600 z-10 relative shadow-[0_0_10px_rgba(255,255,255,0.5)]"></div>
+                  {/* Circle point - smaller and more subtle */}
+                  <div className="w-4 h-4 rounded-full bg-gray-500 z-10 relative opacity-80"></div>
                 </div>
                 {/* Timeline item text */}
-                <div className="ml-6">
-                  <p className="text-white text-lg">{item}</p>
+                <div className="ml-4">
+                  <p className="text-white text-base opacity-90">{item}</p>
                 </div>
               </div>
             ))}

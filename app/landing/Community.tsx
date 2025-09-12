@@ -4,13 +4,13 @@ import Image from 'next/image'
 const Community = () => {
   return (
     <div>
-      <div className='text-[#7052FF] sm:mt-[200px] mt-[100px] text-center flex flex-col mb-[120px] items-center px-4 sm:px-6 lg:px-8'>
-        <h1 className='sm:text-[56px] md:text-[64px] text-[36px] lg:text-[72px] font-bold leading-tight mb-4'>Join a Global Community</h1>
-        <p className='sm:text-[42px] md:text-[48px] text-[28px] lg:text-[54px] font-light leading-tight mb-8'>of Aspiring Change Makers</p>
-        <p className='text-[#4A4A4A] text-[20px] sm:text-[24px] md:text-[28px] sm:mt-[50px] mt-[30px] font-medium max-w-2xl leading-relaxed'>Our community members are from leading companies and innovative startups worldwide</p>
+      <div className='text-[#7052FF] sm:mt-[120px] mt-[60px] text-center flex flex-col mb-[80px] items-center px-4 sm:px-6 lg:px-8'>
+        <h1 className='sm:text-[56px] md:text-[64px] text-[36px] lg:text-[72px] font-semibold leading-tight mb-4 '>Join a Global Community</h1>
+        <p className='sm:text-[42px] md:text-[48px] text-[28px] lg:text-[54px] font-normal leading-tight mb-8'>of Aspiring Change Makers</p>
+        <p className='text-[#4A4A4A] text-[20px] sm:text-[24px] md:text-[28px] sm:mt-[30px] mt-[20px] font-medium max-w-2xl leading-relaxed'>Our community members are from leading companies and innovative startups worldwide</p>
       </div>
       {/* Companies logos with animation */}
-      <div className="relative overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-r from-gray-50 to-white p-4 sm:p-6 md:p-8 shadow-sm mb-12 sm:mb-16 md:mb-20 lg:mb-24 xl:mb-32">
+      <div className="relative overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-r from-gray-50 to-white p-4 sm:p-6 md:p-8 shadow-sm">
         <div className="animate-slideX flex items-center justify-center">
           {/* First set of logos */}
           <img

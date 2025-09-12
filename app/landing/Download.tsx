@@ -28,11 +28,11 @@ const Download = () => {
   ]
 
   return (
-    <div className='w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24'>
+    <div className='w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16'>
       
       {/* Header Section */}
-      <div className="text-center mb-12 sm:mb-16 md:mb-20 lg:mb-24">
-        <h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-[#4A4A4A] leading-tight mb-6 sm:mb-8 max-w-4xl mx-auto'>
+      <div className="text-center mb-8 sm:mb-12 md:mb-16">
+        <h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#7052FF]text-[#4A4A4A] leading-tight mb-6 sm:mb-8 max-w-4xl mx-auto'>
           <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             One Place
           </span>{' '}
@@ -47,7 +47,7 @@ const Download = () => {
       </div>
 
       {/* Features Section */}
-      <div className="space-y-8 sm:space-y-12 md:space-y-16 lg:space-y-20">
+      <div className="space-y-6 sm:space-y-8 md:space-y-12">
         {features.map((feature, index) => (
           <div key={feature.id} className="w-full">
             
@@ -66,7 +66,7 @@ const Download = () => {
 
               {/* Image Container */}
               <div className="flex-shrink-0 w-full lg:w-auto flex justify-center items-center p-4 sm:p-6 md:p-8">
-                <div className="relative  w-[280px] sm:w-[320px] md:w-[360px] lg:w-[400px] aspect-[3/4] bg-[#FFF7E3] rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 shadow-md">
+                <div className="relative  w-[280px] sm:w-[320px] md:w-[360px] lg:w-[400px] aspect-[3/4]">
                   <Image 
                     src={feature.image} 
                     alt={feature.imageAlt}
@@ -79,7 +79,7 @@ const Download = () => {
             </div>
 
             {/* Mobile Image (shown separately on very small screens for better layout) */}
-            <div className="block sm:hidden mt-4">
+            {/* <div className="block sm:hidden mt-4">
               <div className="flex justify-center">
                 <div className="relative w-full max-w-[250px] aspect-[3/4] bg-[#FFF7E3] rounded-xl p-2 shadow-md">
                   <Image 
@@ -91,7 +91,7 @@ const Download = () => {
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         ))}
       </div>

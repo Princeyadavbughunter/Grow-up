@@ -36,14 +36,14 @@ const Future = () => {
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       {/* Section Title */}
-      <div className="text-center mt-16 sm:mt-24 md:mt-32 lg:mt-40 xl:mt-52 mb-12 sm:mb-16 md:mb-20 lg:mb-24">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-[#4A4A4A] leading-tight max-w-4xl mx-auto">
-          Empower Your Future in{' '}
-          <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            3 Steps
-          </span>
-        </h1>
-      </div>
+       <div className="text-center mt-16 sm:mt-24 md:mt-32 lg:mt-40 xl:mt-52 mb-12 sm:mb-16 md:mb-20 lg:mb-24">
+         <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-[#4A4A4A] leading-tight max-w-4xl mx-auto">
+           Empower Your Future in{' '}
+             <span className="bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#7052FF] px-4 py-2">
+               3 Steps
+             </span>
+         </h1>
+       </div>
 
       {/* Cards Section */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 pb-12 sm:pb-16 md:pb-20 lg:pb-24">
