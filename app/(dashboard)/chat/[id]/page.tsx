@@ -232,8 +232,6 @@ const ChatInterface: React.FC = () => {
                 console.log("WebSocket message received:", event.data);
                 try {
                     const message = JSON.parse(event.data);
-                    const message = JSON.parse(event.data);
-
                     const currentUserId = userId || profileData?.user;
                     const isSender = currentUserId && message.user_id === currentUserId;
           
@@ -277,11 +275,6 @@ const ChatInterface: React.FC = () => {
     };
 
     const sendMessage = (): void => {
-        console.log("Send message function called");
-        console.log("Selected chatroom:", selectedChatroom);
-        console.log("Message input:", messageInput);
-        console.log("WebSocket state:", websocketRef.current?.readyState);
-        
         if (!selectedChatroom?.id || !messageInput.trim()) {
             console.log("Validation failed - chatroom or message empty");
             return;

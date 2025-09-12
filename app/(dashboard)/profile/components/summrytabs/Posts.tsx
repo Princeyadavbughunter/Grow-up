@@ -239,7 +239,12 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                     </Link>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                    <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">{post.club_name}</span>
+                    <Link
+                        href={`/clubs/${post.club}`}
+                        className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 transition-colors cursor-pointer"
+                    >
+                        {post.club_name}
+                    </Link>
                     {post.link && (
                         <a
                             href={post.link}

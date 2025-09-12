@@ -8,12 +8,12 @@ interface Club {
     name: string;
     description: string;
     participants_count: number;
-    is_user_member:boolean;
+    is_user_member: boolean;
 }
 
 const Clubs = () => {
     const [clubs, setClubs] = useState<Club[]>([]);
-    const {authToken} = useAuth()
+    const { authToken } = useAuth();
     const { api } = useAuthenticatedApi();
 
     const fetchClubs = async () => {
@@ -33,16 +33,16 @@ const Clubs = () => {
 
     return (
         <div className="p-4">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Clubs</h2>
-                <Link href="/clubs" className="text-sm text-purple-600">
+            <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">Clubs</h2>
+                <Link href="/clubs" className="text-sm text-gray-600 hover:text-gray-800">
                     View all
                 </Link>
             </div>
 
             {/* Mobile: Horizontal scrollable container */}
             <div className="block lg:hidden">
-                <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+                <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
                     {clubs.map((club) => (
                         <ClubCard key={club.id} club={club} refresh={fetchClubs} isMobile={true} />
                     ))}
@@ -50,7 +50,7 @@ const Clubs = () => {
             </div>
 
             {/* Desktop: Vertical stack */}
-            <div className="hidden lg:block">
+            <div className="hidden lg:block space-y-3">
                 {clubs.map((club) => (
                     <ClubCard key={club.id} club={club} refresh={fetchClubs} isMobile={false} />
                 ))}
@@ -79,37 +79,51 @@ const ClubCard = ({ club, refresh, isMobile }: ClubCardProps) => {
                 await api.post(`/freelancer/join-club/?id=${club.id}`);
             }
             setIsJoined(!isJoined);
-            refresh()
+            refresh();
         } catch (error) {
             console.error('Error toggling club membership:', error);
         }
     };
 
-    return (
-        <div className={`bg-white rounded-xl shadow-sm ${isMobile ? 'mb-0 w-64 flex-shrink-0' : 'mb-4'}`}>
-            <Link href={`/clubs/${club.id}`} >
-                <div className={`flex flex-col ${isMobile ? 'p-3' : 'p-4'}`} >
+    const maxDescriptionLength = isMobile ? 80 : 120;
+    const truncatedDescription = club.description.length > maxDescriptionLength
+        ? club.description.substring(0, maxDescriptionLength) + '...'
+        : club.description;
 
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className={`bg-purple-100 rounded-lg flex items-center justify-center ${isMobile ? 'w-10 h-10' : 'w-12 h-12'}`}>
-                                <span className={`text-purple-600 ${isMobile ? 'text-lg' : 'text-xl'}`}>{club.name[0]}</span>
+    return (
+        <div className={`bg-white border border-gray-200 rounded-lg ${isMobile ? 'w-64 flex-shrink-0' : ''}`}>
+            <Link href={`/clubs/${club.id}`}>
+                <div className={`p-4 ${isMobile ? 'p-3' : ''}`}>
+                    <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3 flex-1">
+                            <div className={`bg-gray-100 rounded-md flex items-center justify-center ${isMobile ? 'w-10 h-10' : 'w-11 h-11'}`}>
+                                <span className={`text-gray-600 font-medium ${isMobile ? 'text-base' : 'text-lg'}`}>
+                                    {club.name[0].toUpperCase()}
+                                </span>
                             </div>
                             <div className="min-w-0 flex-1">
-                                <h3 className={`font-semibold ${isMobile ? 'text-sm' : ''} truncate`}>{club.name}</h3>
-                                <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>{club.participants_count} members</p>
+                                <h3 className={`font-semibold text-gray-900 ${isMobile ? 'text-sm' : 'text-base'} truncate`}>
+                                    {club.name}
+                                </h3>
+                                <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                                    {club.participants_count} members
+                                </p>
                             </div>
                         </div>
                         <button
-                            className={`text-purple-600 hover:text-purple-800 whitespace-nowrap ${isMobile ? 'text-xs' : 'text-sm md:text-base'} ${club.is_user_member ? "font-bold" : ""}`}
-                            onClick={(e) => {e.preventDefault(); handleClick()}}
+                            className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap ml-3 ${
+                                club.is_user_member
+                                    ? 'bg-gray-100 text-gray-700 border border-gray-300'
+                                    : 'bg-blue-600 text-white'
+                            }`}
+                            onClick={(e) => { e.preventDefault(); handleClick(); }}
                         >
                             {club.is_user_member ? "Joined" : "Join"}
                         </button>
                     </div>
-                    <p className={`text-gray-600 mt-2 flex-grow ${isMobile ? 'text-xs line-clamp-2' : 'text-sm'}`}>
-                        {club.description.substring(0, isMobile ? 80 : 150)}{club.description.length > (isMobile ? 80 : 150) ? '...' : ''}
-                        <button className="text-purple-600 ml-1">Read More...</button>
+
+                    <p className={`text-gray-600 leading-relaxed ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                        {truncatedDescription}
                     </p>
                 </div>
             </Link>

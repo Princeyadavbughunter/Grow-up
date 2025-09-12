@@ -170,9 +170,12 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                         </Link>
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                        <span className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
+                        <Link
+                            href={`/clubs/${post.club}`}
+                            className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium hover:bg-green-200 transition-colors cursor-pointer"
+                        >
                             {post.club_name}
-                        </span>
+                        </Link>
                         {post.link && (
                             <a 
                                 href={post.link} 
