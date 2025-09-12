@@ -2,6 +2,7 @@
 'use client'
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BiSearch, BiArrowBack } from 'react-icons/bi';
+import { FaUser } from 'react-icons/fa';
 import { RiBroadcastFill } from 'react-icons/ri';
 import { HiMenuAlt3 } from 'react-icons/hi';
 import ProfileView from './_component/profile';
@@ -289,11 +290,17 @@ const ChatInterface = () => {
                   className="flex items-center gap-3 border p-3 md:p-4 rounded-xl cursor-pointer hover:shadow-md transition-shadow bg-white min-w-max"
                   onClick={() => handlePageSelect(page)}
                 >
-                  <img
-                    src={page.profile_picture || 'https://randomuser.me/portraits/thumb/men/1.jpg'}
-                    alt={page.name}
-                    className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover"
-                  />
+                  {page.profile_picture ? (
+                    <img
+                      src={page.profile_picture}
+                      alt={page.name}
+                      className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                      <FaUser className="h-5 w-5 md:h-6 md:w-6 text-gray-500" />
+                    </div>
+                  )}
                   <div>
                     <span className="text-sm font-medium block truncate max-w-[120px]">{page.name}</span>
                     <div className="text-xs text-gray-500 font-medium flex items-center">
@@ -351,11 +358,17 @@ const ChatInterface = () => {
                         }`}
                         onClick={() => handlePageSelect(page)}
                       >
-                        <img
-                          src={page.profile_picture || 'https://randomuser.me/portraits/thumb/women/1.jpg'}
-                          alt={page.name}
-                          className="h-10 w-10 rounded-full object-cover"
-                        />
+                        {page.profile_picture ? (
+                          <img
+                            src={page.profile_picture}
+                            alt={page.name}
+                            className="h-10 w-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                            <FaUser className="h-5 w-5 text-gray-500" />
+                          </div>
+                        )}
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium truncate">{page.name}</h3>
                           <p className="text-sm text-gray-500 flex items-center">
@@ -407,11 +420,17 @@ const ChatInterface = () => {
                     }`}
                     onClick={() => handlePageSelect(page)}
                   >
-                    <img
-                      src={page.profile_picture || 'https://randomuser.me/portraits/thumb/women/1.jpg'}
-                      alt={page.name}
-                      className="h-10 w-10 rounded-full object-cover"
-                    />
+                    {page.profile_picture ? (
+                      <img
+                        src={page.profile_picture}
+                        alt={page.name}
+                        className="h-10 w-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                        <FaUser className="h-5 w-5 text-gray-500" />
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium truncate">{page.name}</h3>
                       <p className="text-sm text-gray-500 flex items-center">
@@ -445,11 +464,17 @@ const ChatInterface = () => {
             {/* Chat Header */}
             <div className="flex items-center justify-between border-b bg-white p-3 md:p-4 shadow-sm">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <img 
-                  src={selectedPage.profile_picture || 'https://randomuser.me/portraits/thumb/men/1.jpg'}
-                  alt={selectedPage.name}
-                  className="h-8 w-8 md:h-10 md:w-10 rounded-full object-cover"
-                />
+                {selectedPage.profile_picture ? (
+                  <img
+                    src={selectedPage.profile_picture}
+                    alt={selectedPage.name}
+                    className="h-8 w-8 md:h-10 md:w-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                    <FaUser className="h-4 w-4 md:h-5 md:w-5 text-gray-500" />
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <h2 className="font-semibold flex items-center text-sm md:text-base">
                     <span className="truncate">{selectedPage.name}</span>
@@ -493,11 +518,17 @@ const ChatInterface = () => {
                   key={message.message_id}
                   className="mb-4 flex items-start gap-2 md:gap-3"
                 >
-                  <img 
-                    src={selectedPage?.profile_picture || 'https://randomuser.me/portraits/thumb/men/1.jpg'} 
-                    alt="Page" 
-                    className="h-6 w-6 md:h-8 md:w-8 rounded-full object-cover flex-shrink-0"
-                  />
+                  {selectedPage?.profile_picture ? (
+                    <img
+                      src={selectedPage.profile_picture}
+                      alt="Page"
+                      className="h-6 w-6 md:h-8 md:w-8 rounded-full object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="h-6 w-6 md:h-8 md:w-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                      <FaUser className="h-3 w-3 md:h-4 md:w-4 text-gray-500" />
+                    </div>
+                  )}
                   
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-gray-800 mb-1 text-sm md:text-base">

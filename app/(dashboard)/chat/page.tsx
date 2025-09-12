@@ -2,6 +2,7 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
 import { BiSearch } from 'react-icons/bi';
+import { FaUser } from 'react-icons/fa';
 import { Send, Check, X, MessageSquare, Clock, ArrowLeft, MoreVertical, FileText } from 'lucide-react';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 import {
@@ -91,7 +92,7 @@ const ChatInterface: React.FC = () => {
   const wsReconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const { userId, authToken } = useAuth();
+  const { userId, authToken, profileData } = useAuth();
   const { api } = useAuthenticatedApi();
 
 
@@ -175,10 +176,18 @@ const ChatInterface: React.FC = () => {
       };
 
       ws.onmessage = (event) => {
-        console.log("WebSocket message received:", event.data);
         try {
           const message = JSON.parse(event.data);
-          setMessages(prevMessages => [...(prevMessages || []), message]);
+
+          const currentUserId = userId || profileData?.user;
+          const isSender = currentUserId && message.user_id === currentUserId;
+
+          const messageWithSender = {
+            ...message,
+            is_sender: isSender
+          };
+
+          setMessages(prevMessages => [...(prevMessages || []), messageWithSender]);
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
         }
@@ -213,64 +222,52 @@ const ChatInterface: React.FC = () => {
   };
 
   const sendMessage = (): void => {
-    console.log("Send message function called");
-    console.log("Selected chatroom:", selectedChatroom);
-    console.log("Message input:", messageInput);
-    console.log("WebSocket state:", websocketRef.current?.readyState);
-    
+
     if (!selectedChatroom?.id || !messageInput.trim()) {
       console.log("Validation failed - chatroom or message empty");
       return;
     }
 
+    // Get current user ID with fallback
+    const currentUserId = userId || profileData?.user;
+    if (!currentUserId) {
+      console.log("No user ID available");
+      setWsError('User authentication required');
+      return;
+    }
+
     if (!websocketRef.current || websocketRef.current.readyState !== WebSocket.OPEN) {
-      console.log("WebSocket not connected, attempting reconnection");
-      console.error('Chat connection is not open');
-      
+
       if (selectedChatroom?.id) {
         connectWebSocket(selectedChatroom.id);
-        setWsError('Reconnecting to chat server...');
-        
+
         const tempMessage = messageInput;
         setTimeout(() => {
           if (websocketRef.current?.readyState === WebSocket.OPEN) {
-            console.log("Sending message after reconnection");
             websocketRef.current.send(JSON.stringify({
               room_id: selectedChatroom.id,
               message: tempMessage,
-              user_id: userId,
+              user_id: currentUserId,
               message_type: "chat"
             }));
-            
-            const tempMessageObj: Message = {
-              message_id: `temp-${Date.now()}`,
-              message: tempMessage,
-              user_id: userId || '',
-              timestamp: new Date().toISOString(),
-            };
-            
-            setMessages(prevMessages => [...prevMessages, tempMessageObj]);
+
             setWsError(null);
-          } else {
-            console.log("Failed to reconnect WebSocket");
           }
         }, 2000);
       }
-      
+
       setMessageInput('');
       return;
     }
 
     try {
-      console.log("Attempting to send message via WebSocket");
       websocketRef.current.send(JSON.stringify({
         room_id: selectedChatroom.id,
         message: messageInput,
-        user_id: userId,
+        user_id: currentUserId,
         message_type: "chat"
       }));
-      console.log("Message sent successfully");
-      
+
       setMessageInput('');
     } catch (error) {
       console.error('Error sending message:', error);
@@ -286,15 +283,7 @@ const ChatInterface: React.FC = () => {
         api.get(`/individualchats/chatroom-notes/?chatroom_id=${roomId}`)
       ]);
       
-      console.log('API response for messages:', messagesResponse.data);
-      console.log('API response for notes:', notesResponse.data);
-      console.log('Messages array:', messagesResponse.data.results);
-      
-      if (messagesResponse.data.results && messagesResponse.data.results.length > 0) {
-        console.log('First message structure:', messagesResponse.data.results[0]);
-      }
-      
-      setMessages(messagesResponse.data.results || []);
+      setMessages((messagesResponse.data.results || []).reverse());
       
       // Handle notes array
       const notes = notesResponse.data || [];
@@ -309,16 +298,6 @@ const ChatInterface: React.FC = () => {
       console.log('Messages and notes fetched successfully for room:', roomId);
     } catch (error) {
       console.error('Error fetching messages and notes:', error);
-      
-      // Fallback: try to fetch messages only if the combined request fails
-      try {
-        const messagesResponse = await api.get(`/individualchats/chatrooms-messages/?room_id=${roomId}`);
-        setMessages(messagesResponse.data.results || []);
-        connectWebSocket(roomId);
-        console.log('Messages fetched successfully (fallback)');
-      } catch (fallbackError) {
-        console.error('Error fetching messages (fallback):', fallbackError);
-      }
     }
   };
 
@@ -504,16 +483,22 @@ const ChatInterface: React.FC = () => {
                 <div className="p-4 text-center text-gray-500">No chats found</div>
               ) : (
                 filteredChatrooms.map((chatroom) => (
-                  <div 
-                    key={chatroom.id} 
+                  <div
+                    key={chatroom.id}
                     className={`flex items-center p-3 md:p-4 hover:bg-gray-50 cursor-pointer active:bg-gray-100 ${selectedChatroom?.id === chatroom.id ? 'bg-gray-100' : ''}`}
                     onClick={() => handleChatroomSelect(chatroom)}
                   >
-                    <img
-                      src={chatroom.chatting_with_current_user.image || '/default-avatar.png'}
-                      alt={chatroom.chatting_with_current_user.name}
-                      className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0"
-                    />
+                    {chatroom.chatting_with_current_user.image ? (
+                      <img
+                        src={chatroom.chatting_with_current_user.image}
+                        alt={chatroom.chatting_with_current_user.name}
+                        className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                        <FaUser className="h-5 w-5 md:h-6 md:w-6 text-gray-500" />
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-sm md:text-base truncate">{chatroom.chatting_with_current_user.name}</h3>
                       <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
@@ -540,11 +525,17 @@ const ChatInterface: React.FC = () => {
               ) : (
                 filteredPendingChatrooms.map((chatroom) => (
                   <div key={chatroom.id} className="flex items-center p-3 md:p-4 border-b">
-                    <img
-                      src={chatroom.chatting_with_current_user.image || '/default-avatar.png'}
-                      alt={chatroom.chatting_with_current_user.name}
-                      className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0"
-                    />
+                    {chatroom.chatting_with_current_user.image ? (
+                      <img
+                        src={chatroom.chatting_with_current_user.image}
+                        alt={chatroom.chatting_with_current_user.name}
+                        className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                        <FaUser className="h-5 w-5 md:h-6 md:w-6 text-gray-500" />
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-sm md:text-base truncate">{chatroom.chatting_with_current_user.name}</h3>
                       <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
@@ -598,11 +589,17 @@ const ChatInterface: React.FC = () => {
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <img
-                src={selectedChatroom.chatting_with_current_user.image || '/default-avatar.png'}
-                alt={selectedChatroom.chatting_with_current_user.name}
-                className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0"
-              />
+              {selectedChatroom.chatting_with_current_user.image ? (
+                <img
+                  src={selectedChatroom.chatting_with_current_user.image}
+                  alt={selectedChatroom.chatting_with_current_user.name}
+                  className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0"
+                />
+              ) : (
+                <div className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                  <FaUser className="h-4 w-4 md:h-5 md:w-5 text-gray-500" />
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 <h2 className="font-medium text-sm md:text-base truncate">{selectedChatroom.chatting_with_current_user.name}</h2>
                 <p className="text-xs md:text-sm text-gray-500 flex items-center">
@@ -664,12 +661,10 @@ const ChatInterface: React.FC = () => {
                           <div className={`text-xs mt-1 ${isCurrentUser ? 'text-blue-100' : 'text-gray-500'} flex items-center justify-between`}>
                             <span>
                               {(() => {
-                                console.log('Message timestamp:', message.timestamp, 'Type:', typeof message.timestamp);
                                 if (!message.timestamp || message.timestamp.trim() === '') {
                                   return 'No time';
                                 }
                                 const date = new Date(message.timestamp);
-                                console.log('Parsed date:', date, 'Is valid:', !isNaN(date.getTime()));
                                 return isNaN(date.getTime()) ? 'Invalid time' : date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                               })()}
                             </span>

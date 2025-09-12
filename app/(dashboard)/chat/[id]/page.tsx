@@ -2,6 +2,7 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
 import { BiSearch } from 'react-icons/bi';
+import { FaUser } from 'react-icons/fa';
 import { Send, Check, X, MessageSquare, Clock, ArrowLeft, MoreVertical, FileText } from 'lucide-react';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 import { useParams } from 'next/navigation';
@@ -231,7 +232,17 @@ const ChatInterface: React.FC = () => {
                 console.log("WebSocket message received:", event.data);
                 try {
                     const message = JSON.parse(event.data);
-                    setMessages(prevMessages => [...(prevMessages || []), message]);
+                    const message = JSON.parse(event.data);
+
+                    const currentUserId = userId || profileData?.user;
+                    const isSender = currentUserId && message.user_id === currentUserId;
+          
+                    const messageWithSender = {
+                      ...message,
+                      is_sender: isSender
+                    };
+          
+                    setMessages(prevMessages => [...(prevMessages || []), messageWithSender]);
                 } catch (error) {
                     console.error('Error parsing WebSocket message:', error);
                 }
@@ -407,15 +418,11 @@ const ChatInterface: React.FC = () => {
                 api.get(`/individualchats/chatroom-notes/?chatroom_id=${roomId}`)
             ]);
             
-            console.log('API response for messages:', messagesResponse.data);
-            console.log('API response for notes:', notesResponse.data);
-            console.log('Messages array:', messagesResponse.data.results);
-            
             if (messagesResponse.data.results && messagesResponse.data.results.length > 0) {
                 console.log('First message structure:', messagesResponse.data.results[0]);
             }
             
-            setMessages(messagesResponse.data.results || []);
+            setMessages((messagesResponse.data.results || []).reverse());
             
             // Handle notes array
             const notes = notesResponse.data || [];
@@ -531,16 +538,22 @@ const ChatInterface: React.FC = () => {
                                 <div className="p-4 text-center text-gray-500">No chats found</div>
                             ) : (
                                 filteredChatrooms.map((chatroom) => (
-                                    <div 
-                                        key={chatroom.id} 
+                                    <div
+                                        key={chatroom.id}
                                         className={`flex items-center p-3 md:p-4 hover:bg-gray-50 cursor-pointer active:bg-gray-100 ${selectedChatroom?.id === chatroom.id ? 'bg-gray-100' : ''}`}
                                         onClick={() => handleChatroomSelect(chatroom)}
                                     >
-                                        <img
-                                            src={chatroom.chatting_with_current_user.image || '/default-avatar.png'}
-                                            alt={chatroom.chatting_with_current_user.name}
-                                            className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0"
-                                        />
+                                        {chatroom.chatting_with_current_user.image ? (
+                                            <img
+                                                src={chatroom.chatting_with_current_user.image}
+                                                alt={chatroom.chatting_with_current_user.name}
+                                                className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0"
+                                            />
+                                        ) : (
+                                            <div className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                                                <FaUser className="h-5 w-5 md:h-6 md:w-6 text-gray-500" />
+                                            </div>
+                                        )}
                                         <div className="flex-1 min-w-0">
                                             <h3 className="font-medium text-sm md:text-base truncate">{chatroom.chatting_with_current_user.name}</h3>
                                             <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
@@ -567,11 +580,17 @@ const ChatInterface: React.FC = () => {
                             ) : (
                                 filteredPendingChatrooms.map((chatroom) => (
                                     <div key={chatroom.id} className="flex items-center p-3 md:p-4 border-b">
-                                        <img
-                                            src={chatroom.chatting_with_current_user.image || '/default-avatar.png'}
-                                            alt={chatroom.chatting_with_current_user.name}
-                                            className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0"
-                                        />
+                                        {chatroom.chatting_with_current_user.image ? (
+                                            <img
+                                                src={chatroom.chatting_with_current_user.image}
+                                                alt={chatroom.chatting_with_current_user.name}
+                                                className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0"
+                                            />
+                                        ) : (
+                                            <div className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                                                <FaUser className="h-5 w-5 md:h-6 md:w-6 text-gray-500" />
+                                            </div>
+                                        )}
                                         <div className="flex-1 min-w-0">
                                             <h3 className="font-medium text-sm md:text-base truncate">{chatroom.chatting_with_current_user.name}</h3>
                                             <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
@@ -625,11 +644,17 @@ const ChatInterface: React.FC = () => {
                             >
                                 <ArrowLeft className="h-5 w-5" />
                             </button>
-                            <img
-                                src={selectedChatroom.chatting_with_current_user.image || '/default-avatar.png'}
-                                alt={selectedChatroom.chatting_with_current_user.name}
-                                className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0"
-                            />
+                            {selectedChatroom.chatting_with_current_user.image ? (
+                                <img
+                                    src={selectedChatroom.chatting_with_current_user.image}
+                                    alt={selectedChatroom.chatting_with_current_user.name}
+                                    className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0"
+                                />
+                            ) : (
+                                <div className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                                    <FaUser className="h-4 w-4 md:h-5 md:w-5 text-gray-500" />
+                                </div>
+                            )}
                             <div className="min-w-0 flex-1">
                                 <h2 className="font-medium text-sm md:text-base truncate">{selectedChatroom.chatting_with_current_user.name}</h2>
                                 <p className="text-xs md:text-sm text-gray-500 flex items-center">

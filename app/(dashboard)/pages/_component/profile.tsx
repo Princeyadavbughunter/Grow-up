@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 import React, { useState, useEffect } from 'react';
-import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook } from 'react-icons/fa';
+import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaUser } from 'react-icons/fa';
 import { BsArrowLeft } from 'react-icons/bs';
 import { IoLocationOutline } from 'react-icons/io5';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
@@ -110,59 +110,70 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
     <div className="min-h-screen bg-gray-50 p-4 flex flex-col lg:flex-row gap-4 mx-auto w-full max-w-7xl">
       <div className="rounded-lg bg-white p-6 shadow-sm flex-1">
         
-        <div className='flex flex-col lg:flex-row gap-4'>
-        <div className="mb-6 flex items-center gap-4">
-          <button onClick={onBack} className="rounded-full p-2 hover:bg-gray-100">
-            <BsArrowLeft className="h-6 w-6" />
-          </button>
-          <div className="flex flex-1 items-center gap-4">
-            <img 
-              src={pageDetails.profile_picture || '/white-room-logo.png'} 
-              alt={pageDetails.name} 
-              className="h-16 w-16 rounded-full"
-            />
-            <div>
-              <h1 className="text-2xl font-bold">{pageDetails.name}</h1>
-              <p className="text-gray-600">{pageDetails.description}</p>
-              {pageDetails.location && (
-                <div className="flex items-center gap-2 text-gray-500">
-                  <IoLocationOutline />
-                  <span>{pageDetails.location}</span>
+        {activeTab !== 'Post' && (
+          <div className="mb-4">
+            <div className="flex items-center gap-4 mb-3">
+              <button onClick={onBack} className="rounded-full p-2 hover:bg-gray-100 flex-shrink-0">
+                <BsArrowLeft className="h-5 w-5" />
+              </button>
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                {pageDetails.profile_picture ? (
+                  <img
+                    src={pageDetails.profile_picture}
+                    alt={pageDetails.name}
+                    className="h-12 w-12 rounded-full flex-shrink-0"
+                  />
+                ) : (
+                  <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                    <FaUser className="h-6 w-6 text-gray-500" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-xl font-bold truncate">{pageDetails.name}</h1>
+                  <p className="text-sm text-gray-600 truncate">{pageDetails.description}</p>
+                  <div className="flex items-center gap-4 mt-1">
+                    <p className="text-sm text-purple-600 font-medium">
+                      {pageDetails.followers_count} followers
+                    </p>
+                    {pageDetails.location && (
+                      <div className="flex items-center gap-1 text-gray-500 text-sm">
+                        <IoLocationOutline className="h-4 w-4" />
+                        <span className="truncate">{pageDetails.location}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
+              </div>
+              <div className="flex items-center gap-3 flex-shrink-0">
+                {!pageDetails.is_admin && (
+                  <button
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      pageDetails.is_following
+                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        : 'bg-[#7052FF] text-white hover:bg-[#5a42cc]'
+                    }`}
+                    onClick={handleFollowToggle}
+                  >
+                    {pageDetails.is_following ? 'Unfollow' : 'Follow'}
+                  </button>
+                )}
+                <div className="flex gap-2">
+                  {pageDetails.social_links?.linkedin && <FaLinkedin className="h-5 w-5 text-gray-500 hover:text-blue-600 cursor-pointer" />}
+                  {pageDetails.social_links?.twitter && <FaTwitter className="h-5 w-5 text-gray-500 hover:text-blue-400 cursor-pointer" />}
+                  {pageDetails.social_links?.instagram && <FaInstagram className="h-5 w-5 text-gray-500 hover:text-pink-500 cursor-pointer" />}
+                  {pageDetails.social_links?.facebook && <FaFacebook className="h-5 w-5 text-gray-500 hover:text-blue-600 cursor-pointer" />}
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-3 flex-wrap justify-center lg:justify-start">
-            {pageDetails.social_links?.linkedin && <FaLinkedin className="h-6 w-6 text-gray-500" />}
-            {pageDetails.social_links?.twitter && <FaTwitter className="h-6 w-6 text-gray-500" />}
-            {pageDetails.social_links?.instagram && <FaInstagram className="h-6 w-6 text-gray-500" />}
-            {pageDetails.social_links?.facebook && <FaFacebook className="h-6 w-6 text-gray-500" />}
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <p className="text-lg text-purple-600">
-            {pageDetails.followers_count} followers
-          </p>
-        </div>
-        </div>
-
-        {!pageDetails.is_admin && (
-          <div className="mb-6 flex flex-col sm:flex-row gap-4">
-            <button 
-              className={`flex-1 rounded-lg py-3 ${
-                pageDetails.is_following 
-                  ? 'bg-gray-200 text-gray-700' 
-                  : 'bg-[#7052FF] text-white'
-              }`}
-              onClick={handleFollowToggle}
-            >
-              {pageDetails.is_following ? 'Unfollow' : 'Follow'}
-            </button>
           </div>
         )}
 
-        <div className="mb-6 flex gap-4 justify-center flex-wrap">
+        <div className={`mb-6 ${activeTab === 'Post' ? 'flex items-center gap-4' : 'flex gap-4 justify-center flex-wrap'}`}>
+          {activeTab === 'Post' && (
+            <button onClick={onBack} className="rounded-full p-2 hover:bg-gray-100 flex-shrink-0">
+              <BsArrowLeft className="h-5 w-5" />
+            </button>
+          )}
           {['Home', 'About', 'Post', 'People'].map((tab) => (
             <button
               key={tab}
@@ -176,7 +187,11 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           ))}
         </div>
 
-        <div className="mb-6 overflow-y-auto h-[calc(100vh-20rem)] lg:h-[calc(100vh-27rem)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <div className={`mb-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent ${
+          activeTab === 'Post'
+            ? 'h-[calc(100vh-12rem)] lg:h-[calc(100vh-15rem)]'
+            : 'h-[calc(100vh-20rem)] lg:h-[calc(100vh-27rem)]'
+        }`}>
           {renderTabContent()}
         </div>
       </div>
