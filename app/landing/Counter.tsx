@@ -92,11 +92,9 @@ const Counter = () => {
     <div className="w-full py-8 sm:py-12 md:py-16 lg:py-20">
       
       {/* Header Section */}
-      <div className="text-center mb-8 sm:mb-12 md:mb-16 px-4 sm:px-6 lg:px-8">
-        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#4A4A4A] leading-tight max-w-4xl mx-auto">
-          <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Some Numbers That Matter
-          </span>
+      <div className="text-center mb-8 sm:mb-12 md:mb-16">
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#4A4A4A] leading-tight mb-6 sm:mb-8 max-w-4xl mx-auto py-2 sm:py-4 md:py-6 lg:py-8 px-6 sm:px-8 md:px-12 rounded-2xl sm:rounded-3xl">
+          Some Numbers That Matter
         </h1>
       </div>
 
@@ -150,10 +148,10 @@ const Counter = () => {
         </div>
 
         {/* Decorative Elements */}
-        <div className="absolute top-10 left-10 w-20 h-20 bg-purple-500 rounded-full opacity-10 animate-pulse"></div>
+        <div className="absolute top-10 left-10 w-20 h-20 bg-[#7052FF] rounded-full opacity-10 animate-pulse"></div>
         <div className="absolute bottom-10 right-10 w-32 h-32 bg-blue-500 rounded-full opacity-10 animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/4 w-4 h-4 bg-white rounded-full opacity-30 animate-ping"></div>
-        <div className="absolute top-1/3 right-1/3 w-6 h-6 bg-purple-300 rounded-full opacity-20 animate-ping delay-500"></div>
+        <div className="absolute top-1/3 right-1/3 w-6 h-6 bg-[#7052FF]/60 rounded-full opacity-20 animate-ping delay-500"></div>
       </div>
 
       {/* Additional spacing after component */}

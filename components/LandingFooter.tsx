@@ -45,7 +45,7 @@ const LandingFooter = () => {
       
       {/* Background decorative elements */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-purple-500 rounded-full blur-3xl"></div>
+        <div className="absolute top-10 left-10 w-32 h-32 bg-[#7052FF] rounded-full blur-3xl"></div>
         <div className="absolute bottom-10 right-10 w-40 h-40 bg-blue-500 rounded-full blur-3xl"></div>
         <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-indigo-500 rounded-full blur-2xl"></div>
       </div>
@@ -58,7 +58,7 @@ const LandingFooter = () => {
             
             {/* Download Title */}
             <div className="text-center lg:text-left">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-white bg-clip-text text-transparent">
                 Download app now
               </h2>
               <p className="text-gray-300 text-base sm:text-lg max-w-md">
@@ -115,14 +115,14 @@ const LandingFooter = () => {
             
             {/* Newsletter Signup */}
             <div className="space-y-3">
-              <h4 className="text-purple-400 font-semibold text-sm sm:text-base">Stay Updated</h4>
+              <h4 className="text-[#7052FF] font-semibold text-sm sm:text-base">Stay Updated</h4>
               <div className="flex flex-col sm:flex-row gap-2">
                 <input 
                   type="email" 
                   placeholder="Enter your email"
-                  className="flex-1 px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400"
+                  className="flex-1 px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7052FF] text-white placeholder-gray-400"
                 />
-                <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-300">
+                <button className="px-4 py-2 bg-[#7052FF] hover:bg-[#5a42d4] text-white text-sm font-medium rounded-lg transition-colors duration-300">
                   Subscribe
                 </button>
               </div>
@@ -132,7 +132,7 @@ const LandingFooter = () => {
           {/* Footer Links */}
           {footerLinks.map((section, index) => (
             <div key={index} className="text-center md:text-left">
-              <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-purple-400">
+              <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-[#7052FF]">
                 {section.title}
               </h3>
               <ul className="space-y-2 sm:space-y-3">
@@ -143,7 +143,7 @@ const LandingFooter = () => {
                       className="text-gray-400 hover:text-white text-sm sm:text-base transition-colors duration-300 flex items-center justify-center md:justify-start gap-2 group"
                     >
                       {link.icon && (
-                        <span className="text-purple-400 group-hover:text-purple-300 transition-colors duration-300">
+                        <span className="text-[#7052FF] group-hover:text-[#8B5FFF] transition-colors duration-300">
                           {link.icon}
                         </span>
                       )}

@@ -20,6 +20,15 @@ const workSans = Work_Sans({
 export const metadata: Metadata = {
   title: "Grow Up Buddy",
   description: "Grow Up Buddy is a student community that helps students grow ahead in their future.",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon.png', type: 'image/png' }
+    ],
+    apple: { url: '/icon.png', sizes: '180x180', type: 'image/png' },
+    shortcut: '/favicon.ico'
+  }
 };
 
 export default function RootLayout({

@@ -8,7 +8,7 @@ const Future = () => {
       title: 'Monetize Your Skills',
       description: 'Find gigs that match your skills and start earning with GrowUp Buddy.',
       icon: '/landing-icon.png',
-      bgColor: 'bg-purple-600',
+      bgColor: 'bg-[#7052FF]',
       borderColor: 'border-transparent',
       textColor: 'text-white',
     },
@@ -17,7 +17,7 @@ const Future = () => {
       title: 'Learn & Grow',
       description: 'Join clubs, learn from experts, and stay ahead in your field.',
       icon: '/landing-icon.png',
-      bgColor: 'bg-purple-600',
+      bgColor: 'bg-[#7052FF]',
       borderColor: 'border-transparent',
       textColor: 'text-white',
     },
@@ -26,7 +26,7 @@ const Future = () => {
       title: 'Connect & Thrive',
       description: 'Network with like-minded individuals and find collaborators for your projects.',
       icon: '/landing-icon.png',
-      bgColor: 'bg-purple-600',
+      bgColor: 'bg-[#7052FF]',
       borderColor: 'border-transparent',
       textColor: 'text-white',
     },
@@ -39,7 +39,7 @@ const Future = () => {
        <div className="text-center mt-16 sm:mt-24 md:mt-32 lg:mt-40 xl:mt-52 mb-12 sm:mb-16 md:mb-20 lg:mb-24">
          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-[#4A4A4A] leading-tight max-w-4xl mx-auto">
            Empower Your Future in{' '}
-             <span className="bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#7052FF] px-4 py-2">
+             <span className="bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#7052FF] px-4 py-6">
                3 Steps
              </span>
          </h1>
@@ -50,12 +50,12 @@ const Future = () => {
         {cards.map((card) => (
           <div
             key={card.id}
-            className={`group relative rounded-2xl sm:rounded-3xl border-2 ${card.bgColor} ${card.borderColor} shadow-lg hover:shadow-xl hover:bg-white hover:border-purple-600 transition-all duration-300 transform hover:-translate-y-2 hover:scale-105`}
+            className={`group relative rounded-2xl sm:rounded-3xl border-2 ${card.bgColor} ${card.borderColor} shadow-lg hover:shadow-xl hover:bg-white hover:border-[#7052FF] transition-all duration-300 transform hover:-translate-y-2 hover:scale-105`}
           >
             <div className="flex flex-col items-center text-center p-6 sm:p-8 lg:p-10">
               
               {/* Icon Container */}
-              <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-purple-100 rounded-xl sm:rounded-2xl mb-6 sm:mb-8 lg:mb-10 group-hover:bg-purple-200 transition-colors duration-300">
+              <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-[#7052FF]/10 rounded-xl sm:rounded-2xl mb-6 sm:mb-8 lg:mb-10 group-hover:bg-[#7052FF]/20 transition-colors duration-300">
                 <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12">
                   <Image 
                     src={card.icon} 
@@ -78,7 +78,7 @@ const Future = () => {
 
               {/* Button (appears on hover) */}
               <button
-                className={`opacity-0 group-hover:opacity-100 inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 shadow-md hover:shadow-lg`}
+                className={`opacity-0 group-hover:opacity-100 inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold bg-[#7052FF] text-white hover:bg-[#5a42d4] transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/30 shadow-md hover:shadow-lg`}
               >
                 View
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
@@ -89,7 +89,7 @@ const Future = () => {
             </div>
             
             {/* Hover Effect Overlay */}
-            <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-transparent via-transparent to-purple-500 opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+            <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-transparent via-transparent to-[#7052FF] opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
           </div>
         ))}
       </section>

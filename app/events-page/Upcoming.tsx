@@ -9,9 +9,9 @@ const Upcoming = () => {
       organizer: "Growbuddy Events",
       description: "For the Community, From The community",
       buttonText: "Register Now",
-      bgColor: "bg-purple-100",
+      bgColor: "bg-[#7052FF]/10",
       iconColor: "bg-yellow-400",
-      attendeesColor: "bg-purple-200",
+      attendeesColor: "bg-[#7052FF]/20",
     },
     {
       date: "Thu, May 15 @ 7:30 PM",
@@ -62,7 +62,7 @@ const Upcoming = () => {
   return (
     <div className="py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       {/* Main heading */}
-      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[40px] font-bold text-center text-[#4A4A4A] mb-8 sm:mb-10 md:mb-12 lg:mb-16">
+      <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#4A4A4A] leading-tight mb-6 sm:mb-8 max-w-4xl mx-auto py-2 sm:py-4 md:py-6 lg:py-8 px-2 sm:px-2 md:px-6 rounded-2xl sm:rounded-3xl whitespace-nowrap text-center">
         Upcoming Events
       </h1>
 
@@ -97,7 +97,7 @@ const Upcoming = () => {
             </div>
 
             {/* Register button */}
-            <button className="w-full py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl bg-purple-500 hover:bg-purple-600 active:bg-purple-700 text-white text-sm sm:text-base md:text-sm font-semibold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2">
+            <button className="w-full py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl bg-[#7052FF] hover:bg-[#5a42d4] active:bg-[#4a36b8] text-white text-sm sm:text-base md:text-sm font-semibold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/40 focus:ring-offset-2">
               {card.buttonText}
             </button>
           </div>

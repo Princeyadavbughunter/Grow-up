@@ -50,8 +50,8 @@ const NavItem = ({
     href={href}
     className={`flex flex-col items-center gap-1 p-1 md:p-2 rounded-lg transition-colors min-w-[50px] w-[50px] md:min-w-[60px] md:w-[60px]
       ${active 
-        ? 'text-purple-600 bg-purple-50' 
-        : 'text-gray-500 hover:text-purple-600 hover:bg-purple-50'
+        ? 'text-[#7052FF] bg-[#7052FF]/10' 
+        : 'text-gray-500 hover:text-[#7052FF] hover:bg-[#7052FF]/10'
       }`}
   >
     {icon}

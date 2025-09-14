@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -11,18 +12,39 @@ const Header = () => {
       <div className="flex flex-col items-center justify-center h-full w-full py-8 sm:py-12 lg:py-16">
         
         {/* Header Text Section */}
-        <div className='text-center w-full max-w-6xl px-4'>
+        <div className='text-center w-full px-4'>
           <p className='text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-white mb-4 sm:mb-6 lg:mb-8 tracking-wide'>
             Empower your growth
           </p>
-          <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl text-[#FDDF8E] font-black leading-tight break-words drop-shadow-2xl'>
-            <div>Collaborate</div>
-            <div>Connect</div>
-          </h1>
+          
+          {/* Animated Text Container */}
+          <div className='relative h-[120px] sm:h-[180px] md:h-[210px] lg:h-[240px] xl:h-[270px] overflow-hidden flex items-center'>
+            <div className='animate-scroll-text flex items-center whitespace-nowrap'>
+              <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#90EE90] mx-8 sm:mx-12 lg:mx-16'>
+                Collaborate
+              </h1>
+              <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#FDDF8E] mx-8 sm:mx-12 lg:mx-16'>
+                Connect
+              </h1>
+              <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#B19CD9] mx-8 sm:mx-12 lg:mx-16'>
+                Earn
+              </h1>
+              {/* Seamless duplicate for infinite loop */}
+              <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#90EE90] mx-8 sm:mx-12 lg:mx-16'>
+                Collaborate
+              </h1>
+              <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#FDDF8E] mx-8 sm:mx-12 lg:mx-16'>
+                Connect
+              </h1>
+              <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#B19CD9] mx-8 sm:mx-12 lg:mx-16'>
+                Earn
+              </h1>
+            </div>
+          </div>
         </div>
         
         {/* Call to Action Section */}
-        <div className='flex flex-col items-center mt-12 sm:mt-16 lg:mt-20'>
+        <div className='flex flex-col items-center mt-8 sm:mt-12 lg:mt-16'>
 
           {/* Profile Images */}
           <div className='flex -space-x-2 mb-4'>
@@ -89,6 +111,26 @@ const Header = () => {
 
       {/* Background Decoration (optional) */}
       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-[#7052FF] opacity-20 pointer-events-none"></div>
+      
+      {/* Custom CSS for infinite scroll animation */}
+      <style jsx>{`
+        @keyframes scroll-text {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        
+        .animate-scroll-text {
+          animation: scroll-text 15s linear infinite;
+        }
+        
+        .animate-scroll-text:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
       </section>
     </div>
   )

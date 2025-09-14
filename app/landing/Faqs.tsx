@@ -21,7 +21,7 @@ const Faqs = () => {
         <div
           key={index}
           className={`rounded-xl border transition-all duration-500 ease-in-out
-            ${activeIndex === index ? 'bg-purple-500 text-white' : 'bg-white text-black'}
+            ${activeIndex === index ? 'bg-[#7052FF] text-white' : 'bg-white text-black'}
           `}
         >
           {/* Question Header */}

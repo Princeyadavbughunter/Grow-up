@@ -5,7 +5,7 @@ const Unique = () => {
     {
       title: "Learn from Experts",
       description: "Get advice from successful people who have made their mark in the industry",
-      bgColor: "bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500",
+      bgColor: "bg-gradient-to-br from-blue-500 via-[#7052FF] to-pink-500",
       textColor: "text-white",
       hoverColor: "hover:shadow-2xl hover:shadow-blue-500/25",
       icon: (
@@ -41,7 +41,7 @@ const Unique = () => {
     {
       title: "Find New Opportunities",
       description: "Discover ways to grow your career and unlock new possibilities",
-      bgColor: "bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-500",
+      bgColor: "bg-gradient-to-br from-violet-500 via-[#7052FF] to-indigo-500",
       textColor: "text-white",
       hoverColor: "hover:shadow-2xl hover:shadow-violet-500/25",
       icon: (
@@ -56,11 +56,11 @@ const Unique = () => {
     <div className="py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 bg-gradient-to-b from-gray-50 to-white">
       {/* Main heading */}
       <div className="text-center mb-8 sm:mb-12 md:mb-16 lg:mb-20">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[40px] text-gray-800 font-bold leading-tight max-w-4xl mx-auto mb-4">
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text text-[#4A4A4A] leading-tight mb-6 sm:mb-8 max-w-4xl mx-auto py-2 sm:py-4 md:py-6 lg:py-8 px-6 sm:px-8 md:px-12 rounded-2xl sm:rounded-3xl">
           What Makes Our Events
-          <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"> Unique?</span>
+          <span className="bg-gradient-to-r from-blue-600 via-[#7052FF] to-pink-600 bg-clip-text text-transparent"> Unique?</span>
         </h1>
-        <p className="text-gray-600 text-lg sm:text-xl max-w-2xl mx-auto">
+        <p className="text-[#4A4A4A] text-lg sm:text-xl max-w-2xl mx-auto">
           Discover the exceptional features that set our events apart
         </p>
       </div>
