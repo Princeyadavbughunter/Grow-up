@@ -33,7 +33,7 @@ const LandingTestimonials = () => {
     { 
       name: 'David Kim', 
       image: '/testimonial1.png', 
-      bgColor: 'bg-purple-50',
+      bgColor: 'bg-[#7052FF]/5',
       role: 'Content Creator',
       testimonial: 'GrowUp Buddy gave me the tools and connections I needed to turn my passion into a profitable business.'
     },
@@ -54,17 +54,13 @@ const LandingTestimonials = () => {
   ]
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
       
       {/* Header Section */}
-      <div className="text-center mb-12 sm:mb-16 md:mb-20">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-[#4A4A4A] leading-tight mb-4 sm:mb-6 max-w-4xl mx-auto">
-          How{' '}
-          <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            GrowUp Buddy is Changing
-          </span>{' '}
-          Lives
-        </h2>
+      <div className="text-center mb-8 sm:mb-12 md:mb-16">
+      <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#4A4A4A] leading-tight mb-6 sm:mb-8 max-w-4xl mx-auto py-2 sm:py-4 md:py-6 lg:py-8 px-6 sm:px-8 md:px-12 rounded-2xl sm:rounded-3xl whitespace-nowrap">
+  How GrowUp Buddy is Changing Lives
+</h2>
         <p className="text-base sm:text-lg md:text-xl text-gray-500 font-medium">
           Hear from Our Community
         </p>
@@ -137,7 +133,7 @@ const LandingTestimonials = () => {
                     <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#4A4A4A] mb-1 sm:mb-2">
                       {testimonial.name}
                     </h3>
-                    <p className="text-sm sm:text-base text-purple-600 font-medium">
+                    <p className="text-sm sm:text-base text-[#7052FF] font-medium">
                       {testimonial.role}
                     </p>
                   </div>
@@ -178,12 +174,12 @@ const LandingTestimonials = () => {
 
         {/* Custom Navigation Buttons */}
         <div className="hidden lg:block">
-          <button className="swiper-button-prev-custom absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-12 h-12 bg-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center text-purple-600 hover:text-purple-700 transition-all duration-300 z-10 group">
+          <button className="swiper-button-prev-custom absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-12 h-12 bg-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center text-[#7052FF] hover:text-[#5a42d4] transition-all duration-300 z-10 group">
             <svg className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
             </svg>
           </button>
-          <button className="swiper-button-next-custom absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-12 h-12 bg-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center text-purple-600 hover:text-purple-700 transition-all duration-300 z-10 group">
+          <button className="swiper-button-next-custom absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-12 h-12 bg-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center text-[#7052FF] hover:text-[#5a42d4] transition-all duration-300 z-10 group">
             <svg className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
             </svg>

@@ -20,7 +20,7 @@ const Hero = () => {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1400px"
           />
           {/* Overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-purple-900/60"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-[#7052FF]/60"></div>
         </div>
 
         {/* Content Container */}
@@ -32,9 +32,9 @@ const Hero = () => {
             {/* Main Heading */}
             <h1 className="font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-relaxed sm:leading-relaxed md:leading-relaxed lg:leading-relaxed xl:leading-relaxed mb-4 sm:mb-6 md:mb-8">
               Explore a{' '}
-              <span className="bg-gradient-to-r from-purple-400 via-purple-500 to-blue-500 bg-clip-text text-transparent relative">
+              <span className="bg-gradient-to-r from-[#7052FF] via-[#8B5FFF] to-blue-500 bg-clip-text text-transparent relative">
                 wide range of job
-                <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 to-blue-500 rounded-full opacity-50"></div>
+                <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-[#7052FF] to-blue-500 rounded-full opacity-50"></div>
               </span>{' '}
               opportunities tailored to your skills and interests.
             </h1>
@@ -48,7 +48,7 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:gap-8 justify-center items-center">
               
               {/* Primary CTA */}
-              <button className="group relative inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-purple-300 focus:ring-opacity-50 w-full sm:w-auto">
+              <button className="group relative inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#7052FF] to-blue-600 hover:from-[#5a42d4] hover:to-blue-700 text-white font-semibold text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/30 focus:ring-opacity-50 w-full sm:w-auto">
                 <span>Explore Opportunities</span>
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
@@ -73,7 +73,7 @@ const Hero = () => {
               {/* Stats Row */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 max-w-3xl mx-auto">
                 <div className="text-center">
-                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-purple-400 mb-1">
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-[#7052FF] mb-1">
                     50K+
                   </div>
                   <div className="text-xs text-gray-300">
@@ -110,14 +110,14 @@ const Hero = () => {
         </div>
 
         {/* Decorative Elements */}
-        <div className="absolute top-6 left-6 w-12 h-12 bg-purple-500 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute top-6 left-6 w-12 h-12 bg-[#7052FF] rounded-full opacity-20 animate-pulse"></div>
         <div className="absolute bottom-6 right-6 w-16 h-16 bg-blue-500 rounded-full opacity-15 animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 right-1/4 w-4 h-4 bg-white rounded-full opacity-40 animate-ping"></div>
-        <div className="absolute top-1/4 left-1/3 w-6 h-6 bg-purple-300 rounded-full opacity-30 animate-ping delay-700"></div>
+        <div className="absolute top-1/4 left-1/3 w-6 h-6 bg-[#7052FF]/60 rounded-full opacity-30 animate-ping delay-700"></div>
         
         {/* Floating Icons */}
         <div className="hidden lg:block absolute top-12 right-12 opacity-20 animate-bounce">
-          <svg className="w-8 h-8 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+          <svg className="w-8 h-8 text-[#7052FF]" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
           </svg>
         </div>

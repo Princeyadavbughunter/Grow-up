@@ -133,7 +133,7 @@ const Featuredgig = () => {
       <div className="text-center mb-8 sm:mb-12 md:mb-16">
         <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-3 sm:mb-4">
           Featured{' '}
-          <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[#7052FF] to-blue-600 bg-clip-text text-transparent">
             Gigs
           </span>
         </h2>
@@ -153,8 +153,8 @@ const Featuredgig = () => {
                   key={category}
                   className={`px-6 py-3 mx-1 rounded-xl text-sm font-semibold transition-all duration-200 transform hover:scale-102 min-w-[120px] ${
                     activeCategory === category
-                      ? 'bg-gradient-to-r from-[#7052FF] to-purple-600 text-white shadow-md'
-                      : 'bg-transparent text-gray-600 hover:text-[#7052FF] hover:bg-purple-50'
+                      ? 'bg-gradient-to-r from-[#7052FF] to-[#5a42d4] text-white shadow-md'
+                      : 'bg-transparent text-gray-600 hover:text-[#7052FF] hover:bg-[#7052FF]/10'
                   }`}
                   onClick={() => setActiveCategory(category)}
                 >
@@ -169,7 +169,7 @@ const Featuredgig = () => {
             <select
               value={activeCategory}
               onChange={(e) => setActiveCategory(e.target.value)}
-              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-500 shadow-sm"
+              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/30 focus:border-[#7052FF] shadow-sm"
             >
               {categories.map((category) => (
                 <option key={category} value={category}>
@@ -190,7 +190,7 @@ const Featuredgig = () => {
           >
             
             {/* Background Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-transparent to-blue-50 opacity-0 group-hover:opacity-30 transition-opacity duration-200 rounded-xl"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#7052FF]/5 via-transparent to-blue-50 opacity-0 group-hover:opacity-30 transition-opacity duration-200 rounded-xl"></div>
             
             <div className="relative z-10">
               {/* Header */}
@@ -204,7 +204,7 @@ const Featuredgig = () => {
                   </p>
                 </div>
                 <div className="flex-shrink-0 ml-2">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 relative bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-200">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 relative bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-[#7052FF]/10 transition-colors duration-200">
                     <Image
                       src={job.logo}
                       alt={`${job.company} logo`}
@@ -237,7 +237,7 @@ const Featuredgig = () => {
                 {job.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium"
+                    className="text-xs bg-[#7052FF]/10 text-[#7052FF] px-2 py-1 rounded-full font-medium"
                   >
                     {tag}
                   </span>
@@ -260,7 +260,7 @@ const Featuredgig = () => {
               </div>
 
               {/* Apply Button */}
-              <button className="w-full bg-gradient-to-r from-[#7052FF] to-purple-600 hover:from-purple-700 hover:to-purple-700 text-white py-2.5 px-4 rounded-lg flex items-center justify-center font-semibold text-sm transition-all duration-200 transform hover:scale-102 focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-md hover:shadow-lg group">
+              <button className="w-full bg-gradient-to-r from-[#7052FF] to-[#5a42d4] hover:from-[#5a42d4] hover:to-[#4a36b8] text-white py-2.5 px-4 rounded-lg flex items-center justify-center font-semibold text-sm transition-all duration-200 transform hover:scale-102 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/30 shadow-md hover:shadow-lg group">
                 <span>Apply Now</span>
                 <svg className="ml-1.5 w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
@@ -273,7 +273,7 @@ const Featuredgig = () => {
 
       {/* View More Button */}
       <div className="text-center mt-8 sm:mt-12 md:mt-16">
-        <button className="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-[#7052FF] border border-[#7052FF] hover:border-purple-700 font-semibold text-sm px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-102 focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-md hover:shadow-lg">
+        <button className="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-[#7052FF] border border-[#7052FF] hover:border-[#5a42d4] font-semibold text-sm px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-102 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/30 shadow-md hover:shadow-lg">
           <span>View All Opportunities</span>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
