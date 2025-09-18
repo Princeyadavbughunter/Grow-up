@@ -67,53 +67,56 @@ const Upcoming = () => {
       </h1>
 
       {/* Events grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 sm:gap-8 md:gap-10 lg:gap-12 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 max-w-7xl mx-auto">
         {eventCards.map((card, index) => (
           <div 
             key={index} 
-            className={`p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 ${card.bgColor} border border-gray-100`}
+            className={`p-3 sm:p-4 md:p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] ${card.bgColor} border border-gray-100 flex flex-col min-h-[280px] sm:min-h-[300px]`}
           >
             {/* Date and attendees badges */}
-            <div className="flex justify-between items-start gap-2 mb-4">
-              <span className={`text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 sm:py-1.5 rounded-full ${card.iconColor} text-gray-800 flex-shrink-0`}>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3 sm:mb-4">
+              <span className={`text-xs font-semibold px-2 py-1 rounded-full ${card.iconColor} text-gray-800 self-start truncate max-w-full`}>
                 {card.date}
               </span>
-              <span className={`text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 sm:py-1.5 rounded-full ${card.attendeesColor} text-gray-800 flex-shrink-0`}>
+              <span className={`text-xs font-semibold px-2 py-1 rounded-full ${card.attendeesColor} text-gray-800 self-start sm:self-auto flex-shrink-0`}>
                 {card.attendees}
               </span>
             </div>
 
             {/* Event content */}
-            <div className="mb-4">
-              <h3 className="text-lg sm:text-xl md:text-lg font-bold text-gray-900 mb-2 sm:mb-3 leading-tight">
+            <div className="flex-1 mb-3 sm:mb-4">
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 leading-tight overflow-hidden" style={{
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical'
+              }}>
                 {card.title}
               </h3>
-              <p className="text-sm sm:text-base md:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">
+              <p className="text-sm font-semibold text-gray-700 mb-1 sm:mb-2 truncate">
                 {card.organizer}
               </p>
-              <p className="text-xs sm:text-sm md:text-xs text-gray-500 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-500 leading-relaxed overflow-hidden" style={{
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical'
+              }}>
                 {card.description}
               </p>
             </div>
 
             {/* Register button */}
-            <button className="w-full py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl bg-[#7052FF] hover:bg-[#5a42d4] active:bg-[#4a36b8] text-white text-sm sm:text-base md:text-sm font-semibold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/40 focus:ring-offset-2">
+            <button className="w-full py-2 sm:py-2.5 rounded-lg bg-[#7052FF] hover:bg-[#5a42d4] active:bg-[#4a36b8] text-white text-sm font-semibold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/40 focus:ring-offset-2 mt-auto">
               {card.buttonText}
             </button>
           </div>
         ))}
       </div>
 
-      {/* Mobile scroll indicator (optional) */}
-      <div className="flex justify-center mt-8 sm:hidden">
-        <div className="flex space-x-2">
-          {eventCards.map((_, index) => (
-            <div 
-              key={index} 
-              className="w-2 h-2 rounded-full bg-gray-300"
-            />
-          ))}
-        </div>
+      {/* View More Button */}
+      <div className="flex justify-center mt-8 sm:mt-12">
+        <button className="px-6 py-3 bg-white border-2 border-[#7052FF] text-[#7052FF] font-semibold rounded-lg hover:bg-[#7052FF] hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/40 focus:ring-offset-2">
+          View All Events
+        </button>
       </div>
     </div>
   );
