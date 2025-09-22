@@ -106,7 +106,7 @@ const LandingFooter = () => {
                 GrowUp Buddy
               </h1>
             </div>
-            <p className="text-gray-400 text-sm sm:text-base leading-relaxed mb-6 max-w-sm mx-auto md:mx-0">
+            <p className="text-gray-400 text-sm sm:text-base leading-7 mb-6 max-w-sm mx-auto md:mx-0 text-justify hyphens-auto">
               GrowUp Buddy is a community-based startup dedicated to empowering
               individuals to achieve their professional and personal goals. Join
               us and be part of a growing community that's changing the way

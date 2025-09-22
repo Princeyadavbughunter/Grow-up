@@ -6,37 +6,37 @@ import Link from 'next/link'
 const Header = () => {
   return (
     <div className="w-full max-w-[1400px] mx-auto px-6 lg:px-8 mt-8">
-      <section className="bg-gradient-to-r from-[#23282C] via-[#23282C] to-[#7052FF] w-full min-h-[600px] sm:min-h-[682px] lg:min-h-[732px] rounded-[20px] sm:rounded-[40px] lg:rounded-[80px] flex flex-col justify-center items-center relative overflow-hidden">
+      <section className="bg-gradient-to-r from-[#23282C] via-[#23282C] to-[#7052FF] w-full max-h-[400px] min-h-[400px] sm:min-h-[682px] lg:min-h-[732px] rounded-[20px] sm:rounded-[40px] lg:rounded-[80px] flex flex-col justify-center items-center relative overflow-hidden">
       
       {/* Main Content Container */}
-      <div className="flex flex-col items-center justify-center h-full w-full py-8 sm:py-12 lg:py-16">
+      <div className="flex flex-col items-center justify-center h-full w-full py-4 sm:py-12 lg:py-16">
         
         {/* Header Text Section */}
         <div className='text-center w-full px-4'>
-          <p className='text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-white mb-4 sm:mb-6 lg:mb-8 tracking-wide'>
+          <p className='text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-white mb-2 sm:mb-6 lg:mb-8 tracking-wide'>
             Empower your growth
           </p>
           
           {/* Animated Text Container */}
-          <div className='relative h-[120px] sm:h-[180px] md:h-[210px] lg:h-[240px] xl:h-[270px] overflow-hidden flex items-center'>
+          <div className='relative h-[80px] sm:h-[180px] md:h-[210px] lg:h-[240px] xl:h-[270px] overflow-hidden flex items-center'>
             <div className='animate-scroll-text flex items-center whitespace-nowrap'>
-              <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#90EE90] mx-8 sm:mx-12 lg:mx-16'>
+              <h1 className='text-3xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#90EE90] mx-4 sm:mx-12 lg:mx-16'>
                 Collaborate
               </h1>
-              <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#FDDF8E] mx-8 sm:mx-12 lg:mx-16'>
+              <h1 className='text-3xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#FDDF8E] mx-4 sm:mx-12 lg:mx-16'>
                 Connect
               </h1>
-              <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#B19CD9] mx-8 sm:mx-12 lg:mx-16'>
+              <h1 className='text-3xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#B19CD9] mx-4 sm:mx-12 lg:mx-16'>
                 Earn
               </h1>
               {/* Seamless duplicate for infinite loop */}
-              <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#90EE90] mx-8 sm:mx-12 lg:mx-16'>
+              <h1 className='text-3xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#90EE90] mx-4 sm:mx-12 lg:mx-16'>
                 Collaborate
               </h1>
-              <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#FDDF8E] mx-8 sm:mx-12 lg:mx-16'>
+              <h1 className='text-3xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#FDDF8E] mx-4 sm:mx-12 lg:mx-16'>
                 Connect
               </h1>
-              <h1 className='text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#B19CD9] mx-8 sm:mx-12 lg:mx-16'>
+              <h1 className='text-3xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight drop-shadow-2xl text-[#B19CD9] mx-4 sm:mx-12 lg:mx-16'>
                 Earn
               </h1>
             </div>
@@ -44,10 +44,10 @@ const Header = () => {
         </div>
         
         {/* Call to Action Section */}
-        <div className='flex flex-col items-center mt-8 sm:mt-12 lg:mt-16'>
+        <div className='flex flex-col items-center mt-4 sm:mt-12 lg:mt-16'>
 
           {/* Profile Images */}
-          <div className='flex -space-x-2 mb-4'>
+          <div className='flex -space-x-2 mb-2 sm:mb-4'>
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-white overflow-hidden">
               <Image
                 src='/images/p.png'
@@ -78,7 +78,7 @@ const Header = () => {
           </div>
 
           {/* Subtitle */}
-          <p className='text-white mt-2 mb-6 text-lg sm:text-xl lg:text-2xl font-medium'>
+          <p className='text-white mt-1 mb-3 sm:mb-6 text-lg sm:text-xl lg:text-2xl font-medium'>
             Create top network
           </p>
 

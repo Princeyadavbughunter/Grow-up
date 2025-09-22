@@ -58,10 +58,10 @@ const LandingTestimonials = () => {
       
       {/* Header Section */}
       <div className="text-center mb-8 sm:mb-12 md:mb-16">
-      <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#4A4A4A] leading-tight mb-6 sm:mb-8 max-w-4xl mx-auto py-2 sm:py-4 md:py-6 lg:py-8 px-6 sm:px-8 md:px-12 rounded-2xl sm:rounded-3xl whitespace-nowrap">
+      <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#4A4A4A] leading-tight mb-6 sm:mb-8 max-w-4xl mx-auto py-3 sm:py-4 md:py-6 lg:py-8 px-4 sm:px-6 md:px-8 lg:px-12 rounded-2xl sm:rounded-3xl text-center">
   How GrowUp Buddy is Changing Lives
 </h2>
-        <p className="text-base sm:text-lg md:text-xl text-gray-500 font-medium">
+        <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-500 font-medium px-2">
           Hear from Our Community
         </p>
       </div>
@@ -129,11 +129,11 @@ const LandingTestimonials = () => {
                 <div className="px-4 sm:px-6 pb-6 sm:pb-8">
                   
                   {/* Name and Role */}
-                  <div className="text-center mb-4 sm:mb-6">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#4A4A4A] mb-1 sm:mb-2">
+                  <div className="text-center mb-4 sm:mb-6 px-2">
+                    <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#4A4A4A] mb-1 sm:mb-2 leading-tight">
                       {testimonial.name}
                     </h3>
-                    <p className="text-sm sm:text-base text-[#7052FF] font-medium">
+                    <p className="text-xs sm:text-sm md:text-base text-[#7052FF] font-medium">
                       {testimonial.role}
                     </p>
                   </div>
@@ -149,7 +149,7 @@ const LandingTestimonials = () => {
                         ))}
                       </div>
                     </div>
-                    <p className="text-[#696C78] text-sm sm:text-base md:text-lg text-center leading-relaxed line-clamp-4">
+                    <p className="text-[#696C78] text-xs sm:text-sm md:text-base lg:text-lg text-center leading-relaxed line-clamp-4 px-1">
                       "{testimonial.testimonial}"
                     </p>
                   </div>

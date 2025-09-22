@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     ],
     apple: { url: '/icon.png', sizes: '180x180', type: 'image/png' },
     shortcut: '/favicon.ico'
-  }
+  } 
 };
 
 export default function RootLayout({

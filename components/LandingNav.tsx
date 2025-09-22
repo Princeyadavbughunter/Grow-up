@@ -14,11 +14,11 @@ const LandingNav = () => {
 
   return (
     <nav className="bg-white">
-      <div className="max-w-[1400px] mx-auto px-20 lg:px-8=24">
-        <div className="flex items-center justify-between py-6">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-24">
+        <div className="flex items-center justify-between py-4 sm:py-6">
           {/* Logo */}
-          <div onClick={() => router.push('/')} className="flex cursor-pointer items-center space-x-3 flex-shrink-0">
-            <div className="w-10 h-10">
+          <div onClick={() => router.push('/')} className="flex cursor-pointer items-center space-x-2 sm:space-x-3 flex-shrink-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10">
               <Image 
                 src='/logo.svg' 
                 alt='GrowUp Buddy Logo' 
@@ -27,7 +27,7 @@ const LandingNav = () => {
                 className="w-full h-full object-contain"
               />
             </div>
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="text-xl sm:text-2xl font-bold text-gray-900">
               GrowUp Buddy
             </span>
           </div>
@@ -67,13 +67,14 @@ const LandingNav = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
+          <div className="md:hidden flex-shrink-0">
             <button
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-[#7052FF] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#7052FF]"
-              aria-expanded="false"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-[#7052FF] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#7052FF] transition-colors duration-200"
+              aria-expanded={isMenuOpen}
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             >
-              <span className="sr-only">Open main menu</span>
+              <span className="sr-only">{isMenuOpen ? "Close menu" : "Open main menu"}</span>
               {/* Hamburger icon */}
               {!isMenuOpen ? (
                 <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -92,7 +93,7 @@ const LandingNav = () => {
       {/* Mobile menu */}
       {isMenuOpen && (
         <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
+          <div className="px-4 pt-2 pb-3 space-y-1 sm:px-6 bg-white border-t border-gray-200">
             <Link 
               href="/talent" 
               className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
