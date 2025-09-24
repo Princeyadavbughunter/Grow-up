@@ -61,12 +61,6 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     setIsLoading(true);
     try {
       if (isFollowing) {
-        // Unfollow
-        await api.post(`/freelancer/unfollow/`, { freelancer_id: profileData.id });
-        setIsFollowing(false);
-        setFollowRequestSent(false);
-      } else if (followRequestSent) {
-        // Delete sent request using DELETE method
         await api.delete(`/freelancer/follow/?freelancer_id=${profileData.id}`);
         setFollowRequestSent(false);
       } else {
