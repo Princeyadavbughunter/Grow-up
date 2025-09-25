@@ -3,18 +3,27 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { FiSearch, FiUser } from 'react-icons/fi';
+import { FaSignOutAlt } from 'react-icons/fa';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 import { LuPlus } from 'react-icons/lu';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import SearchComponent from './SearchComponent';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 const NavBar: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const { profileData } = useAuth();
+  const { profileData, logout } = useAuth();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const buttonConfig: Record<string, { label: string; route: string }> = {
     '/pages': { label: 'Create Pages', route: '/pages/create-page' },
@@ -26,6 +35,16 @@ const NavBar: React.FC = () => {
   const handleCreateClick = () => {
     if (buttonInfo) {
       router.push(buttonInfo.route);
+    }
+  };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+      setIsLoggingOut(false);
     }
   };
 
@@ -57,21 +76,42 @@ const NavBar: React.FC = () => {
               <span className="md:hidden">Create</span>
             </Button>
           )}
-          <Link href='/profile' >
-            {profileData?.profile_picture ? (
-              <Image
-                src={profileData.profile_picture}
-                alt="Profile"
-                width={40}
-                height={40}
-                className="rounded-full md:w-10 md:h-10 w-8 h-8"
-              />
-            ) : (
-              <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
-                <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
-              </div>
-            )}
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
+                {profileData?.profile_picture ? (
+                  <Image
+                    src={profileData.profile_picture}
+                    alt="Profile"
+                    width={40}
+                    height={40}
+                    className="rounded-full md:w-10 md:h-10 w-8 h-8 cursor-pointer"
+                  />
+                ) : (
+                  <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8 cursor-pointer">
+                    <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
+                  </div>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem asChild>
+                <Link href="/profile" className="flex items-center gap-2 cursor-pointer">
+                  <FiUser className="w-4 h-4" />
+                  View Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="flex items-center gap-2 cursor-pointer text-[#7052FF] focus:text-[#5a42d4] hover:text-[#5a42d4]"
+              >
+                <FaSignOutAlt className="w-4 h-4" />
+                {isLoggingOut ? 'Signing Out...' : 'Sign Out'}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

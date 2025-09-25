@@ -67,7 +67,7 @@ interface AuthContextType {
   profileError: string | null;
   setIsAuthenticated: Dispatch<SetStateAction<boolean>>;
   apiCaller: AxiosInstance;
-  logout: () => void;
+  logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   updateProfile: (profileId: string, updatedData: Partial<FreelancerProfile>) => Promise<void>;
 }
@@ -204,18 +204,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [isAuthenticated, loading]);
 
-  // Logout function
-  const logout = () => {
-    setAuthToken(null);
-    setRefreshToken(null);
-    setUserId(null);
-    setIsAuthenticated(false);
-    setProfileData(null);
-    
-    // Remove cookies
-    Cookies.remove('access_token', { path: '/' });
-    Cookies.remove('refresh_token', { path: '/' });
-    Cookies.remove('user_id', { path: '/' });
+  // Logout function 
+  const logout = async () => {
+    try {
+      if (authToken) {
+        await apiCaller.post('/auth/revoke-access-token/');
+      }
+    } catch (error) {
+      console.error("Error revoking token:", error);
+    } finally {
+      setAuthToken(null);
+      setRefreshToken(null);
+      setUserId(null);
+      setIsAuthenticated(false);
+      setProfileData(null);
+      
+      // Remove cookies
+      Cookies.remove('access_token', { path: '/' });
+      Cookies.remove('refresh_token', { path: '/' });
+      Cookies.remove('user_id', { path: '/' });
+      
+      // Redirect to homepage
+      window.location.href = '/landing';
+    }
   };
 
   const contextValue: AuthContextType = {

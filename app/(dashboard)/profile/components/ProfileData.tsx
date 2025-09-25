@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import { HiDotsVertical } from "react-icons/hi";
 import { IoLocationSharp } from "react-icons/io5";
-import { FaLinkedin, FaInstagramSquare, FaPencilAlt, FaCamera, FaDownload, FaUpload, FaUserPlus } from "react-icons/fa";
+import { FaLinkedin, FaInstagramSquare, FaPencilAlt, FaCamera, FaDownload, FaUpload, FaUserPlus, FaSignOutAlt } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
 import { TiSocialFacebook, TiSocialTwitter } from "react-icons/ti";
 import { Button } from "@/components/ui/button";
@@ -82,10 +82,11 @@ interface ProfileFormData {
 }
 
 const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
-  const { apiCaller, refreshProfile } = useAuth();
+  const { apiCaller, refreshProfile, logout } = useAuth();
   
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -221,6 +222,16 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   const downloadResume = () => {
     if (profileData?.resume) {
       window.open(profileData.resume, '_blank');
+    }
+  };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+      setIsLoggingOut(false);
     }
   };
 
@@ -628,7 +639,16 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
               Download Resume
             </Button>
           </div>
-      )}
+        )}
+        {/* Logout Button */}
+        <Button 
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="bg-[#7052FF] hover:bg-[#5a42d4] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto"
+        >
+          <FaSignOutAlt size={14} />
+          {isLoggingOut ? 'Signing Out...' : 'Sign Out'}
+        </Button>
       </div>
 
       {/* Edit Modal */}
