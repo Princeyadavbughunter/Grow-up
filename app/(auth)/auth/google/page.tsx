@@ -40,7 +40,28 @@ const AccountCreationContent = () => {
     const handleGoogleAuth = async () => {
         setLoading(true)
         try {
-            const response = await axios.get<GoogleAuthResponse>('https://backend.growupbuddy.com/api/auth/o/google-oauth2/?redirect_uri=https://growupbuddy.com/auth/google')
+            
+            const isDevelopment = process.env.NODE_ENV === 'development';
+            let redirectUri = 'https://growupbuddy.com/auth/google';
+            
+            if (isDevelopment && process.env.NEXT_PUBLIC_FRONTEND_URL) {
+                redirectUri = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/auth/google`;
+            }
+            
+            console.log('Using redirect URI:', redirectUri);
+            
+            let response;
+            try {
+                response = await axios.get<GoogleAuthResponse>(`https://backend.growupbuddy.com/api/auth/o/google-oauth2/?redirect_uri=${encodeURIComponent(redirectUri)}`);
+            } catch (localError) {
+                if (isDevelopment) {
+                    console.warn('Failed with localhost, falling back to production URL:', localError);
+                    redirectUri = 'https://growupbuddy.com/auth/google';
+                    response = await axios.get<GoogleAuthResponse>(`https://backend.growupbuddy.com/api/auth/o/google-oauth2/?redirect_uri=${encodeURIComponent(redirectUri)}`);
+                } else {
+                    throw localError;
+                }
+            }
 
             if (response.data.authorization_url) {
                 window.location.href = response.data.authorization_url
