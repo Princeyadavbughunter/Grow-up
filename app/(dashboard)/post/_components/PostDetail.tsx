@@ -9,6 +9,7 @@ import { useAuthenticatedApi } from '@/context/AuthContext';
 import SharePopup from './SharePopup';
 import EmptyState from '@/components/ui/empty-state';
 import { CommentModal } from '@/components/ui/comment-modal';
+import { formatTimeAgo } from '@/lib/utils';
 
 interface ImageData {
     id: string;
@@ -91,7 +92,7 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
 
     // Memoize formatted date to prevent recalculation on every render
     const formattedDate = useMemo(() =>
-        new Date(post.created_at).toLocaleString(),
+        formatTimeAgo(post.created_at),
         [post.created_at]
     );
 
@@ -181,13 +182,13 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                             {post.club_name}
                         </Link>
                         {post.link && (
-                            <a 
-                                href={post.link} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="text-sm text-blue-500 hover:text-blue-700 underline break-all max-w-xs text-right"
+                            <a
+                                href={post.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-500 hover:text-blue-700 underline text-right"
                             >
-                                {post.link}
+                                Link
                             </a>
                         )}
                     </div>
@@ -344,7 +345,7 @@ const CommentItem = memo(({ comment, api }: CommentItemProps) => {
 
     // Memoize formatted date
     const formattedDate = useMemo(() =>
-        new Date(comment.created_at).toLocaleString(),
+        formatTimeAgo(comment.created_at),
         [comment.created_at]
     );
 
@@ -457,7 +458,7 @@ const CommentItem = memo(({ comment, api }: CommentItemProps) => {
                                                     {reply.first_name || reply.company_name || 'Anonymous'}
                                                 </h5>
                                                 <span className="text-xs text-gray-500">
-                                                    {new Date(reply.created_at).toLocaleString()}
+                                                    {formatTimeAgo(reply.created_at)}
                                                 </span>
                                             </div>
                                             <p className="text-sm text-gray-700 break-words">{reply.content}</p>

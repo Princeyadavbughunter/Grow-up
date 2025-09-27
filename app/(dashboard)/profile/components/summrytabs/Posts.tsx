@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { FiUser } from 'react-icons/fi';
 import SharePopup from '../../../post/_components/SharePopup';
 import { CommentModal } from '@/components/ui/comment-modal';
+import { formatTimeAgo } from '@/lib/utils';
 
 interface ImageData {
     id: string;
@@ -172,7 +173,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
     const [showCommentModal, setShowCommentModal] = useState(false);
     const [isSubmittingComment, setIsSubmittingComment] = useState(false);
     const { api } = useAuthenticatedApi();
-    const formattedDate = new Date(post.created_at).toLocaleDateString();
+    const formattedDate = formatTimeAgo(post.created_at);
 
     const fetchComments = async () => {
         try {
@@ -254,9 +255,9 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                             href={post.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-blue-500 hover:text-blue-700 underline break-all max-w-xs text-right"
+                            className="text-sm text-blue-500 hover:text-blue-700 underline text-right"
                         >
-                            {post.link}
+                            Link
                         </a>
                     )}
                 </div>
@@ -354,7 +355,7 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
     const [showReplies, setShowReplies] = useState(false);
     const [showReplyModal, setShowReplyModal] = useState(false);
     const [isSubmittingReply, setIsSubmittingReply] = useState(false);
-    const formattedDate = new Date(comment.created_at).toLocaleString();
+    const formattedDate = formatTimeAgo(comment.created_at);
 
     const fetchReplies = async () => {
         try {
@@ -451,7 +452,7 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
                                                 {reply.first_name || reply.company_name || 'Anonymous'}
                                             </h5>
                                             <span className="text-xs text-gray-500">
-                                                {new Date(reply.created_at).toLocaleString()}
+                                                {formatTimeAgo(reply.created_at)}
                                             </span>
                                         </div>
                                         <p className="text-sm break-words">{reply.content}</p>

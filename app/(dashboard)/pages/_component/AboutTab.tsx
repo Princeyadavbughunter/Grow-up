@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react'
 import { useAuthenticatedApi } from '@/context/AuthContext'
+import { formatTimeAgo } from '@/lib/utils'
 
 interface AboutTabProps {
   pageDetails: {
@@ -52,7 +53,7 @@ const AboutTab: React.FC<AboutTabProps> = ({ pageDetails }) => {
         <div className="space-y-2">
           <div>
             <span className="font-medium">Founded:</span>{' '}
-            {pageDetails.created_at ? new Date(pageDetails.created_at).toLocaleDateString() : 'Not specified'}
+            {pageDetails.created_at ? formatTimeAgo(pageDetails.created_at) : 'Not specified'}
           </div>
           <div>
             <span className="font-medium">Location:</span>{' '}

@@ -8,6 +8,7 @@ import { HiMenuAlt3 } from 'react-icons/hi';
 import ProfileView from './_component/profile';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 import { Send } from 'lucide-react';
+import { formatTimeAgo } from '@/lib/utils';
 
 interface Participant {
   id: string;
@@ -536,7 +537,7 @@ const ChatInterface = () => {
                       {message.message}
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
-                      {new Date(message.timestamp).toLocaleString()}
+                      {formatTimeAgo(message.timestamp)}
                     </div>
                   </div>
                 </div>

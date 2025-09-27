@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react'
 import { useAuthenticatedApi } from '@/context/AuthContext'
+import { formatTimeAgo } from '@/lib/utils'
 
 interface HomeTabProps {
   pageId: string;
@@ -85,7 +86,7 @@ const HomeTab: React.FC<HomeTabProps> = ({ pageId }) => {
               <h3 className="font-semibold text-lg mb-2">{post.title}</h3>
               <p className="text-gray-600 mb-2">{post.content}</p>
               <div className="text-sm text-gray-500">
-                Posted on {new Date(post.created_at).toLocaleDateString()}
+                Posted on {formatTimeAgo(post.created_at)}
               </div>
             </div>
           ))

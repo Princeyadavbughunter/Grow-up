@@ -7,6 +7,7 @@ import { HiDotsVertical } from 'react-icons/hi';
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import Link from 'next/link';
 import SharePopup from '../../../../post/_components/SharePopup';
+import { formatTimeAgo } from '@/lib/utils';
 
 interface ImageType {
   id: string;
@@ -76,8 +77,7 @@ const Posts: React.FC<PostsProps> = ({ profileId }) => {
   }, [authToken, profileId]);
 
   const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
+    return formatTimeAgo(dateString);
   };
 
   const getImageUrl = (path: string): string => {
@@ -112,9 +112,9 @@ const Posts: React.FC<PostsProps> = ({ profileId }) => {
                       href={post.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-blue-500 hover:text-blue-700 underline break-all max-w-xs text-right"
+                      className="text-sm text-blue-500 hover:text-blue-700 underline text-right"
                     >
-                      {post.link}
+                      Link
                     </a>
                   )}
                 </div>
