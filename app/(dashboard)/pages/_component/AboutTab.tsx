@@ -58,14 +58,15 @@ const AboutTab: React.FC<AboutTabProps> = ({ pageDetails }) => {
             <span className="font-medium">Location:</span>{' '}
             {pageDetails.location || 'Not specified'}
           </div>
-          <div>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1">
             <span className="font-medium">Website:</span>{' '}
             {pageDetails.website ? (
-              <a 
-                href={pageDetails.website} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-[#7052FF]"
+              <a
+                href={pageDetails.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#7052FF] break-all hover:underline max-w-full truncate"
+                title={pageDetails.website}
               >
                 {pageDetails.website}
               </a>

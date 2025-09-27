@@ -53,9 +53,10 @@ const Followers: React.FC<FollowersProps> = ({ pageId }) => {
           <div>
             <div className="mb-4 md:mb-2">
               <span className="font-medium">Website</span>
-              <a 
-                href={pageDetails?.website || '#'} 
-                className="ml-2 text-purple-600"
+              <a
+                href={pageDetails?.website || '#'}
+                className="ml-2 text-purple-600 break-all truncate max-w-full hover:underline"
+                title={pageDetails?.website || ''}
               >
                 {pageDetails?.website || 'Not provided'}
               </a>

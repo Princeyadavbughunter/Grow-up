@@ -6,6 +6,7 @@ import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import Link from 'next/link';
 import { FiUser } from 'react-icons/fi';
 import SharePopup from '../../post/_components/SharePopup';
+import { CommentModal } from '@/components/ui/comment-modal';
 
 interface ImageData {
     id: string;
@@ -160,8 +161,9 @@ interface PostCardProps {
 const PostCard = ({ post, onLike }: PostCardProps) => {
     const [showComments, setShowComments] = useState(false);
     const [comments, setComments] = useState<Comment[]>([]);
-    const [newComment, setNewComment] = useState('');
     const [showSharePopup, setShowSharePopup] = useState(false);
+    const [showCommentModal, setShowCommentModal] = useState(false);
+    const [isSubmittingComment, setIsSubmittingComment] = useState(false);
     const { api } = useAuthenticatedApi();
     const formattedDate = new Date(post.created_at).toLocaleString();
 
@@ -181,21 +183,23 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
         }
     };
 
-    const handleAddComment = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newComment.trim()) return;
+    const handleAddComment = async (content: string) => {
+        if (!content.trim()) return;
 
+        setIsSubmittingComment(true);
         try {
             await api.post('/post/app/comments/', {
                 post: post.id,
-                content: newComment,
+                content: content,
                 is_take_down: "False"
             });
 
-            setNewComment('');
+            setShowCommentModal(false);
             fetchComments();
         } catch (error) {
             console.error('Error adding comment:', error);
+        } finally {
+            setIsSubmittingComment(false);
         }
     };
 
@@ -322,23 +326,25 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                         ))}
                     </div>
 
-                    <form onSubmit={handleAddComment} className="flex gap-2">
-                        <input
-                            type="text"
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            placeholder="Add a comment..."
-                            className="flex-1 border rounded-lg px-3 py-2 text-sm md:text-base"
-                        />
-                        <button
-                            type="submit"
-                            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-                        >
-                            Post
-                        </button>
-                    </form>
+                    <button
+                        onClick={() => setShowCommentModal(true)}
+                        className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-left text-gray-500 hover:bg-gray-100 transition-colors text-sm md:text-base"
+                    >
+                        Add a comment...
+                    </button>
                 </div>
             )}
+
+            {/* Comment Modal */}
+            <CommentModal
+                isOpen={showCommentModal}
+                onClose={() => setShowCommentModal(false)}
+                onSubmit={handleAddComment}
+                title="Add Comment"
+                placeholder="Share your thoughts about this post..."
+                submitButtonText="Post Comment"
+                isLoading={isSubmittingComment}
+            />
 
             {/* Share Popup */}
             <SharePopup
@@ -358,9 +364,10 @@ interface CommentItemProps {
 
 const CommentItem = ({ comment, api }: CommentItemProps) => {
     const [showReplyForm, setShowReplyForm] = useState(false);
-    const [newReply, setNewReply] = useState('');
     const [replies, setReplies] = useState<CommentReply[]>([]);
     const [showReplies, setShowReplies] = useState(false);
+    const [showReplyModal, setShowReplyModal] = useState(false);
+    const [isSubmittingReply, setIsSubmittingReply] = useState(false);
     const formattedDate = new Date(comment.created_at).toLocaleString();
 
     const fetchReplies = async () => {
@@ -379,23 +386,25 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
         }
     };
 
-    const handleAddReply = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newReply.trim()) return;
+    const handleAddReply = async (content: string) => {
+        if (!content.trim()) return;
 
+        setIsSubmittingReply(true);
         try {
             await api.post('/post/app/comments-replies/', {
                 comment: comment.id,
-                content: newReply,
+                content: content,
                 is_take_down: "False"
             });
 
-            setNewReply('');
+            setShowReplyModal(false);
             fetchReplies();
             setShowReplies(true);
             setShowReplyForm(false);
         } catch (error) {
             console.error('Error adding reply:', error);
+        } finally {
+            setIsSubmittingReply(false);
         }
     };
 
@@ -404,14 +413,14 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
     };
 
     return (
-        <div className="border-l-2 border-gray-200 pl-4">
+        <div className="border-l-2 sm:border-l-4 border-gray-200 pl-3 sm:pl-4">
             <div className="flex items-start gap-3">
                 <Image
                     src={getImageUrl(comment.profile_picture) || "https://randomuser.me/portraits/men/2.jpg"}
                     alt="User"
                     width={32}
                     height={32}
-                    className="rounded-full"
+                    className="rounded-full w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0"
                 />
                 <div className="flex-1">
                     <div className="flex items-center gap-2">
@@ -420,7 +429,7 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
                         </h4>
                         <span className="text-xs text-gray-500">{formattedDate}</span>
                     </div>
-                    <p className="text-sm mb-2">{comment.content}</p>
+                    <p className="text-sm mb-2 break-words">{comment.content}</p>
                     <div className="flex items-center gap-4 text-xs text-gray-500">
                         <button onClick={() => setShowReplyForm(!showReplyForm)}>Reply</button>
                         {comment.comment_reply_count > 0 && (
@@ -431,35 +440,26 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
                     </div>
 
                     {showReplyForm && (
-                        <form onSubmit={handleAddReply} className="mt-2 flex gap-2">
-                            <input
-                                type="text"
-                                value={newReply}
-                                onChange={(e) => setNewReply(e.target.value)}
-                                placeholder="Add a reply..."
-                                className="flex-1 border rounded-lg px-3 py-1 text-sm"
-                            />
-                            <button
-                                type="submit"
-                                className="bg-blue-500 text-white px-3 py-1 text-sm rounded-lg"
-                            >
-                                Reply
-                            </button>
-                        </form>
+                        <button
+                            onClick={() => setShowReplyModal(true)}
+                            className="mt-2 text-sm bg-gray-50 border border-gray-300 rounded-lg px-3 py-1 text-gray-500 hover:bg-gray-100 transition-colors"
+                        >
+                            Add a reply...
+                        </button>
                     )}
 
                     {showReplies && (
                         <div className="mt-2 space-y-3">
                             {replies.map(reply => (
-                                <div key={reply.id} className="flex items-start gap-2">
+                                <div key={reply.id} className="flex items-start gap-2 ml-4 sm:ml-6 pl-3 sm:pl-4 border-l-2 border-gray-100">
                                     <Image
                                         src={getImageUrl(reply.profile_picture) || "https://randomuser.me/portraits/men/2.jpg"}
                                         alt="User"
                                         width={24}
                                         height={24}
-                                        className="rounded-full"
+                                        className="rounded-full w-6 h-6 flex-shrink-0"
                                     />
-                                    <div>
+                                    <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
                                             <h5 className="font-medium text-xs">
                                                 {reply.first_name || reply.company_name || 'Anonymous'}
@@ -468,12 +468,23 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
                                                 {new Date(reply.created_at).toLocaleString()}
                                             </span>
                                         </div>
-                                        <p className="text-sm">{reply.content}</p>
+                                        <p className="text-sm break-words">{reply.content}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     )}
+
+                    {/* Reply Modal */}
+                    <CommentModal
+                        isOpen={showReplyModal}
+                        onClose={() => setShowReplyModal(false)}
+                        onSubmit={handleAddReply}
+                        title="Add Reply"
+                        placeholder="Write your reply..."
+                        submitButtonText="Post Reply"
+                        isLoading={isSubmittingReply}
+                    />
                 </div>
             </div>
         </div>

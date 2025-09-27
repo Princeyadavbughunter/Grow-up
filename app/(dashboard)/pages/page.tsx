@@ -80,7 +80,7 @@ const ChatInterface = () => {
 
   const fetchPages = useCallback(async () => {
     if (!authToken) return;
-    
+
     try {
       const [pagesResponse, followedPagesResponse] = await Promise.all([
         api.get('/post/app/page/'),
@@ -156,7 +156,7 @@ const ChatInterface = () => {
       ws.onclose = (event) => {
         console.log(`WebSocket closed with code: ${event.code}, reason: ${event.reason}`);
         setWsConnected(false);
-        
+
         if (selectedPage?.chatroom_id && event.code !== 1000) {
           wsReconnectTimeoutRef.current = setTimeout(() => {
             console.log('Attempting to reconnect WebSocket...');
@@ -174,13 +174,13 @@ const ChatInterface = () => {
   }, [authToken, selectedPage?.chatroom_id]);
 
   const createBroadcastRoom = async (pageId: string, pageName: string) => {
-    
+
     try {
       const response = await api.post('/chats/app/page-chatroom/', {
         name: pageName,
         participants: [{ id: pageId }],
       });
-      
+
       return response.data;
     } catch (error) {
       console.error('Error creating broadcast room:', error);
@@ -195,12 +195,12 @@ const ChatInterface = () => {
 
     if (!websocketRef.current || websocketRef.current.readyState !== WebSocket.OPEN) {
       console.error('Broadcast connection is not open');
-      
+
       if (selectedPage?.chatroom_id) {
         connectWebSocket(selectedPage.chatroom_id);
         setWsError('Reconnecting to broadcast server...');
       }
-      
+
       setSendingMessage(false);
       return;
     }
@@ -215,7 +215,7 @@ const ChatInterface = () => {
         user_id: userId,
         message_type: "broadcast"
       }));
-      
+
     } catch (error) {
       console.error('Error sending broadcast:', error);
       setWsError('Failed to send broadcast');
@@ -226,7 +226,7 @@ const ChatInterface = () => {
   };
 
   const fetchBroadcastMessages = async (roomId: string) => {
-    
+
     try {
       const response = await api.get(`/chats/app/club-chatrooms-messages/?room_id=${roomId}`);
       setMessages(response.data?.results || []);
@@ -241,13 +241,13 @@ const ChatInterface = () => {
     setSelectedPage(page);
     setMessages([]);
     setShowSidebar(false); // Close sidebar on mobile after selection
-    
+
     if (page.chatroom_id) {
       fetchBroadcastMessages(page.chatroom_id);
     } else {
       const newChatRoom = await createBroadcastRoom(page.id, page.name);
       if (newChatRoom) {
-        const updatedPage = {...page, chatroom_id: newChatRoom.id};
+        const updatedPage = { ...page, chatroom_id: newChatRoom.id };
         setSelectedPage(updatedPage);
         fetchBroadcastMessages(newChatRoom.id);
       }
@@ -261,7 +261,7 @@ const ChatInterface = () => {
     }
   };
 
-  const filteredFollowedPages = followedPages.filter(page => 
+  const filteredFollowedPages = followedPages.filter(page =>
     page.name.toLowerCase().includes(searchInput.toLowerCase())
   );
 
@@ -277,51 +277,51 @@ const ChatInterface = () => {
   }
 
   return (
-    <div className="flex overflow-x-hidden flex-col h-[calc(100vh-10rem)] bg-gray-50">
+    <div className="flex overflow-x-hidden flex-col h-[calc(100vh-5rem)] bg-gray-50">
 
-          <div className='p-2 border-b'>
-            <h1 className="text-lg mb-2 md:text-xl font-bold">
-              Recommended Pages
-            </h1>
-            <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
-              {pages.map((page) => (
-                <div 
-                  key={page.id} 
-                  className="flex items-center gap-3 border p-3 md:p-4 rounded-xl cursor-pointer hover:shadow-md transition-shadow bg-white min-w-max"
-                  onClick={() => handlePageSelect(page)}
-                >
-                  {page.profile_picture ? (
-                    <img
-                      src={page.profile_picture}
-                      alt={page.name}
-                      className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-gray-200 flex items-center justify-center">
-                      <FaUser className="h-5 w-5 md:h-6 md:w-6 text-gray-500" />
-                    </div>
-                  )}
-                  <div>
-                    <span className="text-sm font-medium block truncate max-w-[120px]">{page.name}</span>
-                    <div className="text-xs text-gray-500 font-medium flex items-center">
-                      {page.followers_count} followers
-                      {page.is_owner_of_page && (
-                        <span className="ml-2 text-blue-500 flex items-center">
-                          <RiBroadcastFill className="mr-1" /> Creator
-                        </span>
-                      )}
-                    </div>
-                  </div>
+      <div className='p-2 border-b'>
+        <h1 className="text-lg mb-2 md:text-xl font-bold">
+          Recommended Pages
+        </h1>
+        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
+          {pages.map((page) => (
+            <div
+              key={page.id}
+              className="flex items-center gap-3 border p-3 md:p-4 rounded-xl cursor-pointer hover:shadow-md transition-shadow bg-white min-w-max"
+              onClick={() => handlePageSelect(page)}
+            >
+              {page.profile_picture ? (
+                <img
+                  src={page.profile_picture}
+                  alt={page.name}
+                  className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover"
+                />
+              ) : (
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                  <FaUser className="h-5 w-5 md:h-6 md:w-6 text-gray-500" />
                 </div>
-              ))}
+              )}
+              <div>
+                <span className="text-sm font-medium block truncate max-w-[120px]">{page.name}</span>
+                <div className="text-xs text-gray-500 font-medium flex items-center">
+                  {page.followers_count} followers
+                  {page.is_owner_of_page && (
+                    <span className="ml-2 text-blue-500 flex items-center">
+                      <RiBroadcastFill className="mr-1" /> Creator
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
+          ))}
         </div>
+      </div>
 
       <div className="flex flex-1 overflow-hidden relative">
         {/* Mobile Sidebar Overlay */}
         {showSidebar && (
           <>
-            <div 
+            <div
               className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
               onClick={() => setShowSidebar(false)}
             />
@@ -351,11 +351,10 @@ const ChatInterface = () => {
                 <div className="space-y-3">
                   {filteredFollowedPages.length > 0 ? (
                     filteredFollowedPages.map((page) => (
-                      <div 
-                        key={page.id} 
-                        className={`flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors ${
-                          selectedPage?.id === page.id ? 'bg-blue-50 border border-blue-200' : ''
-                        }`}
+                      <div
+                        key={page.id}
+                        className={`flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors ${selectedPage?.id === page.id ? 'bg-blue-50 border border-blue-200' : ''
+                          }`}
                         onClick={() => handlePageSelect(page)}
                       >
                         {page.profile_picture ? (
@@ -375,7 +374,7 @@ const ChatInterface = () => {
                             {page.followers_count} followers
                             {page.is_admin && (
                               <span className="ml-2 text-blue-500 flex items-center">
-                              Admin
+                                Admin
                               </span>
                             )}
                           </p>
@@ -413,11 +412,10 @@ const ChatInterface = () => {
               <h2 className="mb-4 text-lg font-semibold">My Buddies ({filteredFollowedPages.length})</h2>
               {filteredFollowedPages.length > 0 ? (
                 filteredFollowedPages.map((page) => (
-                  <div 
-                    key={page.id} 
-                    className={`flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors ${
-                      selectedPage?.id === page.id ? 'bg-blue-50 border border-blue-200' : ''
-                    }`}
+                  <div
+                    key={page.id}
+                    className={`flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors ${selectedPage?.id === page.id ? 'bg-blue-50 border border-blue-200' : ''
+                      }`}
                     onClick={() => handlePageSelect(page)}
                   >
                     {page.profile_picture ? (
@@ -455,12 +453,12 @@ const ChatInterface = () => {
 
         {/* Main Content Area */}
         {showProfile && selectedPage ? (
-          <ProfileView 
+          <ProfileView
             onBack={() => setShowProfile(false)}
             pageId={selectedPage.id}
           />
         ) : selectedPage ? (
-          <div className="flex flex-1 flex-col">
+          <div className="flex flex-1 mb-10 flex-col">
             {/* Chat Header */}
             <div className="flex items-center justify-between border-b bg-white p-3 md:p-4 shadow-sm">
               <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -481,9 +479,9 @@ const ChatInterface = () => {
                     <RiBroadcastFill className="ml-2 text-blue-500 flex-shrink-0" />
                   </h2>
                   <p className="text-xs md:text-sm text-gray-500 flex items-center">
-                    Broadcast Channel 
-                    {wsConnected ? 
-                      <span className="text-green-500 ml-2">● Connected</span> : 
+                    Broadcast Channel
+                    {wsConnected ?
+                      <span className="text-green-500 ml-2">● Connected</span> :
                       <span className="text-red-500 ml-2">● Disconnected</span>
                     }
                   </p>
@@ -504,7 +502,7 @@ const ChatInterface = () => {
                   <p>{wsError}</p>
                 </div>
               )}
-              
+
               {selectedPage && !selectedPage.is_admin && messages.length === 0 && !wsError && (
                 <div className="flex flex-col items-center justify-center h-full text-gray-500 text-center px-4">
                   <RiBroadcastFill className="h-12 w-12 mb-4 text-gray-300" />
@@ -512,9 +510,9 @@ const ChatInterface = () => {
                   <p className="text-sm">Stay tuned for updates from {selectedPage.name}!</p>
                 </div>
               )}
-              
+
               {messages.map((message) => (
-                <div 
+                <div
                   key={message.message_id}
                   className="mb-4 flex items-start gap-2 md:gap-3"
                 >
@@ -529,7 +527,7 @@ const ChatInterface = () => {
                       <FaUser className="h-3 w-3 md:h-4 md:w-4 text-gray-500" />
                     </div>
                   )}
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-gray-800 mb-1 text-sm md:text-base">
                       {selectedPage?.name || 'Unknown Page'}
@@ -559,12 +557,11 @@ const ChatInterface = () => {
                     disabled={!wsConnected || sendingMessage}
                     onKeyDown={handleKeyDown}
                   />
-                  <button 
-                    className={`rounded-lg p-2 text-white flex items-center transition-colors text-sm ${
-                      wsConnected && !sendingMessage && messageInput.trim() 
-                        ? 'bg-blue-500 hover:bg-blue-600' 
+                  <button
+                    className={`rounded-lg p-2 text-white flex items-center transition-colors text-sm ${wsConnected && !sendingMessage && messageInput.trim()
+                        ? 'bg-blue-500 hover:bg-blue-600'
                         : 'bg-gray-400 cursor-not-allowed'
-                    }`}
+                      }`}
                     onClick={sendBroadcast}
                     disabled={!wsConnected || sendingMessage || !messageInput.trim()}
                   >
@@ -579,7 +576,7 @@ const ChatInterface = () => {
                 )}
               </div>
             )}
-            
+
             {/* Non-Admin Message */}
             {selectedPage && !selectedPage.is_admin && (
               <div className="border-t bg-white p-3 md:p-4 text-center text-gray-500">

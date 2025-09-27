@@ -62,7 +62,9 @@ const HomeTab: React.FC<HomeTabProps> = ({ pageId }) => {
       <div className="rounded-xl border p-4 mb-5">
         <div className="mb-3">
           <p className="font-medium text-gray-700">Website</p>
-          <p className='text-[#7052FF]'>{website}</p>
+          <p className='text-[#7052FF] break-all truncate max-w-full' title={website !== 'Not provided' ? website : ''}>
+            {website}
+          </p>
         </div>
       </div>
 

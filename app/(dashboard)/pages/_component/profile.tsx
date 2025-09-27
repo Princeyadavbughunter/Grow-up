@@ -107,13 +107,25 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 flex flex-col lg:flex-row gap-4 mx-auto w-full max-w-7xl">
-      <div className="rounded-lg bg-white p-6 shadow-sm flex-1">
-        
+    <div className="min-h-screen bg-gray-50 p-2 md:p-4 flex flex-col lg:flex-row gap-2 md:gap-4 mx-auto w-full max-w-7xl">
+      <div className="rounded-lg overflow-y-auto bg-white p-3 md:p-6 shadow-sm flex-1">
+
+        {/* Mobile Back Button - Above profile picture */}
+        <div className="mb-3 md:hidden">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors mb-3"
+          >
+            <BsArrowLeft className="h-5 w-5" />
+            <span className="text-sm font-medium">Back</span>
+          </button>
+        </div>
+
         {activeTab !== 'Post' && (
           <div className="mb-4">
             <div className="flex items-center gap-4 mb-3">
-              <button onClick={onBack} className="rounded-full p-2 hover:bg-gray-100 flex-shrink-0">
+              {/* Desktop Back Button - Hidden on mobile */}
+              <button onClick={onBack} className="rounded-full p-2 hover:bg-gray-100 flex-shrink-0 hidden md:flex">
                 <BsArrowLeft className="h-5 w-5" />
               </button>
               <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -168,16 +180,11 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           </div>
         )}
 
-        <div className={`mb-6 ${activeTab === 'Post' ? 'flex items-center gap-4' : 'flex gap-4 justify-center flex-wrap'}`}>
-          {activeTab === 'Post' && (
-            <button onClick={onBack} className="rounded-full p-2 hover:bg-gray-100 flex-shrink-0">
-              <BsArrowLeft className="h-5 w-5" />
-            </button>
-          )}
+        <div className={`mb-6 ${activeTab === 'Post' ? 'flex gap-2 md:gap-4 justify-center flex-nowrap overflow-x-auto' : 'flex gap-2 md:gap-4 justify-center flex-nowrap overflow-x-auto'}`}>
           {['Home', 'About', 'Post', 'People'].map((tab) => (
             <button
               key={tab}
-              className={`rounded-lg px-4 py-2 font-medium ${
+              className={`rounded-lg px-2 md:px-4 py-2 font-medium text-sm md:text-base ${
                 activeTab === tab ? 'bg-gray-200 text-black' : 'text-gray-500'
               }`}
               onClick={() => setActiveTab(tab)}
@@ -187,10 +194,10 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           ))}
         </div>
 
-        <div className={`mb-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent ${
+        <div className={`mb-3 md:mb-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent ${
           activeTab === 'Post'
-            ? 'h-[calc(100vh-12rem)] lg:h-[calc(100vh-15rem)]'
-            : 'h-[calc(100vh-20rem)] lg:h-[calc(100vh-27rem)]'
+            ? 'h-[calc(100vh-10rem)] md:h-[calc(100vh-12rem)] lg:h-[calc(100vh-15rem)]'
+            : 'h-[calc(100vh-16rem)] md:h-[calc(100vh-20rem)] lg:h-[calc(100vh-27rem)]'
         }`}>
           {renderTabContent()}
         </div>

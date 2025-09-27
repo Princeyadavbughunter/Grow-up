@@ -8,6 +8,7 @@ import { MessageSquare, Heart, Share } from 'lucide-react';
 import { useAuthenticatedApi } from '@/context/AuthContext';
 import SharePopup from './SharePopup';
 import EmptyState from '@/components/ui/empty-state';
+import { CommentModal } from '@/components/ui/comment-modal';
 
 interface ImageData {
     id: string;
@@ -83,8 +84,9 @@ interface PostDetailProps {
 const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
     const [showComments, setShowComments] = useState<boolean>(true);
     const [comments, setComments] = useState<Comment[]>([]);
-    const [newComment, setNewComment] = useState<string>('');
     const [showSharePopup, setShowSharePopup] = useState<boolean>(false);
+    const [showCommentModal, setShowCommentModal] = useState<boolean>(false);
+    const [isSubmittingComment, setIsSubmittingComment] = useState<boolean>(false);
     const { api } = useAuthenticatedApi();
 
     // Memoize formatted date to prevent recalculation on every render
@@ -116,23 +118,25 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
     }, [fetchComments]);
 
     // Memoize handleAddComment to prevent recreation
-    const handleAddComment = useCallback(async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newComment.trim()) return;
+    const handleAddComment = useCallback(async (content: string) => {
+        if (!content.trim()) return;
 
+        setIsSubmittingComment(true);
         try {
             await api.post('/post/app/comments/', {
                 post: post.id,
-                content: newComment,
+                content: content,
                 is_take_down: "False"
             });
 
-            setNewComment('');
+            setShowCommentModal(false);
             fetchComments();
         } catch (error) {
             console.error('Error adding comment:', error);
+        } finally {
+            setIsSubmittingComment(false);
         }
-    }, [api, post.id, newComment, fetchComments]);
+    }, [api, post.id, fetchComments]);
 
     // Load comments on mount - only run when post.id changes
     useEffect(() => {
@@ -290,26 +294,28 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                         </div>
                     </div>
 
-                    {/* Add Comment Form - Fixed at bottom */}
+                    {/* Add Comment Section - Fixed at bottom */}
                     <div className="border-t border-gray-200 pt-4">
-                        <form onSubmit={handleAddComment} className="flex gap-3">
-                            <input
-                                type="text"
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                placeholder="Add a comment..."
-                                className="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                            <button
-                                type="submit"
-                                className="bg-blue-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors"
-                            >
-                                Post
-                            </button>
-                        </form>
+                        <button
+                            onClick={() => setShowCommentModal(true)}
+                            className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-left text-gray-500 hover:bg-gray-100 transition-colors"
+                        >
+                            Add a comment...
+                        </button>
                     </div>
                 </div>
             )}
+
+            {/* Comment Modal */}
+            <CommentModal
+                isOpen={showCommentModal}
+                onClose={() => setShowCommentModal(false)}
+                onSubmit={handleAddComment}
+                title="Add Comment"
+                placeholder="Share your thoughts about this post..."
+                submitButtonText="Post Comment"
+                isLoading={isSubmittingComment}
+            />
 
             {/* Share Popup */}
             <SharePopup
@@ -331,9 +337,10 @@ interface CommentItemProps {
 
 const CommentItem = memo(({ comment, api }: CommentItemProps) => {
     const [showReplyForm, setShowReplyForm] = useState<boolean>(false);
-    const [newReply, setNewReply] = useState<string>('');
     const [replies, setReplies] = useState<CommentReply[]>([]);
     const [showReplies, setShowReplies] = useState<boolean>(false);
+    const [showReplyModal, setShowReplyModal] = useState<boolean>(false);
+    const [isSubmittingReply, setIsSubmittingReply] = useState<boolean>(false);
 
     // Memoize formatted date
     const formattedDate = useMemo(() =>
@@ -366,35 +373,37 @@ const CommentItem = memo(({ comment, api }: CommentItemProps) => {
     }, [comment.comment_reply_count, fetchReplies]);
 
     // Memoize handleAddReply
-    const handleAddReply = useCallback(async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newReply.trim()) return;
+    const handleAddReply = useCallback(async (content: string) => {
+        if (!content.trim()) return;
 
+        setIsSubmittingReply(true);
         try {
             await api.post('/post/app/comments-replies/', {
                 comment: comment.id,
-                content: newReply,
+                content: content,
                 is_take_down: "False"
             });
 
-            setNewReply('');
+            setShowReplyModal(false);
             fetchReplies();
             setShowReplies(true);
             setShowReplyForm(false);
         } catch (error) {
             console.error('Error adding reply:', error);
+        } finally {
+            setIsSubmittingReply(false);
         }
-    }, [api, comment.id, newReply, fetchReplies]);
+    }, [api, comment.id, fetchReplies]);
 
     return (
-        <div className="border-l-4 border-gray-200 pl-4">
+        <div className="border-l-2 sm:border-l-4 border-gray-200 pl-3 sm:pl-4">
             <div className="flex items-start gap-3">
                 <Image
                     src={comment.profile_picture || "https://randomuser.me/portraits/men/2.jpg"}
                     alt="User"
                     width={40}
                     height={40}
-                    className="rounded-full w-10 h-10"
+                    className="rounded-full w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0"
                 />
                 <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
@@ -403,7 +412,7 @@ const CommentItem = memo(({ comment, api }: CommentItemProps) => {
                         </h4>
                         <span className="text-sm text-gray-500">{formattedDate}</span>
                     </div>
-                    <p className="text-gray-700 mb-3">{comment.content}</p>
+                    <p className="text-gray-700 mb-3 break-words">{comment.content}</p>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                         <button 
                             onClick={() => setShowReplyForm(!showReplyForm)}
@@ -422,36 +431,27 @@ const CommentItem = memo(({ comment, api }: CommentItemProps) => {
                     </div>
 
                     {showReplyForm && (
-                        <form onSubmit={handleAddReply} className="mt-3 flex gap-2">
-                            <input
-                                type="text"
-                                value={newReply}
-                                onChange={(e) => setNewReply(e.target.value)}
-                                placeholder="Add a reply..."
-                                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                            <button
-                                type="submit"
-                                className="bg-blue-500 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-600 transition-colors"
-                            >
-                                Reply
-                            </button>
-                        </form>
+                        <button
+                            onClick={() => setShowReplyModal(true)}
+                            className="mt-3 text-sm bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-gray-500 hover:bg-gray-100 transition-colors"
+                        >
+                            Add a reply...
+                        </button>
                     )}
 
                     {showReplies && (
                         <div className="mt-4 space-y-4">
                             {replies.length > 0 ? (
                                 replies.map(reply => (
-                                    <div key={reply.id} className="flex items-start gap-3">
+                                    <div key={reply.id} className="flex items-start gap-3 ml-4 sm:ml-6 pl-3 sm:pl-4 border-l-2 border-gray-100">
                                         <Image
                                             src={reply.profile_picture || "https://randomuser.me/portraits/men/2.jpg"}
                                             alt="User"
                                             width={32}
                                             height={32}
-                                            className="rounded-full w-8 h-8"
+                                            className="rounded-full w-8 h-8 flex-shrink-0"
                                         />
-                                        <div className="flex-1">
+                                        <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <h5 className="font-medium text-sm text-gray-800">
                                                     {reply.first_name || reply.company_name || 'Anonymous'}
@@ -460,20 +460,33 @@ const CommentItem = memo(({ comment, api }: CommentItemProps) => {
                                                     {new Date(reply.created_at).toLocaleString()}
                                                 </span>
                                             </div>
-                                            <p className="text-sm text-gray-700">{reply.content}</p>
+                                            <p className="text-sm text-gray-700 break-words">{reply.content}</p>
                                         </div>
                                     </div>
                                 ))
                             ) : (
-                                <EmptyState
-                                    icon={<MessageSquare className="w-4 h-4 text-gray-400" />}
-                                    title="No replies yet"
-                                    description="Start a conversation by replying to this comment."
-                                    className="py-2"
-                                />
+                                <div className="ml-4 sm:ml-6 pl-3 sm:pl-4">
+                                    <EmptyState
+                                        icon={<MessageSquare className="w-4 h-4 text-gray-400" />}
+                                        title="No replies yet"
+                                        description="Start a conversation by replying to this comment."
+                                        className="py-2"
+                                    />
+                                </div>
                             )}
                         </div>
                     )}
+
+                    {/* Reply Modal */}
+                    <CommentModal
+                        isOpen={showReplyModal}
+                        onClose={() => setShowReplyModal(false)}
+                        onSubmit={handleAddReply}
+                        title="Add Reply"
+                        placeholder="Write your reply..."
+                        submitButtonText="Post Reply"
+                        isLoading={isSubmittingReply}
+                    />
                 </div>
             </div>
         </div>
