@@ -138,3 +138,15 @@ interface Job {
     current?: boolean;
     description?: string;
   }
+
+  interface Page {
+    id: string;
+    name: string;
+    description: string;
+    profile_picture: string;
+    cover_photo: string;
+    followers_count: number;
+    created_at: string;
+    is_active: boolean;
+    chatroom_id: string;
+  }

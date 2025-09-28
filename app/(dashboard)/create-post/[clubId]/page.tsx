@@ -5,6 +5,7 @@ import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import { useRouter, useParams } from "next/navigation";
 import { FaBackward, FaImage, FaLink, FaPoll } from "react-icons/fa";
 import { IoArrowBack } from 'react-icons/io5';
+import { Page } from '@/types';
 
 interface PostResponse {
     id: string;
@@ -54,6 +55,9 @@ const CreatePost = (): JSX.Element => {
     const [link, setLink] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [clubName, setClubName] = useState<string>('');
+    const [postingType, setPostingType] = useState<'self' | 'page'>('self');
+    const [selectedPage, setSelectedPage] = useState<string>('');
+    const [userPages, setUserPages] = useState<Page[]>([]);
 
 
     useEffect(() => {
@@ -76,6 +80,21 @@ const CreatePost = (): JSX.Element => {
         }
     }, [clubId, authToken]);
 
+    useEffect(() => {
+        const fetchUserPages = async () => {
+            try {
+                const response = await api.get('/post/app/own-created-pages/');
+                setUserPages(response.data.pages || []);
+            } catch (error) {
+                console.error('Error fetching user pages:', error);
+            }
+        };
+
+        if (authToken) {
+            fetchUserPages();
+        }
+    }, [authToken]);
+
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const files = Array.from(e.target.files);
@@ -88,25 +107,47 @@ const CreatePost = (): JSX.Element => {
         setIsSubmitting(true);
 
         try {
-            const formData = new FormData();
-            formData.append('title', title);
-            formData.append('content', content);
-            formData.append('club', clubId);
-            formData.append('is_take_down', false);
+            let response;
 
-            images.forEach((image) => {
-                formData.append('images', image);
-            }); 
+            if (postingType === 'page') {
+                // Post from a page
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('content', content);
+                formData.append('page', selectedPage);
+                formData.append('is_take_down', false);
 
-            if (link) {
-                formData.append('link', link);
-            }
+                images.forEach((image) => {
+                    formData.append('images', image);
+                });
 
-            const response = await api.post<PostResponse>('/post/app/post-creation/', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
+                response = await api.post('/post/app/page-posts/', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    }
+                });
+            } else {
+                // Post from self (club post)
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('content', content);
+                formData.append('club', clubId);
+                formData.append('is_take_down', false);
+
+                images.forEach((image) => {
+                    formData.append('images', image);
+                });
+
+                if (link) {
+                    formData.append('link', link);
                 }
-            });
+
+                response = await api.post<PostResponse>('/post/app/post-creation/', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    }
+                });
+            }
 
             if (response.status === 200 || response.status === 201) {
                 router.push('/');
@@ -132,6 +173,53 @@ const CreatePost = (): JSX.Element => {
                     Posting to: <span className="bg-green-100 text-green-600 px-2 py-1 rounded">{clubName || 'Loading...'}</span>
                 </h1>
             </div>
+
+            {/* Posting Type Selector */}
+            <div className="mb-4">
+                <label className="block text-black font-semibold mb-2">Post As</label>
+                <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                            type="radio"
+                            value="self"
+                            checked={postingType === 'self'}
+                            onChange={(e) => setPostingType(e.target.value as 'self' | 'page')}
+                            className="w-4 h-4 text-purple-600"
+                        />
+                        <span className="text-gray-700">Self</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                            type="radio"
+                            value="page"
+                            checked={postingType === 'page'}
+                            onChange={(e) => setPostingType(e.target.value as 'self' | 'page')}
+                            className="w-4 h-4 text-purple-600"
+                        />
+                        <span className="text-gray-700">Page</span>
+                    </label>
+                </div>
+            </div>
+
+            {/* Page Selection (only show when posting from page) */}
+            {postingType === 'page' && (
+                <div className="mb-4">
+                    <label className="block text-black font-semibold mb-2">Select Page</label>
+                    <select
+                        value={selectedPage}
+                        onChange={(e) => setSelectedPage(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                        required={postingType === 'page'}
+                    >
+                        <option value="">Select a page...</option>
+                        {userPages.map((page) => (
+                            <option key={page.id} value={page.id}>
+                                {page.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -204,7 +292,7 @@ const CreatePost = (): JSX.Element => {
 
                 <button
                     type="submit"
-                    disabled={isSubmitting || !title}
+                    disabled={isSubmitting || !title || (postingType === 'page' && !selectedPage)}
                     className="w-full bg-purple-500 text-white font-bold py-2 rounded-lg hover:bg-purple-600 disabled:bg-purple-300 disabled:cursor-not-allowed"
                 >
                     {isSubmitting ? 'Posting...' : 'Post'}
