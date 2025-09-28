@@ -49,8 +49,8 @@ const LandingNav = () => {
             }`}>
               Gigs
             </Link>
-            <Link href="/explore" className={`font-semibold transition-colors duration-200 ${
-              pathname === '/explore' ? 'text-[#7052FF]' : 'text-gray-600 hover:text-[#7052FF]'
+            <Link href="/clubs-page" className={`font-semibold transition-colors duration-200 ${
+              pathname === '/clubs-page' ? 'text-[#7052FF]' : 'text-gray-600 hover:text-[#7052FF]'
             }`}>
               Club
             </Link>
@@ -128,9 +128,9 @@ const LandingNav = () => {
               Gigs
             </Link>
             <Link 
-              href="/explore" 
+              href="/clubs-page" 
               className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
-                pathname === '/explore' 
+                pathname === '/clubs-page' 
                   ? 'text-[#7052FF] bg-[#7052FF]/10' 
                   : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
               }`}

@@ -224,8 +224,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       Cookies.remove('refresh_token', { path: '/' });
       Cookies.remove('user_id', { path: '/' });
       
-      // Redirect to homepage
-      window.location.href = '/landing';
+      window.location.href = '/';
     }
   };
 
