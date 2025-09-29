@@ -101,16 +101,18 @@ const WhyChoose = () => {
                 : 'max-h-0 opacity-0'
               }
             `}>
-              <div className="px-6 pb-6">
-                <p className={`
-                  text-sm sm:text-base leading-relaxed
-                  ${activeCategory === category.title 
-                    ? 'text-white text-opacity-90' 
-                    : 'text-[#696C78]'
-                  }
-                `}>
-                  {category.description}
-                </p>
+              <div className="flex justify-center px-6 pb-6">
+                <div className="w-full max-w-md mx-auto">
+                  <p className={`
+                    text-sm sm:text-base leading-relaxed
+                    ${activeCategory === category.title 
+                      ? 'text-white text-opacity-90' 
+                      : 'text-[#696C78]'
+                    }
+                  `}>
+                    {category.description}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
