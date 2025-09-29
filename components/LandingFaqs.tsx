@@ -114,7 +114,7 @@ const LandingFaqs = () => {
                   activeIndex === index ? 'border-white border-opacity-20' : 'border-gray-200'
                 }`}>
                   <p className={`text-sm sm:text-base md:text-lg leading-relaxed ${
-                    activeIndex === index ? 'text-[#7052FF]/80' : 'text-gray-600'
+                    activeIndex === index ? 'text-white' : 'text-gray-600'
                   }`}>
                     {item.answer}
                   </p>

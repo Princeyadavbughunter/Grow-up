@@ -1,7 +1,11 @@
+'use client'
 import React from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 const Future = () => {
+  const router = useRouter()
+
   const cards = [
     {
       id: 1,
@@ -11,6 +15,7 @@ const Future = () => {
       bgColor: 'bg-[#7052FF]',
       borderColor: 'border-transparent',
       textColor: 'text-white',
+      route: '/gigs-page',
     },
     {
       id: 2,
@@ -20,6 +25,7 @@ const Future = () => {
       bgColor: 'bg-[#7052FF]',
       borderColor: 'border-transparent',
       textColor: 'text-white',
+      route: '/events-page',
     },
     {
       id: 3,
@@ -29,8 +35,13 @@ const Future = () => {
       bgColor: 'bg-[#7052FF]',
       borderColor: 'border-transparent',
       textColor: 'text-white',
+      route: '/clubs-page',
     },
   ]
+
+  const handleCardClick = (route: string) => {
+    router.push(route)
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -78,7 +89,8 @@ const Future = () => {
 
               {/* Button (appears on hover) */}
               <button
-                className={`opacity-0 group-hover:opacity-100 inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold bg-[#7052FF] text-white hover:bg-[#5a42d4] transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/30 shadow-md hover:shadow-lg`}
+                onClick={() => handleCardClick(card.route)}
+                className={`opacity-0 group-hover:opacity-100 inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold bg-[#7052FF] text-white hover:bg-[#5a42d4] transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/30 shadow-md hover:shadow-lg cursor-pointer`}
               >
                 View
                 <span className="transition-transform duration-300 group-hover:translate-x-1">

@@ -49,8 +49,8 @@ const LandingNav = () => {
             }`}>
               Gigs
             </Link>
-            <Link href="/explore" className={`font-semibold transition-colors duration-200 ${
-              pathname === '/explore' ? 'text-[#7052FF]' : 'text-gray-600 hover:text-[#7052FF]'
+            <Link href="/clubs-page" className={`font-semibold transition-colors duration-200 ${
+              pathname === '/clubs-page' ? 'text-[#7052FF]' : 'text-gray-600 hover:text-[#7052FF]'
             }`}>
               Club
             </Link>
@@ -59,7 +59,7 @@ const LandingNav = () => {
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <Link href="/auth/google" className="text-[#7052FF] hover:text-[#5a42d4] font-medium transition-colors duration-200">
-              Sign in
+              Get Started
             </Link>
             <Link href="/auth/google" className="bg-[#7052FF] text-white px-6 py-3 rounded-full hover:bg-[#5a42d4] font-medium transition-all duration-200 shadow-sm hover:shadow-md">
               Login
@@ -128,9 +128,9 @@ const LandingNav = () => {
               Gigs
             </Link>
             <Link 
-              href="/explore" 
+              href="/clubs-page" 
               className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
-                pathname === '/explore' 
+                pathname === '/clubs-page' 
                   ? 'text-[#7052FF] bg-[#7052FF]/10' 
                   : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
               }`}

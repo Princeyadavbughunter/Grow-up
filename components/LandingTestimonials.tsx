@@ -130,10 +130,10 @@ const LandingTestimonials = () => {
                   
                   {/* Name and Role */}
                   <div className="text-center mb-4 sm:mb-6 px-2">
-                    <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#4A4A4A] mb-1 sm:mb-2 leading-tight">
-                      {testimonial.name}
+                    <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#4A4A4A] mb-1 sm:mb-2 leading-tight truncate max-w-full">
+                      {testimonial.name.length > 20 ? `${testimonial.name.substring(0, 20)}...` : testimonial.name}
                     </h3>
-                    <p className="text-xs sm:text-sm md:text-base text-[#7052FF] font-medium">
+                    <p className="text-xs sm:text-sm md:text-base text-[#7052FF] font-medium truncate max-w-full">
                       {testimonial.role}
                     </p>
                   </div>

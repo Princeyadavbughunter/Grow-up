@@ -10,7 +10,7 @@ const LandingFooter = () => {
         { name: 'Hire talent', href: '/talent' },
         { name: 'Gigs', href: '/gigs-page' },
         { name: 'Events', href: '/events-page' },
-        { name: 'Community', href: '/community' },
+        { name: 'Clubs', href: '/clubs-page' },
       ],
     },
     {
@@ -27,8 +27,8 @@ const LandingFooter = () => {
       title: 'Contact Us',
       links: [
         { name: 'contact@growupbuddy.com', href: 'mailto:contact@growupbuddy.com', icon: <Mail className="w-4 h-4" /> },
-        { name: '+1 (555) 123-4567', href: 'tel:+15551234567', icon: <Phone className="w-4 h-4" /> },
-        { name: 'San Francisco, CA', href: '#', icon: <MapPin className="w-4 h-4" /> },
+        { name: '+919691762703', href: 'tel:+919691762703', icon: <Phone className="w-4 h-4" /> },
+        { name: 'New Delhim, India', href: '#', icon: <MapPin className="w-4 h-4" /> },
       ],
     },
   ]
@@ -36,8 +36,8 @@ const LandingFooter = () => {
   const socialIcons = [
     { name: 'Twitter', icon: <Twitter className="w-5 h-5" />, href: 'https://twitter.com/growupbuddy', color: 'hover:text-blue-400' },
     { name: 'Facebook', icon: <Facebook className="w-5 h-5" />, href: 'https://facebook.com/growupbuddy', color: 'hover:text-blue-600' },
-    { name: 'LinkedIn', icon: <Linkedin className="w-5 h-5" />, href: 'https://linkedin.com/company/growupbuddy', color: 'hover:text-blue-500' },
-    { name: 'Instagram', icon: <Instagram className="w-5 h-5" />, href: 'https://instagram.com/growupbuddy', color: 'hover:text-pink-500' },
+    { name: 'LinkedIn', icon: <Linkedin className="w-5 h-5" />, href: 'https://www.linkedin.com/company/grow-up-buddy/', color: 'hover:text-blue-500' },
+    { name: 'Instagram', icon: <Instagram className="w-5 h-5" />, href: 'https://www.instagram.com/growup_buddy_official', color: 'hover:text-pink-500' },
   ]
 
   return (

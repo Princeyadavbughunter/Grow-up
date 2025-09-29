@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const publicAuthPath = '/auth/google';
-const publicPaths = ['/', '/gigs-page', '/events-page', '/talent', '/community'];
+const publicPaths = ['/', '/gigs-page', '/events-page', '/talent', '/community', '/clubs-page'];
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
