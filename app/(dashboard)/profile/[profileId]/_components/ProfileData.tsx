@@ -166,7 +166,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start">
         {userProfileData?.id !== profileData.id && (
           isFollowing ? (
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="flex flex-row gap-3">
               <Button
                 onClick={handleFollowAction}
                 disabled={isLoading}

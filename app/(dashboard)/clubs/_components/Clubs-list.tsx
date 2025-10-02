@@ -44,14 +44,9 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
             // Separate clubs into my clubs and all clubs based on is_user_member flag
             const allClubsData = response.data || [];
             const myClubsData = allClubsData.filter((club: Club) => club.is_user_member);
-            
+
             setAllClubs(allClubsData);
             setMyClubs(myClubsData);
-            
-            // Set default selected club if none is selected yet
-            if (!selectedClubId && allClubsData.length > 0) {
-                router.push(`/clubs/${allClubsData[0].id}`);
-            }
         } catch (error) {
             console.error('Error fetching clubs:', error);
             setError('Failed to load clubs. Please try again.');
@@ -178,9 +173,9 @@ interface ClubCardProps {
 
 const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCardProps) => {
     const [showFullDescription, setShowFullDescription] = useState(false);
-    
-    const truncatedDescription = club.description?.length > 100 
-        ? club.description.substring(0, 100) + "..."
+
+    const truncatedDescription = club.description?.length > 60
+        ? club.description.substring(0, 60) + "..."
         : club.description;
 
     return (
@@ -222,17 +217,17 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
 
             {!isMyClub && club.description && (
                 <div className="text-sm text-gray-600 mt-3">
-                    <p>
+                    <p className={`${showFullDescription ? 'whitespace-normal' : 'truncate'}`}>
                         {showFullDescription ? club.description : truncatedDescription}
-                        {club.description.length > 100 && (
-                            <button 
-                                className="text-purple-600 ml-1 hover:text-purple-800"
+                        {club.description.length > 60 && (
+                            <button
+                                className="text-purple-600 ml-1 hover:text-purple-800 font-medium"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setShowFullDescription(!showFullDescription);
                                 }}
                             >
-                                {showFullDescription ? "Show Less" : "Read More..."}
+                                {showFullDescription ? "Read Less" : "Read More"}
                             </button>
                         )}
                     </p>

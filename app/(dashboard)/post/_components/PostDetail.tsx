@@ -104,7 +104,7 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
-    }, [api, post.id]);
+    }, [post.id]);
 
     // Memoize handleCommentToggle to prevent recreation
     const handleCommentToggle = useCallback(() => {
@@ -137,7 +137,7 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
         } finally {
             setIsSubmittingComment(false);
         }
-    }, [api, post.id, fetchComments]);
+    }, [post.id, fetchComments]);
 
     // Load comments on mount - only run when post.id changes
     useEffect(() => {
@@ -357,7 +357,7 @@ const CommentItem = memo(({ comment, api }: CommentItemProps) => {
         } catch (error) {
             console.error('Error fetching replies:', error);
         }
-    }, [api, comment.id]);
+    }, [comment.id]);
 
     // Memoize handleReplyToggle
     const handleReplyToggle = useCallback(() => {
@@ -394,7 +394,7 @@ const CommentItem = memo(({ comment, api }: CommentItemProps) => {
         } finally {
             setIsSubmittingReply(false);
         }
-    }, [api, comment.id, fetchReplies]);
+    }, [comment.id, fetchReplies]);
 
     return (
         <div className="border-l-2 sm:border-l-4 border-gray-200 pl-3 sm:pl-4">
