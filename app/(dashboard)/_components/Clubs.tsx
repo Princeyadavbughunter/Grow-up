@@ -67,6 +67,7 @@ interface ClubCardProps {
 
 const ClubCard = ({ club, refresh, isMobile }: ClubCardProps) => {
     const [isJoined, setIsJoined] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
     const { api } = useAuthenticatedApi();
 
     const handleClick = async () => {
@@ -85,10 +86,7 @@ const ClubCard = ({ club, refresh, isMobile }: ClubCardProps) => {
         }
     };
 
-    const maxDescriptionLength = isMobile ? 80 : 120;
-    const truncatedDescription = club.description.length > maxDescriptionLength
-        ? club.description.substring(0, maxDescriptionLength) + '...'
-        : club.description;
+    const toggleExpanded = () => setIsExpanded(!isExpanded);
 
     return (
         <div className={`bg-white border border-gray-200 rounded-lg ${isMobile ? 'w-64 flex-shrink-0' : ''}`}>
@@ -122,9 +120,22 @@ const ClubCard = ({ club, refresh, isMobile }: ClubCardProps) => {
                         </button>
                     </div>
 
-                    <p className={`text-gray-600 leading-relaxed ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                        {truncatedDescription}
-                    </p>
+                    <div className="text-gray-600 leading-relaxed">
+                        <p className={`${isExpanded ? '' : 'line-clamp-1'} ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                            {club.description}
+                        </p>
+                        {club.description.length > (isMobile ? 80 : 120) && (
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    toggleExpanded();
+                                }}
+                                className={`text-blue-600 hover:text-blue-800 font-medium mt-1 ${isMobile ? 'text-xs' : 'text-sm'}`}
+                            >
+                                {isExpanded ? 'Show less' : 'Read more'}
+                            </button>
+                        )}
+                    </div>
                 </div>
             </Link>
         </div>

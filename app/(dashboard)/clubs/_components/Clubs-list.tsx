@@ -215,7 +215,7 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
                 </button>
             </div>
 
-            {!isMyClub && club.description && (
+            {club.description && (
                 <div className="text-sm text-gray-600 mt-3">
                     <p className={`${showFullDescription ? 'whitespace-normal' : 'truncate'}`}>
                         {showFullDescription ? club.description : truncatedDescription}
