@@ -32,7 +32,7 @@ interface Chatroom {
     id: string;
     name: string;
     participants: Participant[];
-    chatting_with_current_user: Participant;
+    chatting_with_current_user: Participant | null;
     created_at: string;
     is_accepted: boolean;
 }
@@ -78,7 +78,7 @@ const ChatInterface: React.FC = () => {
     const [selectedChatroom, setSelectedChatroom] = useState<Chatroom | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [tab, setTab] = useState<'active' | 'pending'>('pending');
+    const [tab, setTab] = useState<'active' | 'pending'>('active');
     const [wsConnected, setWsConnected] = useState<boolean>(false);
     const [wsError, setWsError] = useState<string | null>(null);
     const [showSidebar, setShowSidebar] = useState<boolean>(true);
@@ -100,14 +100,21 @@ const ChatInterface: React.FC = () => {
 
     const roomCreatedRef = useRef(false);
 
+    console.log('Chat page - params.id:', params.id);
+    console.log('Chat page - current user:', profileData?.user);
+
     useEffect(() => {
         const createRoom = async () => {
             if (roomCreatedRef.current) return;
             try {
+                console.log('Creating room with participants:', {
+                    currentUser: profileData?.user,
+                    targetUser: params.id
+                });
                 const response = await api.post('/individualchats/chatroom/', {
                     name: "Test",
                     participants: [
-                        { id: profileData.user },
+                        { id: profileData?.user },
                         { id: params.id }
                     ]
                 });
@@ -118,11 +125,11 @@ const ChatInterface: React.FC = () => {
                 console.error('Error creating room:', error);
             }
         };
-        if (authToken && profileData.user && params.id && !roomCreated) {
+        if (authToken && profileData?.user && params.id && !roomCreated) {
             console.log("Creating room");   
             createRoom();
         }
-    }, [authToken, profileData.user, params.id, roomCreated]);
+    }, [authToken, profileData?.user, params.id, roomCreated]);
 
     useEffect(() => {
         if (authToken) {
@@ -139,6 +146,29 @@ const ChatInterface: React.FC = () => {
             }
         };
     }, [authToken]);
+
+    // Auto-select the chat room when chatrooms are loaded
+    useEffect(() => {
+        if (chatrooms.length > 0 && pendingChatrooms.length >= 0 && params.id && !selectedChatroom) {
+            // First check active chatrooms
+            const activeChat = chatrooms.find(chatroom => chatroom.chatting_with_current_user?.id === params.id);
+            if (activeChat) {
+                console.log('Auto-selecting active chat:', activeChat.id);
+                handleChatroomSelect(activeChat);
+                setTab('active');
+                return;
+            }
+
+            // Then check pending chatrooms
+            const pendingChat = pendingChatrooms.find(chatroom => chatroom.participants.some(p => p.id === params.id));
+            if (pendingChat) {
+                console.log('Auto-selecting pending chat:', pendingChat.id);
+                handleChatroomSelect(pendingChat);
+                setTab('pending');
+                return;
+            }
+        }
+    }, [chatrooms, pendingChatrooms, params.id, selectedChatroom]);
 
     const fetchChatrooms = async (): Promise<void> => {
         try {
@@ -232,7 +262,7 @@ const ChatInterface: React.FC = () => {
                 console.log("WebSocket message received:", event.data);
                 try {
                     const message = JSON.parse(event.data);
-                    const currentUserId = userId || profileData?.user;
+                    const currentUserId = profileData?.user;
                     const isSender = currentUserId && message.user_id === currentUserId;
           
                     const messageWithSender = {
@@ -295,7 +325,7 @@ const ChatInterface: React.FC = () => {
                         websocketRef.current.send(JSON.stringify({
                             room_id: selectedChatroom.id,
                             message: tempMessage,
-                            user_id: profileData.user,
+                            user_id: profileData?.user,
                             message_type: "chat"
                         }));
                         
@@ -323,7 +353,7 @@ const ChatInterface: React.FC = () => {
             websocketRef.current.send(JSON.stringify({
                 room_id: selectedChatroom.id,
                 message: messageInput,
-                user_id: profileData.user,
+                user_id: profileData?.user,
                 message_type: "chat"
             }));
             console.log("Message sent successfully");
@@ -478,15 +508,15 @@ const ChatInterface: React.FC = () => {
         }
     };
 
-    const filteredChatrooms = chatrooms.filter(chatroom => 
+    const filteredChatrooms = chatrooms.filter(chatroom =>
         chatroom.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-        chatroom.chatting_with_current_user.name.toLowerCase().includes(searchInput.toLowerCase())
+        (chatroom.chatting_with_current_user && chatroom.chatting_with_current_user.name.toLowerCase().includes(searchInput.toLowerCase()))
     );
     
     const filteredPendingChatrooms = pendingChatrooms.filter(chatroom =>
         !chatroom.is_accepted && (
             chatroom.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-            chatroom.chatting_with_current_user.name.toLowerCase().includes(searchInput.toLowerCase())
+            (chatroom.chatting_with_current_user && chatroom.chatting_with_current_user.name.toLowerCase().includes(searchInput.toLowerCase()))
         )
     );
 
@@ -536,7 +566,7 @@ const ChatInterface: React.FC = () => {
                                         className={`flex items-center p-3 md:p-4 hover:bg-gray-50 cursor-pointer active:bg-gray-100 ${selectedChatroom?.id === chatroom.id ? 'bg-gray-100' : ''}`}
                                         onClick={() => handleChatroomSelect(chatroom)}
                                     >
-                                        {chatroom.chatting_with_current_user.image ? (
+                                        {chatroom.chatting_with_current_user && chatroom.chatting_with_current_user.image ? (
                                             <img
                                                 src={chatroom.chatting_with_current_user.image}
                                                 alt={chatroom.chatting_with_current_user.name}
@@ -548,7 +578,9 @@ const ChatInterface: React.FC = () => {
                                             </div>
                                         )}
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="font-medium text-sm md:text-base truncate">{chatroom.chatting_with_current_user.name}</h3>
+                                            <h3 className="font-medium text-sm md:text-base truncate">
+                                                {chatroom.chatting_with_current_user ? chatroom.chatting_with_current_user.name : 'Unknown User'}
+                                            </h3>
                                             <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                                         </div>
                                         <div className="text-xs text-gray-400 flex-shrink-0">
@@ -573,7 +605,7 @@ const ChatInterface: React.FC = () => {
                             ) : (
                                 filteredPendingChatrooms.map((chatroom) => (
                                     <div key={chatroom.id} className="flex items-center p-3 md:p-4 border-b">
-                                        {chatroom.chatting_with_current_user.image ? (
+                                        {chatroom.chatting_with_current_user && chatroom.chatting_with_current_user.image ? (
                                             <img
                                                 src={chatroom.chatting_with_current_user.image}
                                                 alt={chatroom.chatting_with_current_user.name}
@@ -585,15 +617,17 @@ const ChatInterface: React.FC = () => {
                                             </div>
                                         )}
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="font-medium text-sm md:text-base truncate">{chatroom.chatting_with_current_user.name}</h3>
+                                            <h3 className="font-medium text-sm md:text-base truncate">
+                                                {chatroom.chatting_with_current_user ? chatroom.chatting_with_current_user.name : 'Unknown User'}
+                                            </h3>
                                             <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                                             <div className="text-xs text-gray-400 flex items-center">
                                                 <Clock className="h-3 w-3 mr-1" />
-                                                {chatroom.created_at && chatroom.created_at.trim() !== '' ? 
+                                                {chatroom.created_at && chatroom.created_at.trim() !== '' ?
                                                     (() => {
                                                         const date = new Date(chatroom.created_at);
                                                         return isNaN(date.getTime()) ? 'Invalid date' : date.toLocaleDateString();
-                                                    })() 
+                                                    })()
                                                     : null
                                                 }
                                             </div>
@@ -637,7 +671,7 @@ const ChatInterface: React.FC = () => {
                             >
                                 <ArrowLeft className="h-5 w-5" />
                             </button>
-                            {selectedChatroom.chatting_with_current_user.image ? (
+                            {selectedChatroom.chatting_with_current_user && selectedChatroom.chatting_with_current_user.image ? (
                                 <img
                                     src={selectedChatroom.chatting_with_current_user.image}
                                     alt={selectedChatroom.chatting_with_current_user.name}
@@ -649,7 +683,9 @@ const ChatInterface: React.FC = () => {
                                 </div>
                             )}
                             <div className="min-w-0 flex-1">
-                                <h2 className="font-medium text-sm md:text-base truncate">{selectedChatroom.chatting_with_current_user.name}</h2>
+                                <h2 className="font-medium text-sm md:text-base truncate">
+                                    {selectedChatroom.chatting_with_current_user ? selectedChatroom.chatting_with_current_user.name : 'Unknown User'}
+                                </h2>
                                 <p className="text-xs md:text-sm text-gray-500 flex items-center">
                                     {wsConnected ? 
                                         <span className="text-green-500 flex items-center"><span className="h-2 w-2 bg-green-500 rounded-full mr-1"></span>Online</span> : 

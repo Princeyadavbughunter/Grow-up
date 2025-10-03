@@ -165,7 +165,7 @@ export default function NetworkPage() {
       // Process other freelancers (exclude already connected ones)
       const connectedIds = new Set(combinedNetwork.map(f => f.id));
       const processedFreelancers = (freelancersData || [])
-        .filter((freelancer: Freelancer) => !connectedIds.has(freelancer.id) && freelancer.id !== profileData.id)
+        .filter((freelancer: Freelancer) => !connectedIds.has(freelancer.id) && freelancer.id !== profileData?.id)
         .map((freelancer: Freelancer) => ({
           id: freelancer.id,
           name: `${freelancer.first_name || ""} ${freelancer.last_name || ""}`.trim() || "User",

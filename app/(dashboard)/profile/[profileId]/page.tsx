@@ -1,11 +1,12 @@
 // @ts-nocheck 
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import ProfileData from "./_components/ProfileData";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import Summry from "./_components/summrytabs/Summry";
 
 const Page = ({ params }: any) => {
+  const resolvedParams = use(params);
   const { authToken } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +17,7 @@ const Page = ({ params }: any) => {
     const fetchProfileData = async () => {
       try {
         setLoading(true);
-        const response = await api.get(`/freelancer/freelancer-details/?id=${params.profileId}`);
+        const response = await api.get(`/freelancer/freelancer-details/?id=${resolvedParams.profileId}`);
         if (response.data) {
           console.log(response.data);
           setProfileData(response.data);
@@ -51,7 +52,7 @@ const Page = ({ params }: any) => {
       ) : (
         <>
           <ProfileData profileData={profileData} />
-          <Summry profileData={profileData} profileId={params.profileId} />
+          <Summry profileData={profileData} profileId={resolvedParams.profileId} />
         </>
       )}
     </div>

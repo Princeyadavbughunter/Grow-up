@@ -94,6 +94,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   const followButtonContent = getFollowButtonContent();
 
   const handleOpenInbox = () => {
+    console.log('Opening inbox for user:', profileData.user);
     router.push(`/chat/${profileData.user}`);
   };
 
