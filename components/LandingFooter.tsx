@@ -17,8 +17,8 @@ const LandingFooter = () => {
       title: 'Support',
       links: [
         { name: 'Help Center', href: '/help' },
-        { name: 'Privacy Policy', href: '/privacy' },
-        { name: 'Terms of Service', href: '/terms' },
+        { name: 'Privacy Policy', href: '/privacy-policy' },
+        { name: 'Terms of Service', href: '/terms-and-conditions' },
         { name: 'Cookie Policy', href: '/cookies' },
         { name: 'Contact Support', href: '/support' },
       ],
@@ -208,10 +208,10 @@ const LandingFooter = () => {
               © 2024 GrowUp Buddy. All Rights Reserved. Made with ❤️ by the GrowUp Buddy Team
             </p>
             <div className="flex justify-center sm:justify-end gap-4 sm:gap-6 text-xs sm:text-sm">
-              <a href="/privacy" className="text-gray-500 hover:text-white transition-colors duration-300">
+              <a href="/privacy-policy" className="text-gray-500 hover:text-white transition-colors duration-300">
                 Privacy
               </a>
-              <a href="/terms" className="text-gray-500 hover:text-white transition-colors duration-300">
+              <a href="/terms-and-conditions" className="text-gray-500 hover:text-white transition-colors duration-300">
                 Terms
               </a>
               <a href="/cookies" className="text-gray-500 hover:text-white transition-colors duration-300">

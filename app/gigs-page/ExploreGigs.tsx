@@ -1,6 +1,10 @@
+'use client'
 import React from 'react'
+import { useRouter } from 'next/navigation'
 
 const ExploreGigs = () => {
+  const router = useRouter()
+  
   return (
     <div className='relative flex flex-col items-center justify-center py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden'>
       {/* Background Elements */}
@@ -44,7 +48,10 @@ const ExploreGigs = () => {
 
         {/* CTA Button */}
         <div className="flex justify-center items-center pt-6">
-          <button className='group relative font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white flex items-center justify-center py-5 px-10 sm:py-6 sm:px-12 md:py-7 md:px-14 lg:py-8 lg:px-16 rounded-full bg-gradient-to-r from-[#7052FF] via-[#8B5FFF] to-[#E11D48] hover:from-[#5A3FFF] hover:via-[#7A4FFF] hover:to-[#D11D48] shadow-2xl hover:shadow-3xl transform transition-all duration-500 hover:scale-110 hover:-translate-y-2 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/40'>
+          <button 
+            onClick={() => router.push('/gigs')}
+            className='group relative font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white flex items-center justify-center py-5 px-10 sm:py-6 sm:px-12 md:py-7 md:px-14 lg:py-8 lg:px-16 rounded-full bg-gradient-to-r from-[#7052FF] via-[#8B5FFF] to-[#E11D48] hover:from-[#5A3FFF] hover:via-[#7A4FFF] hover:to-[#D11D48] shadow-2xl hover:shadow-3xl transform transition-all duration-500 hover:scale-110 hover:-translate-y-2 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/40'
+          >
             {/* Button Background Glow */}
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#7052FF] via-[#8B5FFF] to-[#E11D48] opacity-0 group-hover:opacity-30 transition-opacity duration-500 blur-xl"></div>
 

@@ -1,8 +1,11 @@
 'use client'
 import React from 'react'
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 
 const ClubPreview = () => {
+  const router = useRouter()
+  
   const clubs = [
     {
       name: 'Marketing Club',
@@ -97,7 +100,10 @@ const ClubPreview = () => {
             </p>
 
             {/* Join Button */}
-            <button className="w-full py-3 px-4 rounded-xl font-medium text-[#7052FF] border-2 border-[#7052FF]/20 hover:bg-[#7052FF] hover:text-white transition-all duration-300">
+            <button 
+              onClick={() => router.push('/clubs')}
+              className="w-full py-3 px-4 rounded-xl font-medium text-[#7052FF] border-2 border-[#7052FF]/20 hover:bg-[#7052FF] hover:text-white transition-all duration-300"
+            >
               View Community
             </button>
           </motion.div>
