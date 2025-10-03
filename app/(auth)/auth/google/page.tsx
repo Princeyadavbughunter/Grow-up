@@ -156,10 +156,10 @@ const AccountCreationContent = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white via-white to-[#E9DAFF] p-6">
-            <div className="max-w-7xl mx-auto">
+        <div className="min-h-screen bg-gradient-to-b from-white via-white to-[#E9DAFF] px-6 py-8">
+            <div className="max-w-7xl mx-auto h-full">
                 {/* Header */}
-                <div className="mb-12 flex items-center">
+                <div className="mb-16 flex items-center">
                     <Image
                         src="/logo.svg"
                         alt="GrowUp Buddy"
@@ -167,45 +167,40 @@ const AccountCreationContent = () => {
                         height={20}
                         className="cursor-pointer"
                     />
-                    <h2 className='text-2xl font-semibold'>GrowUp Buddy</h2>
+                    <h2 className='text-2xl font-semibold ml-3'>GrowUp Buddy</h2>
                 </div>
 
                 {/* Main Content */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+                <div className="flex flex-col lg:flex-row items-center justify-center gap-16 lg:gap-24 min-h-[calc(100vh-200px)]">
                     {/* Left Section */}
-                    <div className="flex-1 flex flex-col gap-10 items-center justify-center">
-                        <Image
-                            src="/images/illustration.svg"
-                            alt="Opportunities Illustration"
-                            width={300}
-                            height={250}
-                        />
-                        <div>
-                            <h2 className="text-2xl font-bold mt-6 mb-3 text-center">
-                                Explore Opportunities
-                            </h2>
-                            <p className="text-gray-600 text-center max-w-md mx-auto">
-                                Welcome to a world of opportunities, where every corner holds the potential for growth and discovery.
-                            </p>
+                    <div className="flex-1 flex flex-col items-center justify-center max-w-2xl">
+                        <div className="w-full flex justify-center">
+                            <Image
+                                src="/images/login_page.svg"
+                                alt="Opportunities Illustration"
+                                width={600}
+                                height={500}
+                                className="w-full max-w-xl h-auto object-contain"
+                            />
                         </div>
                     </div>
 
                     {/* Right Section */}
-                    <div className="flex-1 max-w-md w-full">
-                        <div className="text-center">
-                            <h1 className="text-2xl font-bold mb-3">Create Your Account</h1>
-                            <p className="text-gray-600 mb-8">
+                    <div className="flex-1 max-w-lg w-full flex flex-col justify-center">
+                        <div className="text-center px-4">
+                            <h1 className="text-2xl lg:text-3xl font-bold mb-4">Create Your Account</h1>
+                            <p className="text-gray-600 mb-10 text-base leading-relaxed">
                                 Connect with top students, freelancers, and project-driven recruiters
                             </p>
 
                             {/* Social Login Buttons */}
                             <div className="space-y-4 bg-[#F1F1F1] p-8 rounded-2xl shadow-lg">
                                 <button
-                                    className="w-full flex items-center bg-white justify-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                                    className="w-full flex items-center bg-white justify-center gap-3 px-2 py-4 rounded-xl hover:bg-gray-50 transition-colors font-medium text-lg"
                                     onClick={handleGoogleAuth}
                                     disabled={loading}
                                 >
-                                    <FcGoogle className="text-xl" />
+                                    <FcGoogle className="text-2xl" />
                                     <span>{loading ? 'Loading...' : 'Continue with Google'}</span>
                                 </button>
                             </div>
@@ -219,9 +214,9 @@ const AccountCreationContent = () => {
 
 const LoadingFallback = () => {
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white via-white to-[#E9DAFF] p-6">
-            <div className="max-w-7xl mx-auto">
-                <div className="mb-12 flex items-center">
+        <div className="min-h-screen bg-gradient-to-b from-white via-white to-[#E9DAFF] px-6 py-8">
+            <div className="max-w-7xl mx-auto h-full">
+                <div className="mb-16 flex items-center">
                     <Image
                         src="/logo.svg"
                         alt="GrowUp Buddy"
@@ -229,12 +224,12 @@ const LoadingFallback = () => {
                         height={20}
                         className="cursor-pointer"
                     />
-                    <h2 className='text-2xl font-semibold'>GrowUp Buddy</h2>
+                    <h2 className='text-2xl font-semibold ml-3'>GrowUp Buddy</h2>
                 </div>
-                <div className="flex items-center justify-center min-h-[400px]">
+                <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-                        <p className="text-gray-600">Loading...</p>
+                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-6"></div>
+                        <p className="text-gray-600 text-lg">Loading...</p>
                     </div>
                 </div>
             </div>

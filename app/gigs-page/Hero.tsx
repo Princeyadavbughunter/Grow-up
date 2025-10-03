@@ -1,7 +1,11 @@
+'use client'
 import React from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 const Hero = () => {
+  const router = useRouter()
+  
   return (
     <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
       
@@ -48,7 +52,10 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:gap-8 justify-center items-center">
               
               {/* Primary CTA */}
-              <button className="group relative inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#7052FF] to-blue-600 hover:from-[#5a42d4] hover:to-blue-700 text-white font-semibold text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/30 focus:ring-opacity-50 w-full sm:w-auto">
+              <button 
+                onClick={() => router.push('/gigs')}
+                className="group relative inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#7052FF] to-blue-600 hover:from-[#5a42d4] hover:to-blue-700 text-white font-semibold text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/30 focus:ring-opacity-50 w-full sm:w-auto"
+              >
                 <span>Explore Opportunities</span>
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>

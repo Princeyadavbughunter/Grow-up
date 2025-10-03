@@ -66,6 +66,19 @@ export default function Hero() {
   const [selectedRole, setSelectedRole] = useState<Role>("Developer")
   const { containerRef, contentRef, scale } = useScaleToFit()
 
+  // Auto-rotate roles every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSelectedRole((current) => {
+        const currentIndex = roles.indexOf(current)
+        const nextIndex = (currentIndex + 1) % roles.length
+        return roles[nextIndex]
+      })
+    }, 3000) // Change role every 3 seconds
+
+    return () => clearInterval(interval)
+  }, [])
+
   const otherRoles = roles.filter((r) => r !== selectedRole)
   const topRoles = otherRoles.slice(0, 2)
   const bottomRoles = otherRoles.slice(2)
