@@ -5,34 +5,28 @@ import React from 'react'
 const TeamMemberCard = () => {
   const teamMembers = [
     {
-      name: "Priyanka Chopra",
-      title: "Founder - Finzie | Ex Groww | BITS Pilani",
-      image: "/Team1.png",
+      name: "Dirghayu Kaushik",
+      title: "Co-Founder & CEO, Ambitio | Building Copilot for Higher Education Abroad👨🏻‍🎓 | IIT BHU",
+      image: "/events/dirghayu.jpeg",
+      linkedin: "https://www.linkedin.com/in/dirghayukaushik",
     },
     {
-      name: "Rahul Sharma",
-      title: "CTO - TechCorp | Ex Google | IIT Delhi",
-      image: "/Team2.png",
+      name: "Aryan Trivedi",
+      title: "Founder - Finzie | Helping Startups with Freelancer Onboarding",
+      image: "/events/aryan_trivedi.jpeg",
+      linkedin: "https://www.linkedin.com/in/aryantrivedi/",
     },
     {
-      name: "Anita Desai",
-      title: "Head of Design | Ex Adobe | NID Ahmedabad",
-      image: "/Team3.png",
+      name: "Akanksha Garg",
+      title: "Sde2 @Salesforce| Ex SDE @Microsoft | SDE Intern @Amazon | GSoC'21 @AboutCode | IIT Kanpur'22",
+      image: "/events/akansha_garg.jpeg",
+      linkedin: "https://www.linkedin.com/in/akanksha-garg-5b2868194/",
     },
     {
-      name: "Vikram Singh",
-      title: "VP Engineering | Ex Microsoft | IIT Bombay",
-      image: "/Team4.png",
-    },
-    {
-      name: "Shreya Patel",
-      title: "Product Manager | Ex Flipkart | ISB Hyderabad",
-      image: "/Team5.png",
-    },
-    {
-      name: "Arjun Mehta",
-      title: "Data Scientist | Ex Amazon | IISc Bangalore",
-      image: "/Team6.png",
+      name: "Siddharth Prakash",
+      title: "Co-Founder and COO @ Baylink | Product @Housing | Startups, Entrepreneurship",
+      image: "/events/siddhart_prakash.jpeg",
+      linkedin: "https://www.linkedin.com/in/siddharth-prakash-0551091b8",
     },
   ];
 
@@ -43,8 +37,26 @@ const TeamMemberCard = () => {
         {teamMembers.map((member, index) => (
           <div 
             key={index} 
-            className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden max-w-sm mx-auto w-full transform hover:scale-105"
+            className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden max-w-sm mx-auto w-full transform hover:scale-105 relative"
           >
+            {/* LinkedIn Icon - Top Right */}
+            <a
+              href={member.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute top-4 right-4 z-20 inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#0077B5] hover:bg-[#005582] transition-colors duration-300 shadow-md hover:shadow-lg"
+              aria-label={`Visit ${member.name}'s LinkedIn profile`}
+            >
+              <svg
+                className="w-5 h-5 text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+            </a>
+            
             {/* Gradient Background */}
             <div className="bg-gradient-to-b from-[#7052FF] to-[#A392FF] h-32 sm:h-36 md:h-40 rounded-t-3xl flex justify-center items-end relative">
               {/* Circular Image */}
