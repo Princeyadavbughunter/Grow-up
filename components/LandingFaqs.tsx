@@ -130,7 +130,10 @@ const LandingFaqs = () => {
         <p className="text-[#696C78] text-base sm:text-lg mb-6 sm:mb-8">
           Still have questions? We're here to help!
         </p>
-        <button className="inline-flex items-center justify-center gap-2 bg-[#7052FF] hover:bg-[#5a42d4] active:bg-[#4a36b8] text-white font-semibold text-base sm:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/30">
+        <button 
+          onClick={() => window.location.href = '/support'}
+          className="inline-flex items-center justify-center gap-2 bg-[#7052FF] hover:bg-[#5a42d4] active:bg-[#4a36b8] text-white font-semibold text-base sm:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/30"
+        >
           <span>Contact Support</span>
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 20l1.98-5.874A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"/>
