@@ -58,11 +58,11 @@ const LandingNav = () => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/auth/google" className="text-[#7052FF] hover:text-[#5a42d4] font-medium transition-colors duration-200">
+            {/* <Link href="/auth/google" className="text-[#7052FF] hover:text-[#5a42d4] font-medium transition-colors duration-200">
               Get Started
-            </Link>
+            </Link> */}
             <Link href="/auth/google" className="bg-[#7052FF] text-white px-6 py-3 rounded-full hover:bg-[#5a42d4] font-medium transition-all duration-200 shadow-sm hover:shadow-md">
-              Login
+              Get Started
             </Link>
           </div>
 

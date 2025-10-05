@@ -8,6 +8,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { useAuth } from '@/context/AuthContext'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface GoogleAuthResponse {
     authorization_url?: string;
@@ -18,8 +19,16 @@ interface GoogleAuthResponse {
 
 const AccountCreationContent = () => {
     const [loading, setLoading] = useState(false)
+    const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const searchParams = useSearchParams()
     const router = useRouter()
+
+    // Array of login page images
+    const loginImages = [
+        '/images/login_page.svg',
+        '/images/login_page2.svg',
+        '/images/login_page3.svg'
+    ]
 
     const COOKIE_OPTIONS = {
         expires: 7,
@@ -27,6 +36,15 @@ const AccountCreationContent = () => {
         sameSite: 'strict' as const,
         path: '/'
     };
+
+    // Auto-rotate images every 4 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentImageIndex((prevIndex) => (prevIndex + 1) % loginImages.length)
+        }, 4000) // Change image every 4 seconds
+
+        return () => clearInterval(interval)
+    }, [])
 
     useEffect(() => {
         const code = searchParams.get('code')
@@ -172,16 +190,28 @@ const AccountCreationContent = () => {
 
                 {/* Main Content */}
                 <div className="flex flex-col lg:flex-row items-center justify-center gap-16 lg:gap-24 min-h-[calc(100vh-200px)]">
-                    {/* Left Section */}
+                    {/* Left Section - Image Carousel */}
                     <div className="flex-1 flex flex-col items-center justify-center max-w-2xl">
-                        <div className="w-full flex justify-center">
-                            <Image
-                                src="/images/login_page.svg"
-                                alt="Opportunities Illustration"
-                                width={600}
-                                height={500}
-                                className="w-full max-w-xl h-auto object-contain"
-                            />
+                        <div className="w-full flex justify-center relative h-[400px] lg:h-[500px]">
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={currentImageIndex}
+                                    initial={{ opacity: 0, x: 100 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -100 }}
+                                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                                    className="absolute inset-0 flex items-center justify-center"
+                                >
+                                    <Image
+                                        src={loginImages[currentImageIndex]}
+                                        alt={`Opportunities Illustration ${currentImageIndex + 1}`}
+                                        width={600}
+                                        height={500}
+                                        className="w-full max-w-xl h-auto object-contain"
+                                        priority={currentImageIndex === 0}
+                                    />
+                                </motion.div>
+                            </AnimatePresence>
                         </div>
                     </div>
 

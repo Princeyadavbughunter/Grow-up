@@ -113,7 +113,7 @@ const LandingFaqs = () => {
                 <div className={`border-t pt-4 sm:pt-6 md:pt-8 ${
                   activeIndex === index ? 'border-white border-opacity-20' : 'border-gray-200'
                 }`}>
-                  <p className={`text-sm sm:text-base md:text-lg leading-relaxed ${
+                  <p className={`text-sm sm:text-base md:text-lg leading-relaxed max-w-full mx-auto md:mx-0 text-justify hyphens-auto ${
                     activeIndex === index ? 'text-white' : 'text-gray-600'
                   }`}>
                     {item.answer}

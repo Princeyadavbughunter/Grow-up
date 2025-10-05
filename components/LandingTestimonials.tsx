@@ -2,55 +2,67 @@
 import React from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination, Navigation } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/pagination'
-import 'swiper/css/navigation'
 import Image from 'next/image'
 
 const LandingTestimonials = () => {
   const testimonials = [
     { 
-      name: 'Sarah Johnson', 
-      image: '/testimonial1.png', 
+      name: 'Shivam Kumar', 
+      image: '/testimonials/shivam_kumar.jpeg', 
       bgColor: 'bg-blue-50',
-      role: 'Freelance Designer',
-      testimonial: 'GrowUp Buddy transformed my freelance career. I found amazing clients and doubled my income within 3 months!'
+      role: 'Co-Founder at Techavtar',
+      testimonial: 'Honestly, I wasn\'t expecting much when I joined, but GrowUp Buddy completely changed the game for me. Found some really great clients here and my income literally doubled in just 3 months. Best decision I made for my freelance career!',
+      linkedinUrl: 'https://www.linkedin.com/in/shievam/'
     },
     { 
-      name: 'Michael Chen', 
-      image: '/testimonial1.png', 
+      name: 'Sumati Grover', 
+      image: '/testimonials/sumati_grover.jpeg', 
       bgColor: 'bg-yellow-50',
-      role: 'Software Developer',
-      testimonial: 'The community here is incredible. I learned new skills and found my dream job through the connections I made.'
+      role: 'Digital Marketer & Content Writer',
+      testimonial: 'The community here is something else! Everyone\'s so supportive and willing to share knowledge. I picked up so many new skills just by being active here, and actually landed my dream job through a connection I made on the platform. Couldn\'t be happier!',
+      linkedinUrl: 'https://www.linkedin.com/in/sumati-grover/'
     },
     { 
-      name: 'Emma Rodriguez', 
-      image: '/testimonial1.png', 
+      name: 'Shashank Mishra', 
+      image: '/testimonials/shashank_mishra.jpeg', 
       bgColor: 'bg-green-50',
-      role: 'Marketing Specialist',
-      testimonial: 'Amazing platform for networking and growth. The gigs I found here helped me build a strong portfolio.'
+      role: 'SDE @ RideSense',
+      testimonial: 'What I love most about GrowUp Buddy is how easy it makes networking. The gigs I\'ve worked on here have really helped me build a solid portfolio. Plus, you get to learn from other talented people in your field. It\'s been amazing for my growth as a developer.',
+      linkedinUrl: 'https://www.linkedin.com/in/shashank-mishra14'
     },
     { 
-      name: 'David Kim', 
-      image: '/testimonial1.png', 
+      name: 'Varun Kumar', 
+      image: '/testimonials/varun_kumar.jpeg', 
       bgColor: 'bg-[#7052FF]/5',
-      role: 'Content Creator',
-      testimonial: 'GrowUp Buddy gave me the tools and connections I needed to turn my passion into a profitable business.'
+      role: 'Video Editor',
+      testimonial: 'I was struggling to turn my video editing passion into something profitable. GrowUp Buddy gave me the tools, connections, and opportunities I needed. Now I\'m running my own successful editing business. This platform really works if you put in the effort!',
+      linkedinUrl: 'https://www.linkedin.com/in/varun-kumar-aa9646202'
     },
     { 
-      name: 'Lisa Thompson', 
-      image: '/testimonial1.png', 
+      name: 'Mosin Shaikh', 
+      image: '/testimonials/mosin_shaikh.jpeg', 
       bgColor: 'bg-pink-50',
-      role: 'Business Consultant',
-      testimonial: 'The learning opportunities and expert connections have accelerated my professional growth significantly.'
+      role: 'Founder @Cadrage&Co',
+      testimonial: 'The learning opportunities here are incredible. I\'ve connected with so many experts in my field who\'ve helped me grow professionally. The resources and mentorship available through this platform have been invaluable for building my business.',
+      linkedinUrl: 'https://www.linkedin.com/in/itsmosin'
     },
     { 
-      name: 'Alex Brown', 
-      image: '/testimonial1.png', 
+      name: 'Vishnu Jangid', 
+      image: '/testimonials/vishnu_jangid.jpeg', 
       bgColor: 'bg-indigo-50',
-      role: 'Entrepreneur',
-      testimonial: 'Found my co-founder and initial team through GrowUp Buddy. This platform is a game-changer for startups.'
+      role: 'Freelancer | AI - DS Engineer',
+      testimonial: 'As a freelancer in AI and data science, finding quality projects was always a challenge. GrowUp Buddy made it so much easier. The platform connects you with serious clients and other professionals who actually understand your work. Highly recommend it!',
+      linkedinUrl: 'https://www.linkedin.com/in/vishnu-jangid-899175235'
     },
+    { 
+      name: 'Koushiki Mridha', 
+      image: '/testimonials/koushiki.jpeg', 
+      bgColor: 'bg-indigo-50',
+      role: 'Software Engineer',
+      testimonial: 'I found my co-founder and our initial team members right here on GrowUp Buddy. The quality of people you meet on this platform is impressive. It\'s not just another networking site - people here are genuinely interested in collaborating and building something great together.',
+      linkedinUrl: 'https://www.linkedin.com/in/koushikimridha'
+    },
+
   ]
 
   return (
@@ -114,7 +126,12 @@ const LandingTestimonials = () => {
                 
                 {/* LinkedIn Icon */}
                 <div className="flex justify-end p-4 sm:p-6">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-lg shadow-md flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <a 
+                    href={testimonial.linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-lg shadow-md flex items-center justify-center hover:scale-110 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                  >
                     <Image 
                       src="/linedin.png" 
                       alt="LinkedIn Logo" 
@@ -122,7 +139,7 @@ const LandingTestimonials = () => {
                       height={24}
                       className="w-5 h-5 sm:w-6 sm:h-6 object-contain"
                     />
-                  </div>
+                  </a>
                 </div>
 
                 {/* Content */}
@@ -149,7 +166,7 @@ const LandingTestimonials = () => {
                         ))}
                       </div>
                     </div>
-                    <p className="text-[#696C78] text-xs sm:text-sm md:text-base lg:text-lg text-center leading-relaxed line-clamp-4 px-1">
+                    <p className="text-[#696C78] text-[10px] sm:text-xs md:text-sm lg:text-base text-center leading-relaxed line-clamp-5 px-1">
                       "{testimonial.testimonial}"
                     </p>
                   </div>
@@ -203,6 +220,12 @@ const LandingTestimonials = () => {
         .line-clamp-4 {
           display: -webkit-box;
           -webkit-line-clamp: 4;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .line-clamp-5 {
+          display: -webkit-box;
+          -webkit-line-clamp: 5;
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
