@@ -2,6 +2,9 @@
 import React from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination, Navigation } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/pagination'
+import 'swiper/css/navigation'
 import Image from 'next/image'
 
 const LandingTestimonials = () => {
@@ -121,8 +124,8 @@ const LandingTestimonials = () => {
           className="testimonials-swiper pb-12 sm:pb-16"
         >
           {testimonials.map((testimonial, index) => (
-            <SwiperSlide key={index}>
-              <div className={`relative rounded-2xl mb-10 sm:rounded-3xl ${testimonial.bgColor} border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group overflow-hidden h-full`}>
+            <SwiperSlide key={index} className="h-auto">
+              <div className={`relative rounded-2xl mb-10 sm:rounded-3xl ${testimonial.bgColor} border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group overflow-hidden flex flex-col min-h-[420px] sm:min-h-[450px]`}>
                 
                 {/* LinkedIn Icon */}
                 <div className="flex justify-end p-4 sm:p-6">
@@ -143,7 +146,7 @@ const LandingTestimonials = () => {
                 </div>
 
                 {/* Content */}
-                <div className="px-4 sm:px-6 pb-6 sm:pb-8">
+                <div className="px-4 sm:px-6 pb-6 sm:pb-8 flex-1 flex flex-col">
                   
                   {/* Name and Role */}
                   <div className="text-center mb-4 sm:mb-6 px-2">
@@ -156,7 +159,7 @@ const LandingTestimonials = () => {
                   </div>
 
                   {/* Testimonial Text */}
-                  <div className="mb-6 sm:mb-8">
+                  <div className="mb-6 sm:mb-8 flex-1">
                     <div className="flex justify-center mb-3 sm:mb-4">
                       <div className="flex space-x-1">
                         {[...Array(5)].map((_, i) => (
