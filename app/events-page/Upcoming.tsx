@@ -114,7 +114,10 @@ const Upcoming = () => {
 
       {/* View More Button */}
       <div className="flex justify-center mt-8 sm:mt-12">
-        <button className="px-6 py-3 bg-white border-2 border-[#7052FF] text-[#7052FF] font-semibold rounded-lg hover:bg-[#7052FF] hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/40 focus:ring-offset-2">
+        <button 
+          onClick={() => window.location.href = '/events'}
+          className="px-6 py-3 bg-white border-2 border-[#7052FF] text-[#7052FF] font-semibold rounded-lg hover:bg-[#7052FF] hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#7052FF]/40 focus:ring-offset-2"
+        >
           View All Events
         </button>
       </div>
