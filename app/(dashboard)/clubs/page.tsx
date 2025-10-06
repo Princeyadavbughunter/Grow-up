@@ -105,7 +105,7 @@ const Page = () => {
       )}
 
       {/* Left Sidebar - Clubs List */}
-      <div className={`w-full lg:w-1/4 bg-[#F9FAFF] ${selectedClubId ? 'hidden lg:block' : 'block'} overflow-y-auto`}>
+      <div className={`w-full lg:w-1/4 bg-[#F9FAFF] ${selectedClubId ? 'hidden' : 'block'} overflow-y-auto`}>
         <div className="p-3 sm:p-4 md:p-6">
           <ClubsList selectedClubId={selectedClubId} setSelectedClubId={setSelectedClubId} />
         </div>

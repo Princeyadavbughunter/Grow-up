@@ -1,12 +1,83 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 
+interface Club {
+  name: string;
+  description: string;
+  members: number;
+  posts: number;
+  category: string;
+}
+
+interface ClubCardProps {
+  club: Club;
+  index: number;
+}
+
+const ClubCard = ({ club, index }: ClubCardProps) => {
+  const router = useRouter();
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <motion.div
+      key={club.name}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      className="bg-white rounded-2xl p-6 border-2 border-[#7052FF]/10 hover:border-[#7052FF]/30 hover:shadow-lg transition-all duration-300 group"
+    >
+      {/* Club Header */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-lg text-[#4A4A4A] group-hover:text-[#7052FF] transition-colors">
+            {club.name}
+          </h3>
+          <span className="text-xs font-medium text-[#696C78] bg-gray-100 px-2 py-1 rounded-full">
+            {club.category}
+          </span>
+        </div>
+        <div className="flex items-center gap-4 text-sm text-[#696C78] mb-3">
+          <span>{club.members.toLocaleString()} members</span>
+          <span className="w-1 h-1 bg-[#696C78] rounded-full"></span>
+          <span>{club.posts} posts</span>
+        </div>
+      </div>
+
+      {/* Club Description */}
+      <div className="text-[#696C78] text-sm leading-relaxed mb-6">
+        <p className={`${isExpanded ? '' : 'line-clamp-1'} text-sm`}>
+          {club.description}
+        </p>
+        {club.description.length > 80 && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              setIsExpanded(!isExpanded);
+            }}
+            className="text-[#7052FF] hover:text-[#5a42d1] font-medium mt-1 text-sm"
+          >
+            {isExpanded ? 'Show less' : 'Read more'}
+          </button>
+        )}
+      </div>
+
+      {/* Join Button */}
+      <button
+        onClick={() => router.push('/clubs')}
+        className="w-full py-3 px-4 rounded-xl font-medium text-[#7052FF] border-2 border-[#7052FF]/20 hover:bg-[#7052FF] hover:text-white transition-all duration-300"
+      >
+        View Community
+      </button>
+    </motion.div>
+  );
+};
+
 const ClubPreview = () => {
   const router = useRouter()
-  
-  const clubs = [
+
+  const clubs: Club[] = [
     {
       name: 'Marketing Club',
       description: 'Connect with marketing professionals and share growth strategies.',
@@ -70,43 +141,7 @@ const ClubPreview = () => {
       {/* Club Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 sm:mb-20">
         {clubs.map((club, index) => (
-          <motion.div
-            key={club.name}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-2xl p-6 border-2 border-[#7052FF]/10 hover:border-[#7052FF]/30 hover:shadow-lg transition-all duration-300 group"
-          >
-            {/* Club Header */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-lg text-[#4A4A4A] group-hover:text-[#7052FF] transition-colors">
-                  {club.name}
-                </h3>
-                <span className="text-xs font-medium text-[#696C78] bg-gray-100 px-2 py-1 rounded-full">
-                  {club.category}
-                </span>
-              </div>
-              <div className="flex items-center gap-4 text-sm text-[#696C78] mb-3">
-                <span>{club.members.toLocaleString()} members</span>
-                <span className="w-1 h-1 bg-[#696C78] rounded-full"></span>
-                <span>{club.posts} posts</span>
-              </div>
-            </div>
-
-            {/* Club Description */}
-            <p className="text-[#696C78] text-sm leading-relaxed mb-6">
-              {club.description}
-            </p>
-
-            {/* Join Button */}
-            <button 
-              onClick={() => router.push('/clubs')}
-              className="w-full py-3 px-4 rounded-xl font-medium text-[#7052FF] border-2 border-[#7052FF]/20 hover:bg-[#7052FF] hover:text-white transition-all duration-300"
-            >
-              View Community
-            </button>
-          </motion.div>
+          <ClubCard key={club.name} club={club} index={index} />
         ))}
       </div>
 
