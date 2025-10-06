@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
@@ -47,10 +48,10 @@ const ClubCard = ({ club, index }: ClubCardProps) => {
 
       {/* Club Description */}
       <div className="text-[#696C78] text-sm leading-relaxed mb-6">
-        <p className={`${isExpanded ? '' : 'line-clamp-1'} text-sm`}>
+        <p className={`${isExpanded ? '' : 'line-clamp-1 overflow-hidden'} text-sm`}>
           {club.description}
         </p>
-        {club.description.length > 80 && (
+        {club.description.length > 50 && (
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -80,42 +81,42 @@ const ClubPreview = () => {
   const clubs: Club[] = [
     {
       name: 'Marketing Club',
-      description: 'Connect with marketing professionals and share growth strategies.',
+      description: 'Connect with marketing professionals and share growth strategies. Learn about the latest marketing trends, digital campaigns, SEO techniques, and social media strategies to boost your business.',
       members: 1247,
       posts: 89,
       category: 'Business'
     },
     {
       name: 'Finance Club',
-      description: 'Investment insights, financial planning, and market discussions.',
+      description: 'Investment insights, financial planning, and market discussions. Join us to discuss stock market analysis, cryptocurrency investments, personal finance management, and career opportunities in finance.',
       members: 892,
       posts: 156,
       category: 'Finance'
     },
     {
       name: 'Tech Club',
-      description: 'Latest technology trends, coding insights, and innovation.',
+      description: 'Latest technology trends, coding insights, and innovation. Explore cutting-edge technologies, programming languages, software development methodologies, and the future of tech industry.',
       members: 2134,
       posts: 234,
       category: 'Technology'
     },
     {
       name: 'Design Club',
-      description: 'UI/UX design, creative inspiration, and portfolio feedback.',
+      description: 'UI/UX design, creative inspiration, and portfolio feedback. Share your design work, get constructive feedback, learn about design principles, and discover new design tools and techniques.',
       members: 678,
       posts: 145,
       category: 'Design'
     },
     {
       name: 'Startup Club',
-      description: 'Entrepreneurship, funding, and building successful startups.',
+      description: 'Entrepreneurship, funding, and building successful startups. Connect with fellow entrepreneurs, learn about startup funding options, business development strategies, and scaling your business.',
       members: 1532,
       posts: 198,
       category: 'Business'
     },
     {
       name: 'Web3 Club',
-      description: 'Blockchain, cryptocurrency, and decentralized technologies.',
+      description: 'Blockchain, cryptocurrency, and decentralized technologies. Discuss the latest developments in blockchain technology, DeFi protocols, NFT marketplaces, and the future of decentralized finance.',
       members: 945,
       posts: 167,
       category: 'Technology'

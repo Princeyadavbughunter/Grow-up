@@ -103,16 +103,6 @@ const Page = () => {
               >
                 Members
               </button>
-              <button
-                onClick={() => setActiveTab('clubs')}
-                className={`flex-1 py-2 px-4 text-center font-medium transition-colors ${
-                  activeTab === 'clubs'
-                    ? 'text-purple-600 border-b-2 border-purple-600 bg-purple-50'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                Clubs
-              </button>
             </div>
           </div>
 
@@ -126,11 +116,6 @@ const Page = () => {
             {activeTab === 'members' && (
               <div className="p-4">
                 <NetworkSection title="Members" clubId={clubId} />
-              </div>
-            )}
-            {activeTab === 'clubs' && (
-              <div className="bg-[#F9FAFF] min-h-screen">
-                <ClubsList selectedClubId={clubId} setSelectedClubId={() => {}} />
               </div>
             )}
           </div>

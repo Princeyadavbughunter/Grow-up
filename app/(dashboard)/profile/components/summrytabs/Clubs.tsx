@@ -4,6 +4,12 @@ import { FaLaptopCode } from 'react-icons/fa6';
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import Link from "next/link";
 
+interface ClubCardProps {
+    club: Club;
+    onJoin: (clubId: string) => void;
+    isMobile: boolean;
+}
+
 interface Club {
     id: string;
     name: string;
@@ -11,6 +17,51 @@ interface Club {
     participants_count: number;
     is_user_member: boolean;
 }
+
+const ClubCard = ({ club, onJoin, isMobile }: ClubCardProps) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const toggleExpanded = () => setIsExpanded(!isExpanded);
+
+    return (
+        <div
+            className={`flex gap-2 items-center justify-between p-${isMobile ? '3' : '4'} border rounded-lg hover:shadow-sm transition-shadow ${isMobile ? 'w-64 flex-shrink-0 min-h-[100px]' : ''}`}
+        >
+            <div className="flex-shrink-0">
+                <FaLaptopCode color='#7052FF' size={isMobile ? 32 : 40} />
+            </div>
+            <div className="flex-1 min-w-0">
+                <h4 className={`text-sm font-bold ${!isMobile ? 'truncate' : ''}`}>{club.name}</h4>
+                <p className="text-xs text-gray-500">{club.participants_count} members</p>
+                <div className="text-xs text-gray-400">
+                    <p className={`${isExpanded ? '' : `${isMobile ? 'line-clamp-2 overflow-hidden' : 'truncate'}`}`}>
+                        {club.description}
+                    </p>
+                    {club.description.length > (isMobile ? 40 : 60) && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                toggleExpanded();
+                            }}
+                            className="text-[#7052FF] hover:text-[#5a42d1] font-medium mt-1"
+                        >
+                            {isExpanded ? 'Show less' : 'Read more'}
+                        </button>
+                    )}
+                </div>
+            </div>
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onJoin(club.id);
+                }}
+                className={`text-${isMobile ? 'xs' : 'sm'} font-semibold text-[#7052FF] hover:bg-[#7052FF] hover:text-white px-${isMobile ? '3' : '4'} py-1 border border-[#7052FF] rounded-full transition-colors whitespace-nowrap`}
+            >
+                Join
+            </button>
+        </div>
+    );
+};
 
 const Clubs = () => {
     const [clubs, setClubs] = useState([] as Club[]);
@@ -56,25 +107,12 @@ const Clubs = () => {
                     <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
                         {clubs && clubs.length > 0 ? (
                             clubs.map((club) => (
-                                <div
+                                <ClubCard
                                     key={club.id}
-                                    className="flex gap-2 items-center justify-between p-3 border rounded-lg hover:shadow-sm transition-shadow w-64 flex-shrink-0 min-h-[100px]"
-                                >
-                                    <div className="flex-shrink-0">
-                                        <FaLaptopCode color='#7052FF' size={32} />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="text-sm font-bold truncate">{club.name}</h4>
-                                        <p className="text-xs text-gray-500">{club.participants_count} members</p>
-                                        <p className="text-xs text-gray-400 line-clamp-2">{club.description}</p>
-                                    </div>
-                                    <button
-                                        onClick={() => handleJoin(club.id)}
-                                        className="text-xs font-semibold text-[#7052FF] hover:bg-[#7052FF] hover:text-white px-3 py-1 border border-[#7052FF] rounded-full transition-colors whitespace-nowrap"
-                                    >
-                                        Join
-                                    </button>
-                                </div>
+                                    club={club}
+                                    onJoin={handleJoin}
+                                    isMobile={true}
+                                />
                             ))
                         ) : (
                             <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4 text-gray-500 text-center w-full">
@@ -88,25 +126,12 @@ const Clubs = () => {
                 <div className="hidden lg:block space-y-4">
                     {clubs && clubs.length > 0 ? (
                         clubs.map((club) => (
-                            <div
+                            <ClubCard
                                 key={club.id}
-                                className="flex gap-2 items-center justify-between p-4 border rounded-lg hover:shadow-sm transition-shadow"
-                            >
-                                <div className="div">
-                                    <FaLaptopCode color='#7052FF' size={40} />
-                                </div>
-                                <div>
-                                    <h4 className="text-sm font-bold">{club.name}</h4>
-                                    <p className="text-xs text-gray-500">{club.participants_count} members</p>
-                                    <p className="text-xs text-gray-400 truncate">{club.description}</p>
-                                </div>
-                                <button
-                                    onClick={() => handleJoin(club.id)}
-                                    className="text-sm font-semibold text-[#7052FF] hover:bg-[#7052FF] hover:text-white px-4 py-1 border border-[#7052FF] rounded-full transition-colors"
-                                >
-                                    Join
-                                </button>
-                            </div>
+                                club={club}
+                                onJoin={handleJoin}
+                                isMobile={false}
+                            />
                         ))
                     ) : (
                         <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4 text-gray-500 text-center">

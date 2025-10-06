@@ -121,10 +121,10 @@ const ClubCard = ({ club, refresh, isMobile }: ClubCardProps) => {
                     </div>
 
                     <div className="text-gray-600 leading-relaxed">
-                        <p className={`${isExpanded ? '' : 'line-clamp-1'} ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                        <p className={`${isExpanded ? '' : 'line-clamp-1 overflow-hidden'} ${isMobile ? 'text-xs' : 'text-sm'}`}>
                             {club.description}
                         </p>
-                        {club.description.length > (isMobile ? 80 : 120) && (
+                        {club.description.length > (isMobile ? 50 : 80) && (
                             <button
                                 onClick={(e) => {
                                     e.preventDefault();
