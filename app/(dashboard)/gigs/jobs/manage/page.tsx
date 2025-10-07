@@ -110,7 +110,7 @@ export default function ManageJobsPage() {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-4">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Job Management</h1>
-                            <nav className="flex items-center gap-3 sm:gap-4 overflow-x-auto">
+                            <nav className="flex items-center gap-5 sm:gap-6 overflow-x-auto">
                                 <Link 
                                     href="/gigs" 
                                     className="text-gray-600 hover:text-purple-600 font-medium transition-colors flex items-center gap-2 whitespace-nowrap text-sm sm:text-base"
