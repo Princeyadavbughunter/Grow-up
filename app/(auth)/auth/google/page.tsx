@@ -189,10 +189,10 @@ const AccountCreationContent = () => {
                 </div>
 
                 {/* Main Content */}
-                <div className="flex flex-col lg:flex-row items-center justify-center gap-16 lg:gap-24 min-h-[calc(100vh-200px)]">
+                <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-24 min-h-[calc(100vh-200px)]">
                     {/* Left Section - Image Carousel */}
-                    <div className="flex-1 flex flex-col items-center justify-center max-w-2xl">
-                        <div className="w-full flex justify-center relative h-[400px] lg:h-[500px]">
+                    <div className="flex-1 flex flex-col items-center justify-center w-full max-w-2xl px-4 lg:px-0">
+                        <div className="w-full flex justify-center relative min-h-[280px] sm:min-h-[350px] md:h-[400px] lg:h-[500px]">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={currentImageIndex}
@@ -200,14 +200,14 @@ const AccountCreationContent = () => {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -100 }}
                                     transition={{ duration: 0.5, ease: "easeInOut" }}
-                                    className="absolute inset-0 flex items-center justify-center"
+                                    className="absolute inset-0 flex items-center justify-center w-full h-full"
                                 >
                                     <Image
                                         src={loginImages[currentImageIndex]}
                                         alt={`Opportunities Illustration ${currentImageIndex + 1}`}
                                         width={600}
                                         height={500}
-                                        className="w-full max-w-xl h-auto object-contain"
+                                        className="w-full h-full max-w-xl object-contain"
                                         priority={currentImageIndex === 0}
                                     />
                                 </motion.div>
@@ -216,21 +216,21 @@ const AccountCreationContent = () => {
                     </div>
 
                     {/* Right Section */}
-                    <div className="flex-1 max-w-lg w-full flex flex-col justify-center">
-                        <div className="text-center px-4">
-                            <h1 className="text-2xl lg:text-3xl font-bold mb-4">Create Your Account</h1>
-                            <p className="text-gray-600 mb-10 text-base leading-relaxed">
+                    <div className="flex-1 max-w-lg w-full flex flex-col justify-center px-4 lg:px-0">
+                        <div className="text-center">
+                            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4">Create Your Account</h1>
+                            <p className="text-gray-600 mb-6 sm:mb-8 lg:mb-10 text-sm sm:text-base leading-relaxed px-2">
                                 Connect with top students, freelancers, and project-driven recruiters
                             </p>
 
                             {/* Social Login Buttons */}
-                            <div className="space-y-4 bg-[#F1F1F1] p-8 rounded-2xl shadow-lg">
+                            <div className="space-y-4 bg-[#F1F1F1] p-4 sm:p-6 lg:p-8 rounded-2xl shadow-lg">
                                 <button
-                                    className="w-full flex items-center bg-white justify-center gap-3 px-2 py-4 rounded-xl hover:bg-gray-50 transition-colors font-medium text-lg"
+                                    className="w-full flex items-center bg-white justify-center gap-3 px-2 py-3 sm:py-4 rounded-xl hover:bg-gray-50 transition-colors font-medium text-base sm:text-lg"
                                     onClick={handleGoogleAuth}
                                     disabled={loading}
                                 >
-                                    <FcGoogle className="text-2xl" />
+                                    <FcGoogle className="text-xl sm:text-2xl" />
                                     <span>{loading ? 'Loading...' : 'Continue with Google'}</span>
                                 </button>
                             </div>

@@ -142,19 +142,13 @@ const LandingNav = () => {
             {/* Mobile Auth Buttons */}
             <div className="pt-4 pb-3 border-t border-gray-200">
               <div className="flex items-center px-3 space-y-3 flex-col">
-                <Link 
-                  href="/auth/google" 
-                  className="w-full text-center py-2 text-[#7052FF] hover:text-[#5a42d4] transition-colors duration-200"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Sign in
-                </Link>
+                
                 <Link 
                   href="/auth/google" 
                   className="w-full bg-[#7052FF] text-white px-4 py-2 rounded-full hover:bg-[#5a42d4] transition-colors duration-200 text-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Login
+                  Get Started
                 </Link>
               </div>
             </div>
