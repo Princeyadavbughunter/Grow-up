@@ -4,12 +4,21 @@ import { useEffect, useState } from 'react';
 import Image from "next/image";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { FiUser } from 'react-icons/fi';
-import { MessageSquare, FileText, Users, Heart, Share } from 'lucide-react';
+import { MessageSquare, FileText, Users, Heart, Share, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import SharePopup from '../post/_components/SharePopup';
 import EmptyState from '@/components/ui/empty-state';
 import { CommentModal } from '@/components/ui/comment-modal';
 import { formatTimeAgo } from '@/lib/utils';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from 'sonner';
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 
 interface ImageData {
     id: string;
@@ -27,6 +36,8 @@ interface Post {
     last_name: string | null;
     company_name: string | null;
     company_logo: string | null;
+    page_name: string | null;
+    page_id: string | null;
     role: string;
     title: string;
     content: string;
@@ -38,7 +49,7 @@ interface Post {
     author: string;
     club: string;
     club_name: string;
-    freelancer_profile: string;
+    freelancer_profile: string | null;
     is_liked?: boolean;
     link: string;
 }
@@ -76,14 +87,25 @@ interface CommentReply {
     author: string;
 }
 
-const Posts = () => {
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
+interface PostsProps {
+    posts?: Post[];
+}
+
+const Posts = ({ posts: propPosts }: PostsProps = {}) => {
+    const [posts, setPosts] = useState<Post[]>(propPosts || []);
+    const [loading, setLoading] = useState<boolean>(!propPosts);
     const [error, setError] = useState<string | null>(null);
     const { api } = useAuthenticatedApi();
-    const { authToken } = useAuth();
+    const { authToken, userId } = useAuth();
 
     useEffect(() => {
+        // Only fetch posts if not provided via props
+        if (propPosts) {
+            setPosts(propPosts);
+            setLoading(false);
+            return;
+        }
+
         const fetchPosts = async () => {
             try {
                 setLoading(true);
@@ -101,7 +123,7 @@ const Posts = () => {
         if (authToken) {
             fetchPosts();
         }
-    }, [authToken]);
+    }, [authToken, propPosts]);
 
     const handleLikePost = async (postId: string) => {
         try {
@@ -121,6 +143,35 @@ const Posts = () => {
             );
         } catch (error) {
             console.error('Error toggling like:', error);
+        }
+    };
+
+    const handleDeletePost = async (postId: string) => {
+        try {
+            // Find the post to get its data
+            const postToDelete = posts.find(p => p.id === postId);
+            if (!postToDelete) return;
+
+            // Use PATCH to mark post as taken down (soft delete)
+            const formData = new FormData();
+            formData.append('title', postToDelete.title);
+            formData.append('content', postToDelete.content || '');
+            formData.append('is_take_down', 'true');
+            
+            if (postToDelete.link) {
+                formData.append('link', postToDelete.link);
+            }
+            
+            await api.patch(`/post/app/posts/?id=${postId}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+            setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+            toast.success('Post deleted successfully');
+        } catch (error) {
+            console.error('Error deleting post:', error);
+            toast.error('Failed to delete post');
         }
     };
 
@@ -191,6 +242,8 @@ const Posts = () => {
                     key={post.id}
                     post={post}
                     onLike={handleLikePost}
+                    onDelete={handleDeletePost}
+                    currentUserId={userId}
                 />
             ))}
         </div>
@@ -200,16 +253,32 @@ const Posts = () => {
 interface PostCardProps {
     post: Post;
     onLike: (postId: string) => void;
+    onDelete: (postId: string) => void;
+    currentUserId: string | null;
 }
 
-const PostCard = ({ post, onLike }: PostCardProps) => {
+const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
     const [showComments, setShowComments] = useState(false);
     const [comments, setComments] = useState<Comment[]>([]);
     const [showSharePopup, setShowSharePopup] = useState(false);
     const [showCommentModal, setShowCommentModal] = useState(false);
     const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const { api } = useAuthenticatedApi();
+    const router = useRouter();
     const formattedDate = formatTimeAgo(post.created_at);
+
+    // Check if current user is the post owner
+    const isOwner = currentUserId === post.author;
+
+    // Helper function to safely get hostname from URL
+    const getHostname = (url: string) => {
+        try {
+            return new URL(url).hostname.replace('www.', '');
+        } catch {
+            return url;
+        }
+    };
 
     const fetchComments = async () => {
         try {
@@ -247,68 +316,163 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
         }
     };
 
+    // Determine the profile link based on whether it's a page post or user post
+    const profileLink = post.page_id 
+        ? `/pages` // For now, link to pages list. You might want to create a page detail route
+        : post.freelancer_profile 
+            ? `/profile/${post.freelancer_profile}`
+            : '#';
+
+    const handleDelete = () => {
+        onDelete(post.id);
+        setShowDeleteDialog(false);
+    };
+
+    const handleEdit = () => {
+        // Navigate to edit page - you can adjust the route as needed
+        router.push(`/create-post?edit=${post.id}&clubId=${post.club}`);
+    };
+
     return (
         <div className="bg-white rounded-xl px-4 py-4 mb-4 shadow-lg mx-0">
             <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                    <Link href={`/profile/${post.freelancer_profile}`} className="flex items-center gap-3">
-                        <div>
-                            {post.profile_picture ? (
-                                <Image
-                                    src={post.profile_picture}
-                                    alt="Profile"
-                                    width={40}
-                                    height={40}
-                                    className="rounded-full md:w-10 md:h-10 w-8 h-8"
-                                />
-                            ) : (
-                                <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
-                                    <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
-                                </div>
-                            )}
+                <div className="flex items-center gap-3 flex-1">
+                    {(post.page_id || post.freelancer_profile) ? (
+                        <Link href={profileLink} className="flex items-center gap-3">
+                            <div>
+                                {post.profile_picture ? (
+                                    <Image
+                                        src={post.profile_picture}
+                                        alt="Profile"
+                                        width={40}
+                                        height={40}
+                                        className="rounded-full md:w-10 md:h-10 w-8 h-8"
+                                    />
+                                ) : (
+                                    <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
+                                        <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <h3 className="font-semibold">
+                                    {post.page_name || post.first_name || post.company_name || 'Anonymous'}
+                                </h3>
+                                <p className="text-sm text-gray-500">{formattedDate}</p>
+                            </div>
+                        </Link>
+                    ) : (
+                        <div className="flex items-center gap-3">
+                            <div>
+                                {post.profile_picture ? (
+                                    <Image
+                                        src={post.profile_picture}
+                                        alt="Profile"
+                                        width={40}
+                                        height={40}
+                                        className="rounded-full md:w-10 md:h-10 w-8 h-8"
+                                    />
+                                ) : (
+                                    <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
+                                        <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <h3 className="font-semibold">
+                                    {post.page_name || post.first_name || post.company_name || 'Anonymous'}
+                                </h3>
+                                <p className="text-sm text-gray-500">{formattedDate}</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="font-semibold">
-                                {post.first_name || post.company_name || 'Anonymous'}
-                            </h3>
-                            <p className="text-sm text-gray-500">{formattedDate}</p>
-                        </div>
-                    </Link>
+                    )}
                 </div>
-                <div className="flex flex-col items-end gap-2">
+                <div className="flex items-center gap-2">
                     <Link
                         href={`/clubs/${post.club}`}
-                        className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 transition-colors cursor-pointer"
+                        className="text-xs sm:text-sm bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 transition-colors cursor-pointer whitespace-nowrap"
                     >
                         {post.club_name}
                     </Link>
-                    {post.link && (
-                        <a
-                            href={post.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-blue-500 hover:text-blue-700 underline text-right"
-                        >
-                            Link
-                        </a>
+                    {isOwner && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                                    <MoreVertical className="w-5 h-5 text-gray-600" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
+                                    <Edit className="w-4 h-4 mr-2" />
+                                    Edit Post
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} className="cursor-pointer text-red-600 focus:text-red-600">
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Delete Post
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     )}
                 </div>
             </div>
 
-            <Link href={`/post/${post.id}`} className="block hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors">
-                <p className="mb-4">{post.title}</p>
-                {post.content && <p className="mb-4">{post.content}</p>}
+            {/* Delete Confirmation Dialog */}
+            <DeleteConfirmDialog
+                isOpen={showDeleteDialog}
+                onClose={() => setShowDeleteDialog(false)}
+                onConfirm={handleDelete}
+            />
 
-                {post.images && post.images.length > 0 && (
-                    <Image
-                        src={post.images[0].file}
-                        alt="Post"
-                        width={800}
-                        height={600}
-                        className="rounded-xl mb-4"
-                    />
+            {/* Post Content */}
+            <div className="mb-4">
+                <Link href={`/post/${post.id}`} className="block">
+                    <h2 className="text-lg font-bold text-gray-900 mb-2 hover:text-purple-600 transition-colors">
+                        {post.title}
+                    </h2>
+                </Link>
+                
+                {post.content && (
+                    <p className="text-gray-700 text-sm leading-relaxed mb-3 line-clamp-3">
+                        {post.content}
+                    </p>
                 )}
-            </Link>
+
+                {/* Link Preview */}
+                {post.link && (
+                    <a
+                        href={post.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-2 px-3 py-2 mb-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors group"
+                    >
+                        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                        <div className="flex flex-col items-start min-w-0">
+                            <span className="text-xs text-blue-600 font-medium group-hover:underline">
+                                {getHostname(post.link)}
+                            </span>
+                            {/* <span className="text-xs text-gray-500 truncate max-w-[250px]">
+                                {post.link}
+                            </span> */}
+                        </div>
+                    </a>
+                )}
+
+                {/* Post Images */}
+                {post.images && post.images.length > 0 && (
+                    <Link href={`/post/${post.id}`} className="block">
+                        <Image
+                            src={post.images[0].file}
+                            alt="Post"
+                            width={800}
+                            height={600}
+                            className="rounded-xl w-full h-auto object-cover hover:opacity-95 transition-opacity"
+                        />
+                    </Link>
+                )}
+            </div>
 
             <div className="flex items-center gap-4 text-gray-500">
                 <button
