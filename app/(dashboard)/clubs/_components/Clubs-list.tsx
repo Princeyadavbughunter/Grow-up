@@ -113,9 +113,9 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
     }
 
     return (
-        <div className="h-[calc(100vh-10rem)] flex flex-col">
+        <div className="h-[calc(96vh-10rem)] flex flex-col">
             {/* Tabs Container - Fixed at top */}
-            <div className="px-4 pt-4 pb-2 border-b border-gray-200 bg-white sticky top-0 z-10">
+            <div className="px-4 pt-4 pb-2 border-b border-gray-200 sticky top-0 z-10">
                 <div className="flex items-center gap-4 md:gap-6">
                     <button
                         onClick={() => setActiveTab("all")}
@@ -141,7 +141,7 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
             </div>
 
             {/* Clubs List - Scrollable */}
-            <div className="flex-1 overflow-y-auto px-4 py-4">
+            <div className="flex-1 overflow-y-auto px-4 py-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
                 {displayClubs.length > 0 ? (
                     <div className="space-y-3">
                         {displayClubs.map((club) => (
@@ -192,8 +192,8 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
         >
             <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-purple-600 text-lg md:text-xl font-semibold">
+                    <div className="w-8 h-8 md:w-10 md:h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-purple-600 text-base md:text-lg font-semibold">
                             {club.name?.[0]?.toUpperCase() || '?'}
                         </span>
                     </div>
@@ -210,10 +210,10 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
                         e.stopPropagation();
                         onJoinToggle(club.id, isMyClub);
                     }}
-                    className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors flex-shrink-0 ${
+                    className={`px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-colors flex-shrink-0 ${
                         isMyClub 
-                            ? "bg-green-100 text-green-700 hover:bg-green-200" 
-                            : "text-purple-600 hover:text-purple-800 hover:bg-purple-50 border border-purple-200"
+                            ? "bg-purple-600 text-white hover:bg-purple-700" 
+                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-300"
                     }`}
                 >
                     {isMyClub ? "Joined" : "Join"}
@@ -221,8 +221,8 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
             </div>
 
             {club.description && (
-                <div className="text-xs md:text-sm text-gray-600 mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-100">
-                    <p className={`${showFullDescription ? 'whitespace-normal' : 'truncate'}`}>
+                <div className="text-[11px] md:text-xs text-gray-700 mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-100">
+                    <p className={`leading-relaxed ${showFullDescription ? 'whitespace-normal' : 'truncate'}`}>
                         {showFullDescription ? club.description : truncatedDescription}
                         {club.description.length > 60 && (
                             <button
