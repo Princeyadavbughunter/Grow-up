@@ -28,6 +28,7 @@ interface ImageData {
 }
 
 interface Post {
+    type: 'user_post' | 'page_post';
     id: string;
     images: ImageData[];
     videos: any[];
@@ -37,7 +38,9 @@ interface Post {
     company_name: string | null;
     company_logo: string | null;
     page_name: string | null;
+    page_profile_picture: string | null;
     page_id: string | null;
+    page?: string;
     role: string;
     title: string;
     content: string;
@@ -47,11 +50,14 @@ interface Post {
     like_count: number;
     comment_count: number;
     author: string;
-    club: string;
-    club_name: string;
+    club?: string;
+    club_id?: string;
+    club_name?: string;
     freelancer_profile: string | null;
     is_liked?: boolean;
-    link: string;
+    link?: string;
+    likes_count?: number;
+    comments?: any[];
 }
 
 interface Comment {
@@ -111,7 +117,7 @@ const Posts = ({ posts: propPosts }: PostsProps = {}) => {
                 setLoading(true);
                 setError(null);
                 const response = await api.get('/post/app/posts/');
-                setPosts(response.data.response || []);
+                setPosts(response.data.results || []);
             } catch (error) {
                 console.error('Error fetching posts:', error);
                 setError('Failed to load posts. Please try again.');
@@ -148,25 +154,7 @@ const Posts = ({ posts: propPosts }: PostsProps = {}) => {
 
     const handleDeletePost = async (postId: string) => {
         try {
-            // Find the post to get its data
-            const postToDelete = posts.find(p => p.id === postId);
-            if (!postToDelete) return;
-
-            // Use PATCH to mark post as taken down (soft delete)
-            const formData = new FormData();
-            formData.append('title', postToDelete.title);
-            formData.append('content', postToDelete.content || '');
-            formData.append('is_take_down', 'true');
-            
-            if (postToDelete.link) {
-                formData.append('link', postToDelete.link);
-            }
-            
-            await api.patch(`/post/app/posts/?id=${postId}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                }
-            });
+            await api.delete(`/post/app/post-creation/?id=${postId}`);
             setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
             toast.success('Post deleted successfully');
         } catch (error) {
@@ -317,11 +305,21 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
     };
 
     // Determine the profile link based on whether it's a page post or user post
-    const profileLink = post.page_id 
+    const profileLink = post.type === 'page_post'
         ? `/pages` // For now, link to pages list. You might want to create a page detail route
         : post.freelancer_profile 
             ? `/profile/${post.freelancer_profile}`
             : '#';
+    
+    // Determine the profile picture based on post type
+    const profilePicture = post.type === 'page_post' 
+        ? post.page_profile_picture 
+        : post.profile_picture;
+    
+    // Determine the display name based on post type
+    const displayName = post.type === 'page_post'
+        ? post.page_name
+        : post.first_name || post.company_name || 'Anonymous';
 
     const handleDelete = () => {
         onDelete(post.id);
@@ -330,19 +328,24 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
 
     const handleEdit = () => {
         // Navigate to edit page - you can adjust the route as needed
-        router.push(`/create-post?edit=${post.id}&clubId=${post.club}`);
+        const clubId = post.club || post.club_id;
+        if (clubId) {
+            router.push(`/create-post?edit=${post.id}&clubId=${clubId}`);
+        } else {
+            router.push(`/create-post?edit=${post.id}`);
+        }
     };
 
     return (
         <div className="bg-white rounded-xl px-4 py-4 mb-4 shadow-lg mx-0">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3 flex-1">
-                    {(post.page_id || post.freelancer_profile) ? (
+                    {(post.type === 'page_post' || post.freelancer_profile) ? (
                         <Link href={profileLink} className="flex items-center gap-3">
                             <div>
-                                {post.profile_picture ? (
+                                {profilePicture ? (
                                     <Image
-                                        src={post.profile_picture}
+                                        src={profilePicture}
                                         alt="Profile"
                                         width={40}
                                         height={40}
@@ -356,7 +359,7 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
                             </div>
                             <div>
                                 <h3 className="font-semibold">
-                                    {post.page_name || post.first_name || post.company_name || 'Anonymous'}
+                                    {displayName}
                                 </h3>
                                 <p className="text-sm text-gray-500">{formattedDate}</p>
                             </div>
@@ -364,9 +367,9 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
                     ) : (
                         <div className="flex items-center gap-3">
                             <div>
-                                {post.profile_picture ? (
+                                {profilePicture ? (
                                     <Image
-                                        src={post.profile_picture}
+                                        src={profilePicture}
                                         alt="Profile"
                                         width={40}
                                         height={40}
@@ -380,7 +383,7 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
                             </div>
                             <div>
                                 <h3 className="font-semibold">
-                                    {post.page_name || post.first_name || post.company_name || 'Anonymous'}
+                                    {displayName}
                                 </h3>
                                 <p className="text-sm text-gray-500">{formattedDate}</p>
                             </div>
@@ -388,12 +391,14 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
                     )}
                 </div>
                 <div className="flex items-center gap-2">
-                    <Link
-                        href={`/clubs/${post.club}`}
-                        className="text-xs sm:text-sm bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 transition-colors cursor-pointer whitespace-nowrap"
-                    >
-                        {post.club_name}
-                    </Link>
+                    {post.type === 'user_post' && post.club_name && (
+                        <Link
+                            href={`/clubs/${post.club || post.club_id}`}
+                            className="text-xs sm:text-sm bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 transition-colors cursor-pointer whitespace-nowrap"
+                        >
+                            {post.club_name}
+                        </Link>
+                    )}
                     {isOwner && (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
