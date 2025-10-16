@@ -90,7 +90,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
       case 'About':
         return <AboutTab pageDetails={pageDetails} />;
       case 'Post':
-        return <PostTab pageId={pageDetails.id} />; 
+        return <PostTab pageId={pageDetails.id} pageName={pageDetails.name} pageProfilePicture={pageDetails.profile_picture} />; 
       case 'People':
         return <PeopleTab pageId={pageDetails.id} />;
       default:

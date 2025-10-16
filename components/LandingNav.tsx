@@ -58,9 +58,6 @@ const LandingNav = () => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* <Link href="/auth/google" className="text-[#7052FF] hover:text-[#5a42d4] font-medium transition-colors duration-200">
-              Get Started
-            </Link> */}
             <Link href="/auth/google" className="bg-[#7052FF] text-white px-6 py-3 rounded-full hover:bg-[#5a42d4] font-medium transition-all duration-200 shadow-sm hover:shadow-md">
               Get Started
             </Link>
@@ -75,86 +72,90 @@ const LandingNav = () => {
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             >
               <span className="sr-only">{isMenuOpen ? "Close menu" : "Open main menu"}</span>
-              {/* Hamburger icon */}
-              {!isMenuOpen ? (
-                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              ) : (
-                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              )}
+              {/* Hamburger icon with transition */}
+              <div className="relative w-6 h-6">
+                <span className={`absolute inset-0 transition-all duration-300 ${isMenuOpen ? 'opacity-0 rotate-180' : 'opacity-100 rotate-0'}`}>
+                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </span>
+                <span className={`absolute inset-0 transition-all duration-300 ${isMenuOpen ? 'opacity-100 rotate-0' : 'opacity-0 -rotate-180'}`}>
+                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </span>
+              </div>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-4 pt-2 pb-3 space-y-1 sm:px-6 bg-white border-t border-gray-200">
-            <Link 
-              href="/talent" 
-              className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
-                pathname === '/talent' 
-                  ? 'text-[#7052FF] bg-[#7052FF]/10' 
-                  : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
-              }`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Hire talent
-            </Link>
-            <Link 
-              href="/events-page" 
-              className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
-                pathname === '/events-page' 
-                  ? 'text-[#7052FF] bg-[#7052FF]/10' 
-                  : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
-              }`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Events
-            </Link>
-            <Link 
-              href="/gigs-page" 
-              className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
-                pathname === '/gigs-page' 
-                  ? 'text-[#7052FF] bg-[#7052FF]/10' 
-                  : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
-              }`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Gigs
-            </Link>
-            <Link 
-              href="/clubs-page" 
-              className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
-                pathname === '/clubs-page' 
-                  ? 'text-[#7052FF] bg-[#7052FF]/10' 
-                  : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
-              }`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Club
-            </Link>
-            
-            {/* Mobile Auth Buttons */}
-            <div className="pt-4 pb-3 border-t border-gray-200">
-              <div className="flex items-center px-3 space-y-3 flex-col">
-                
-                <Link 
-                  href="/auth/google" 
-                  className="w-full bg-[#7052FF] text-white px-4 py-2 rounded-full hover:bg-[#5a42d4] transition-colors duration-200 text-center"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Get Started
-                </Link>
-              </div>
+      {/* Mobile menu with smooth transition */}
+      <div 
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          isMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="px-4 pt-2 pb-3 space-y-1 sm:px-6 bg-white border-t border-gray-200">
+          <Link 
+            href="/talent" 
+            className={`block px-3 py-2 rounded-md font-semibold transition-colors duration-200 ${
+              pathname === '/talent' 
+                ? 'text-[#7052FF] bg-[#7052FF]/10' 
+                : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
+            }`}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Hire talent
+          </Link>
+          <Link 
+            href="/events-page" 
+            className={`block px-3 py-2 rounded-md font-semibold transition-colors duration-200 ${
+              pathname === '/events-page' 
+                ? 'text-[#7052FF] bg-[#7052FF]/10' 
+                : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
+            }`}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Events
+          </Link>
+          <Link 
+            href="/gigs-page" 
+            className={`block px-3 py-2 rounded-md font-semibold transition-colors duration-200 ${
+              pathname === '/gigs-page' 
+                ? 'text-[#7052FF] bg-[#7052FF]/10' 
+                : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
+            }`}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Gigs
+          </Link>
+          <Link 
+            href="/clubs-page" 
+            className={`block px-3 py-2 rounded-md font-semibold transition-colors duration-200 ${
+              pathname === '/clubs-page' 
+                ? 'text-[#7052FF] bg-[#7052FF]/10' 
+                : 'text-gray-700 hover:text-[#7052FF] hover:bg-gray-50'
+            }`}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Club
+          </Link>
+          
+          {/* Mobile Auth Buttons */}
+          <div className="pt-4 pb-3 border-t border-gray-200">
+            <div className="flex items-center px-3 space-y-3 flex-col">
+              <Link 
+                href="/auth/google" 
+                className="w-full bg-[#7052FF] text-white px-4 py-2 rounded-full hover:bg-[#5a42d4] transition-colors duration-200 text-center"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Get Started
+              </Link>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </nav>
   )
 }

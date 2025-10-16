@@ -68,18 +68,7 @@ const AccountCreationContent = () => {
             
             console.log('Using redirect URI:', redirectUri);
             
-            let response;
-            try {
-                response = await axios.get<GoogleAuthResponse>(`https://backend.growupbuddy.com/api/auth/o/google-oauth2/?redirect_uri=${encodeURIComponent(redirectUri)}`);
-            } catch (localError) {
-                if (isDevelopment) {
-                    console.warn('Failed with localhost, falling back to production URL:', localError);
-                    redirectUri = 'https://growupbuddy.com/auth/google';
-                    response = await axios.get<GoogleAuthResponse>(`https://backend.growupbuddy.com/api/auth/o/google-oauth2/?redirect_uri=${encodeURIComponent(redirectUri)}`);
-                } else {
-                    throw localError;
-                }
-            }
+            const response = await axios.get<GoogleAuthResponse>(`https://backend.growupbuddy.com/api/auth/o/google-oauth2/?redirect_uri=${encodeURIComponent(redirectUri)}`);
 
             if (response.data.authorization_url) {
                 window.location.href = response.data.authorization_url
