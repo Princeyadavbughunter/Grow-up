@@ -262,13 +262,30 @@ export default function NetworkPage() {
     }
   };
 
+  const handleCancelRequest = async (freelancerId: string) => {
+    try {
+      await api.delete(`/freelancer/follow/?freelancer_id=${freelancerId}`);
+      
+      setNearNetwork(prevNetwork => 
+        prevNetwork.map(user => 
+          user.id === freelancerId 
+            ? { ...user, requestSent: false } 
+            : user
+        )
+      );
+    } catch (error) {
+      console.error('Error canceling follow request:', error);
+      setError('Failed to cancel follow request. Please try again.');
+    }
+  };
+
 
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-lg">Loading...</div>
-      </div>
+      </div>  
     );
   }
 
@@ -331,6 +348,7 @@ export default function NetworkPage() {
                     {...connection}
                     showFollow={!connection.requestSent}
                     onFollow={() => handleFollowUser(connection.id)}
+                    onCancelRequest={() => handleCancelRequest(connection.id)}
                   />
                 </div>
               ))

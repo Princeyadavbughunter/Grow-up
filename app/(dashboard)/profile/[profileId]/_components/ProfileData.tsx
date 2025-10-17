@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoLocationSharp } from "react-icons/io5";
 import { FaLinkedin, FaInstagramSquare, FaUserPlus, FaUserCheck, FaClock } from "react-icons/fa";
 import { TiSocialFacebook, TiSocialTwitter } from "react-icons/ti";
@@ -45,6 +45,14 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { profileData: userProfileData } = useAuth();
 
+  // Sync state with props when profileData changes (e.g., after page reload)
+  useEffect(() => {
+    if (profileData) {
+      setIsFollowing(profileData.is_following || false);
+      setFollowRequestSent(profileData.follow_request_sent || false);
+    }
+  }, [profileData?.is_following, profileData?.follow_request_sent]);
+
   if (!profileData) {
     return <div>Loading profile data...</div>;
   }
@@ -61,10 +69,16 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     setIsLoading(true);
     try {
       if (isFollowing) {
+        // Unfollow an already approved connection
+        await api.delete(`/freelancer/follow/?freelancer_id=${profileData.id}`);
+        setIsFollowing(false);
+        setFollowRequestSent(false);
+      } else if (followRequestSent) {
+        // Cancel a pending follow request
         await api.delete(`/freelancer/follow/?freelancer_id=${profileData.id}`);
         setFollowRequestSent(false);
       } else {
-        // Send follow request or follow
+        // Send a new follow request
         await api.post(`/freelancer/follow/?freelancer_id=${profileData.id}`);
         setFollowRequestSent(true);
       }

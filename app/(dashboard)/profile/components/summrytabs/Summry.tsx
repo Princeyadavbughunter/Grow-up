@@ -14,6 +14,7 @@ import Posts from './Posts'
 import Portfolios from './Portfolios'
 import MyExperience from './MyExperience'
 import MyEducation from './MyEducation'
+import MyApplications from './MyApplications'
 
 // Use the same interface as in AuthContext
 interface FreelancerProfile {
@@ -143,8 +144,8 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
 
     return (
         <div className='w-full mb-10'>
-            <div className="flex space-x-4">
-                {["About", "Skills", "Porfolio", "Post"].map((tab) => (
+            <div className="flex flex-wrap gap-2 sm:gap-0 sm:space-x-4">
+                {["About", "Skills", "Porfolio", "Post", "Applications"].map((tab) => (
                     <Button
                         key={tab}
                         variant={activeJobTypeTab === tab ? "default" : "ghost"}
@@ -225,6 +226,8 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                     {activeJobTypeTab === "Porfolio" && <Portfolios profileData={profileData} />}
 
                     {activeJobTypeTab === "Post" && <Posts profileId={profileData?.id} />}
+
+                    {activeJobTypeTab === "Applications" && <MyApplications profileId={profileData?.id} isOwnProfile={true} />}
                 </div>
 
                 <div className="md:w-1/2">

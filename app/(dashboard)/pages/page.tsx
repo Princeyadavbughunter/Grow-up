@@ -278,17 +278,17 @@ const ChatInterface = () => {
   }
 
   return (
-    <div className="flex overflow-x-hidden flex-col h-[calc(100vh-5rem)] bg-gray-50">
+    <div className="flex flex-col h-[calc(100vh-5rem)] bg-gray-50 overflow-hidden">
 
-      <div className='p-2 border-b'>
-        <h1 className="text-lg mb-2 md:text-xl font-bold">
+      <div className='p-3 md:p-4 border-b flex-shrink-0 bg-white'>
+        <h1 className="text-lg md:text-xl font-bold mb-3">
           Recommended Pages
         </h1>
-        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
           {pages.map((page) => (
             <div
               key={page.id}
-              className="flex items-center gap-3 border p-3 md:p-4 rounded-xl cursor-pointer hover:shadow-md transition-shadow bg-white min-w-max"
+              className="flex items-center gap-3 border border-gray-200 p-3 md:p-4 rounded-xl cursor-pointer hover:shadow-lg hover:border-blue-300 transition-all duration-200 bg-white min-w-max"
               onClick={() => handlePageSelect(page)}
             >
               {page.profile_picture ? (
@@ -348,13 +348,13 @@ const ChatInterface = () => {
                   />
                 </div>
               </div>
-              <div className="p-4 overflow-y-auto h-full">
-                <div className="space-y-3">
+              <div className="p-4 overflow-y-auto scrollbar-hide h-full">
+                <div className="space-y-2">
                   {filteredFollowedPages.length > 0 ? (
                     filteredFollowedPages.map((page) => (
                       <div
                         key={page.id}
-                        className={`flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors ${selectedPage?.id === page.id ? 'bg-blue-50 border border-blue-200' : ''
+                        className={`flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-all duration-150 ${selectedPage?.id === page.id ? 'bg-blue-50 border border-blue-300 shadow-sm' : 'border border-transparent'
                           }`}
                         onClick={() => handlePageSelect(page)}
                       >
@@ -394,7 +394,7 @@ const ChatInterface = () => {
         )}
 
         {/* Desktop Sidebar */}
-        <div className="hidden md:block border-r bg-white w-1/3 lg:w-1/4 overflow-y-auto">
+        <div className="hidden md:block border-r border-gray-200 bg-white w-1/3 lg:w-1/4 overflow-y-auto scrollbar-hide">
           <div className="p-4">
             <div className="mb-4">
               <div className="relative">
@@ -409,13 +409,13 @@ const ChatInterface = () => {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <h2 className="mb-4 text-lg font-semibold">My Buddies ({filteredFollowedPages.length})</h2>
+            <div className="space-y-2">
+              <h2 className="mb-3 text-base md:text-lg font-semibold text-gray-800">My Buddies ({filteredFollowedPages.length})</h2>
               {filteredFollowedPages.length > 0 ? (
                 filteredFollowedPages.map((page) => (
                   <div
                     key={page.id}
-                    className={`flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors ${selectedPage?.id === page.id ? 'bg-blue-50 border border-blue-200' : ''
+                    className={`flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-all duration-150 ${selectedPage?.id === page.id ? 'bg-blue-50 border border-blue-300 shadow-sm' : 'border border-transparent'
                       }`}
                     onClick={() => handlePageSelect(page)}
                   >
@@ -454,14 +454,16 @@ const ChatInterface = () => {
 
         {/* Main Content Area */}
         {showProfile && selectedPage ? (
-          <ProfileView
-            onBack={() => setShowProfile(false)}
-            pageId={selectedPage.id}
-          />
+          <div className="flex-1 overflow-hidden h-full">
+            <ProfileView
+              onBack={() => setShowProfile(false)}
+              pageId={selectedPage.id}
+            />
+          </div>
         ) : selectedPage ? (
-          <div className="flex flex-1 mb-10 flex-col">
+          <div className="flex flex-1 flex-col overflow-hidden">
             {/* Chat Header */}
-            <div className="flex items-center justify-between border-b bg-white p-3 md:p-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-gray-200 bg-white p-3 md:p-4 flex-shrink-0">
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 {selectedPage.profile_picture ? (
                   <img
@@ -497,7 +499,7 @@ const ChatInterface = () => {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 p-3 md:p-4 overflow-y-auto bg-gray-50">
+            <div className="flex-1 p-3 md:p-4 overflow-y-auto scrollbar-hide bg-gray-50">
               {wsError && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
                   <p>{wsError}</p>
@@ -547,7 +549,7 @@ const ChatInterface = () => {
 
             {/* Message Input Area - Only for Admins */}
             {selectedPage && selectedPage.is_admin && (
-              <div className="border-t bg-white p-3 md:p-4">
+              <div className="border-t border-gray-200 bg-white p-3 md:p-4 flex-shrink-0">
                 <div className="flex items-end gap-2 rounded-lg bg-gray-50 p-2">
                   <textarea
                     value={messageInput}
@@ -580,7 +582,7 @@ const ChatInterface = () => {
 
             {/* Non-Admin Message */}
             {selectedPage && !selectedPage.is_admin && (
-              <div className="border-t bg-white p-3 md:p-4 text-center text-gray-500">
+              <div className="border-t border-gray-200 bg-white p-3 md:p-4 text-center text-gray-500 flex-shrink-0">
                 <div className="flex items-center justify-center text-sm">
                   <RiBroadcastFill className="h-5 w-5 mr-2 text-blue-500" />
                   <span>This is a broadcast channel. Only page owners can send messages.</span>

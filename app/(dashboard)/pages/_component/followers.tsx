@@ -47,19 +47,23 @@ const Followers: React.FC<FollowersProps> = ({ pageId }) => {
   }
 
   return (
-    <div>
-      <div className="mb-6 rounded-lg border p-4 flex flex-col">
+    <div className="hidden lg:block lg:w-80 overflow-y-auto flex-shrink-0">
+      <div className="rounded-lg border p-4 flex flex-col bg-white">
         <div className="div">
           <div>
             <div className="mb-4 md:mb-2">
               <span className="font-medium">Website</span>
-              <a
-                href={pageDetails?.website || '#'}
-                className="ml-2 text-purple-600 break-all truncate max-w-full hover:underline"
-                title={pageDetails?.website || ''}
-              >
-                {pageDetails?.website || 'Not provided'}
-              </a>
+              <div className="mt-1">
+                <a
+                  href={pageDetails?.website || '#'}
+                  className="text-purple-600 hover:underline text-sm break-words overflow-wrap-anywhere"
+                  title={pageDetails?.website || ''}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {pageDetails?.website || 'Not provided'}
+                </a>
+              </div>
             </div>
           </div>
         </div>
