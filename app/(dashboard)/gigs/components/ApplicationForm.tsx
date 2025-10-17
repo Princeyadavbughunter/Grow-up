@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -89,17 +89,22 @@ export default function ApplicationForm({ jobId, isApplied }: { jobId?: string, 
                             <div className="flex flex-col space-y-4">
                                 <div className="flex items-center gap-2">
                                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                    <span className="text-gray-800">Already Applied</span>
+                                    <span className="text-gray-800">Application Submitted</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                                    <span className="text-gray-400">Application Viewed</span>
+                                    <span className="text-gray-400">Under Review</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                                    <span className="text-gray-400">Profile Viewed</span>
+                                    <span className="text-gray-400">Decision Pending</span>
                                 </div>
                             </div>
+                        </div>
+                        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                            <p className="text-sm text-blue-800">
+                                Your application has been submitted successfully. The recruiter will review it soon.
+                            </p>
                         </div>
                     </div>
                 ) : !formSubmitted ? (

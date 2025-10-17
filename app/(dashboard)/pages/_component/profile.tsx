@@ -92,7 +92,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
       case 'Post':
         return <PostTab pageId={pageDetails.id} pageName={pageDetails.name} pageProfilePicture={pageDetails.profile_picture} />; 
       case 'People':
-        return <PeopleTab pageId={pageDetails.id} />;
+        return <PeopleTab pageId={pageDetails.id} creatorId={pageDetails.creator} />;
       default:
         return null;
     }
@@ -107,7 +107,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-2 md:p-4 flex flex-col lg:flex-row gap-2 md:gap-4 mx-auto w-full max-w-7xl">
+    <div className="flex flex-col lg:flex-row gap-2 md:gap-4 mx-auto w-full h-full overflow-hidden">
       <div className="rounded-lg overflow-y-auto bg-white p-3 md:p-6 shadow-sm flex-1">
 
         {/* Mobile Back Button - Above profile picture */}

@@ -22,6 +22,7 @@ interface NetworkCardProps {
   onAccept?: () => void;
   onReject?: () => void;
   onFollow?: () => void;
+  onCancelRequest?: () => void;
 }
 
 export function NetworkCard({ 
@@ -38,6 +39,7 @@ export function NetworkCard({
   onAccept,
   onReject,
   onFollow,
+  onCancelRequest,
 }: NetworkCardProps) {
   // Safe access for name with fallback
   const nameInitial = name && name.length > 0 ? name.charAt(0) : "U";
@@ -101,7 +103,12 @@ export function NetworkCard({
                 Follow
               </Button>
             ) : requestSent ? (
-              <Button size="sm" variant="outline" disabled>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="bg-yellow-100 hover:bg-yellow-200 border-yellow-400 text-yellow-800"
+                onClick={onCancelRequest}
+              >
                 Request Sent
               </Button>
             ) : (

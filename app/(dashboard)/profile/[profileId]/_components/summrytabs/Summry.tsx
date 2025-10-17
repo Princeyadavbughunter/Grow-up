@@ -7,6 +7,7 @@ import Portfolios from './Portfolios'
 import MyExperience from './MyExperience'
 import MyEducation from './MyEducation'
 import Clubs from '../../../components/summrytabs/Clubs'
+import MyApplications from '../../../components/summrytabs/MyApplications'
 
 
 interface FreelancerProfile {
@@ -67,8 +68,8 @@ const Summry: React.FC<SummryProps> = ({ profileData, profileId }) => {
 
     return (
         <div className='w-full mb-10'>
-            <div className="flex space-x-4">
-                {["About", "Skills", "Porfolio", "Post"].map((tab) => (
+            <div className="flex flex-wrap gap-2 sm:gap-0 sm:space-x-4">
+                {["About", "Skills", "Porfolio", "Post", "Applications"].map((tab) => (
                     <Button
                         key={tab}
                         variant={activeJobTypeTab === tab ? "default" : "ghost"}
@@ -137,6 +138,8 @@ const Summry: React.FC<SummryProps> = ({ profileData, profileId }) => {
                     {activeJobTypeTab === "Porfolio" && <Portfolios profileData={profileData} />}
 
                     {activeJobTypeTab === "Post" && <Posts profileId={profileId} />}
+
+                    {activeJobTypeTab === "Applications" && <MyApplications profileId={profileId} isOwnProfile={false} />}
                 </div>
 
                 <div className="md:w-1/2">
