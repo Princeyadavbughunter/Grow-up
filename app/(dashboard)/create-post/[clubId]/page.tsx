@@ -58,7 +58,21 @@ const CreatePost = (): JSX.Element => {
     const [postingType, setPostingType] = useState<'self' | 'page'>('self');
     const [selectedPage, setSelectedPage] = useState<string>('');
     const [userPages, setUserPages] = useState<Page[]>([]);
+    const [isEditMode, setIsEditMode] = useState<boolean>(false);
+    const [editPostId, setEditPostId] = useState<string>('');
+    const [existingImages, setExistingImages] = useState<any[]>([]);
 
+
+    useEffect(() => {
+        // Check if we're in edit mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('edit');
+        
+        if (editId) {
+            setIsEditMode(true);
+            setEditPostId(editId);
+        }
+    }, []);
 
     useEffect(() => {
         const fetchClubDetails = async () => {
@@ -79,6 +93,37 @@ const CreatePost = (): JSX.Element => {
             fetchClubDetails();
         }
     }, [clubId, authToken]);
+
+    // Fetch post data if in edit mode
+    useEffect(() => {
+        const fetchPostData = async () => {
+            if (!isEditMode || !editPostId) return;
+            
+            try {
+                const response = await api.get(`/post/app/post-chat-details/?id=${editPostId}`);
+                const postData = response.data.response?.[0] || response.data;
+                
+                if (postData) {
+                    setTitle(postData.title || '');
+                    setContent(postData.content || '');
+                    setLink(postData.link || '');
+                    setExistingImages(postData.images || []);
+                    
+                    // Set posting type based on whether it's a page post
+                    if (postData.page_id) {
+                        setPostingType('page');
+                        setSelectedPage(postData.page_id);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching post data:', error);
+            }
+        };
+
+        if (isEditMode && editPostId && authToken) {
+            fetchPostData();
+        }
+    }, [isEditMode, editPostId, authToken]);
 
     useEffect(() => {
         const fetchUserPages = async () => {
@@ -109,7 +154,27 @@ const CreatePost = (): JSX.Element => {
         try {
             let response;
 
-            if (postingType === 'page') {
+            if (isEditMode) {
+                // Update existing post
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('content', content);
+                
+                if (link) {
+                    formData.append('link', link);
+                }
+
+                // Only append new images if any were selected
+                images.forEach((image) => {
+                    formData.append('images', image);
+                });
+
+                response = await api.patch(`/post/app/posts/?id=${editPostId}`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    }
+                });
+            } else if (postingType === 'page') {
                 // Post from a page
                 const formData = new FormData();
                 formData.append('title', title);
@@ -153,7 +218,7 @@ const CreatePost = (): JSX.Element => {
                 router.push('/');
             }
         } catch (error) {
-            console.error('Error creating post:', error);
+            console.error(isEditMode ? 'Error updating post:' : 'Error creating post:', error);
         } finally {
             setIsSubmitting(false);
         }
@@ -170,39 +235,41 @@ const CreatePost = (): JSX.Element => {
                 </button>
 
                 <h1 className="text-gray-700 font-medium mb-4">
-                    Posting to: <span className="bg-green-100 text-green-600 px-2 py-1 rounded">{clubName || 'Loading...'}</span>
+                    {isEditMode ? 'Editing Post' : 'Posting to:'} {!isEditMode && <span className="bg-green-100 text-green-600 px-2 py-1 rounded">{clubName || 'Loading...'}</span>}
                 </h1>
             </div>
 
-            {/* Posting Type Selector */}
-            <div className="mb-4">
-                <label className="block text-black font-semibold mb-2">Post As</label>
-                <div className="flex gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            value="self"
-                            checked={postingType === 'self'}
-                            onChange={(e) => setPostingType(e.target.value as 'self' | 'page')}
-                            className="w-4 h-4 text-purple-600"
-                        />
-                        <span className="text-gray-700">Self</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            value="page"
-                            checked={postingType === 'page'}
-                            onChange={(e) => setPostingType(e.target.value as 'self' | 'page')}
-                            className="w-4 h-4 text-purple-600"
-                        />
-                        <span className="text-gray-700">Page</span>
-                    </label>
+            {/* Posting Type Selector - Hide in edit mode */}
+            {!isEditMode && (
+                <div className="mb-4">
+                    <label className="block text-black font-semibold mb-2">Post As</label>
+                    <div className="flex gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="radio"
+                                value="self"
+                                checked={postingType === 'self'}
+                                onChange={(e) => setPostingType(e.target.value as 'self' | 'page')}
+                                className="w-4 h-4 text-purple-600"
+                            />
+                            <span className="text-gray-700">Self</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="radio"
+                                value="page"
+                                checked={postingType === 'page'}
+                                onChange={(e) => setPostingType(e.target.value as 'self' | 'page')}
+                                className="w-4 h-4 text-purple-600"
+                            />
+                            <span className="text-gray-700">Page</span>
+                        </label>
+                    </div>
                 </div>
-            </div>
+            )}
 
-            {/* Page Selection (only show when posting from page) */}
-            {postingType === 'page' && (
+            {/* Page Selection (only show when posting from page and not in edit mode) */}
+            {postingType === 'page' && !isEditMode && (
                 <div className="mb-4">
                     <label className="block text-black font-semibold mb-2">Select Page</label>
                     <select
@@ -263,6 +330,24 @@ const CreatePost = (): JSX.Element => {
                         />
                     </label>
 
+                    {/* Show existing images in edit mode */}
+                    {isEditMode && existingImages.length > 0 && (
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-600 mb-2">Current Images:</p>
+                            <div className="flex gap-2 flex-wrap">
+                                {existingImages.map((image, index) => (
+                                    <div key={index} className="relative">
+                                        <img
+                                            src={image.file}
+                                            alt={`Existing ${index}`}
+                                            className="w-20 h-20 object-cover rounded"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {images.length > 0 && (
                         <div className="flex gap-2 flex-wrap">
                             {images.map((file, index) => (
@@ -292,10 +377,10 @@ const CreatePost = (): JSX.Element => {
 
                 <button
                     type="submit"
-                    disabled={isSubmitting || !title || (postingType === 'page' && !selectedPage)}
+                    disabled={isSubmitting || !title || (!isEditMode && postingType === 'page' && !selectedPage)}
                     className="w-full bg-purple-500 text-white font-bold py-2 rounded-lg hover:bg-purple-600 disabled:bg-purple-300 disabled:cursor-not-allowed"
                 >
-                    {isSubmitting ? 'Posting...' : 'Post'}
+                    {isSubmitting ? (isEditMode ? 'Updating...' : 'Posting...') : (isEditMode ? 'Update Post' : 'Post')}
                 </button>
             </form>
         </div>

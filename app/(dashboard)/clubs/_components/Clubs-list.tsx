@@ -18,7 +18,7 @@ interface Club {
 
 interface ClubsListProps {
     selectedClubId: string;
-    setSelectedClubId?: (id: string) => void; // Make optional since we'll use router navigation
+    setSelectedClubId?: (id: string) => void;
 }
 
 const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
@@ -41,7 +41,6 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
             const response = await api.get('/freelancer/club/');
             console.log(response.data);
             
-            // Separate clubs into my clubs and all clubs based on is_user_member flag
             const allClubsData = response.data || [];
             const myClubsData = allClubsData.filter((club: Club) => club.is_user_member);
 
@@ -66,10 +65,8 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
         
         try {
             if (isCurrentlyJoined) {
-                // Exit club
                 await api.get(`/freelancer/exit-club/?id=${clubId}`);
             } else {
-                // Join club
                 await api.post(`/freelancer/join-club/?id=${clubId}`);
             }
             await fetchClubs();
@@ -116,49 +113,57 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
     }
 
     return (
-        <div className="p-4 h-[calc(100vh-10rem)] overflow-y-auto">
-            <div className="flex flex-wrap items-center gap-4 mb-4 border-b">
-                <button
-                    onClick={() => setActiveTab("all")}
-                    className={`py-2 px-4 transition-colors ${
-                        activeTab === "all" 
-                            ? "text-purple-600 border-b-2 border-purple-600 font-semibold" 
-                            : "text-gray-500 hover:text-gray-700"
-                    }`}
-                >
-                    All Clubs ({allClubs.length})
-                </button>
-                <button
-                    onClick={() => setActiveTab("my")}
-                    className={`py-2 px-4 transition-colors ${
-                        activeTab === "my" 
-                            ? "text-purple-600 border-b-2 border-purple-600 font-semibold" 
-                            : "text-gray-500 hover:text-gray-700"
-                    }`}
-                >
-                    My Clubs ({myClubs.length})
-                </button>
+        <div className="h-[calc(96vh-10rem)] flex flex-col">
+            {/* Tabs Container - Fixed at top */}
+            <div className="px-4 pt-4 pb-2 border-b border-gray-200 sticky top-0 z-10">
+                <div className="flex items-center gap-4 md:gap-6">
+                    <button
+                        onClick={() => setActiveTab("all")}
+                        className={`py-2 px-3 md:px-4 text-sm md:text-base font-medium transition-all rounded-t-lg whitespace-nowrap flex-shrink-0 ${
+                            activeTab === "all" 
+                                ? "text-purple-600 border-b-2 border-purple-600 bg-purple-50/50" 
+                                : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                        }`}
+                    >
+                        All Clubs ({allClubs.length})
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("my")}
+                        className={`py-2 px-3 md:px-4 text-sm md:text-base font-medium transition-all rounded-t-lg whitespace-nowrap flex-shrink-0 ${
+                            activeTab === "my" 
+                                ? "text-purple-600 border-b-2 border-purple-600 bg-purple-50/50" 
+                                : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                        }`}
+                    >
+                        My Clubs ({myClubs.length})
+                    </button>
+                </div>
             </div>
 
-            {displayClubs.length > 0 ? (
-                displayClubs.map((club) => (
-                    <ClubCard
-                        key={club.id}
-                        club={club}
-                        isMyClub={club.is_user_member || false}
-                        isSelected={club.id === selectedClubId}
-                        onJoinToggle={handleJoinToggle}
-                        onSelect={handleClubSelect}
-                    />
-                ))
-            ) : (
-                <div className="text-center py-8 text-gray-500">
-                    {activeTab === "all" 
-                        ? "No clubs available to join" 
-                        : "You haven't joined any clubs yet"
-                    }
-                </div>
-            )}
+            {/* Clubs List - Scrollable */}
+            <div className="flex-1 overflow-y-auto px-4 py-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+                {displayClubs.length > 0 ? (
+                    <div className="space-y-3">
+                        {displayClubs.map((club) => (
+                            <ClubCard
+                                key={club.id}
+                                club={club}
+                                isMyClub={club.is_user_member || false}
+                                isSelected={club.id === selectedClubId}
+                                onJoinToggle={handleJoinToggle}
+                                onSelect={handleClubSelect}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-12 text-sm text-gray-500">
+                        {activeTab === "all" 
+                            ? "No clubs available to join" 
+                            : "You haven't joined any clubs yet"
+                        }
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
@@ -180,21 +185,21 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
 
     return (
         <div 
-            className={`bg-white rounded-xl p-4 mb-4 shadow-sm cursor-pointer transition-all hover:shadow-md ${
+            className={`bg-white rounded-xl p-3 md:p-4 shadow-sm cursor-pointer transition-all hover:shadow-md ${
                 isSelected ? 'border-2 border-purple-500' : 'border border-gray-200'
             }`}
             onClick={() => onSelect(club.id)}
         >
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <span className="text-purple-600 text-xl font-semibold">
+            <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+                    <div className="w-8 h-8 md:w-10 md:h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-purple-600 text-base md:text-lg font-semibold">
                             {club.name?.[0]?.toUpperCase() || '?'}
                         </span>
                     </div>
-                    <div>
-                        <h3 className="font-semibold text-gray-800">{club.name}</h3>
-                        <p className="text-sm text-gray-500">
+                    <div className="min-w-0 flex-1">
+                        <h3 className="font-semibold text-gray-800 text-sm md:text-base truncate">{club.name}</h3>
+                        <p className="text-xs md:text-sm text-gray-500">
                             {club.participants_count || 0} member{(club.participants_count || 0) !== 1 ? 's' : ''}
                         </p>
                     </div>
@@ -205,10 +210,10 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
                         e.stopPropagation();
                         onJoinToggle(club.id, isMyClub);
                     }}
-                    className={`px-3 py-1 rounded text-sm transition-colors ${
+                    className={`px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-colors flex-shrink-0 ${
                         isMyClub 
-                            ? "bg-green-100 text-green-700 font-medium hover:bg-green-200" 
-                            : "text-purple-600 hover:text-purple-800 hover:bg-purple-50"
+                            ? "bg-purple-600 text-white hover:bg-purple-700" 
+                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-300"
                     }`}
                 >
                     {isMyClub ? "Joined" : "Join"}
@@ -216,8 +221,8 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
             </div>
 
             {club.description && (
-                <div className="text-sm text-gray-600 mt-3">
-                    <p className={`${showFullDescription ? 'whitespace-normal' : 'truncate'}`}>
+                <div className="text-[11px] md:text-xs text-gray-700 mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-100">
+                    <p className={`leading-relaxed ${showFullDescription ? 'whitespace-normal' : 'truncate'}`}>
                         {showFullDescription ? club.description : truncatedDescription}
                         {club.description.length > 60 && (
                             <button

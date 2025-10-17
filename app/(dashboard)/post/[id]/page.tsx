@@ -22,6 +22,8 @@ interface Post {
     last_name: string | null;
     company_name: string | null;
     company_logo: string | null;
+    page_name: string | null;
+    page_id: string | null;
     role: string;
     title: string;
     content: string;
@@ -30,11 +32,11 @@ interface Post {
     is_take_down: boolean;
     like_count: number;
     comment_count: number;
-    share_count: number;
+    share_count?: number;
     author: string;
     club: string;
     club_name: string;
-    freelancer_profile: string;
+    freelancer_profile: string | null;
     is_liked?: boolean;
     link: string;
 }
@@ -58,6 +60,9 @@ const PostDetailPage = () => {
                 
                 if (response.data.response && response.data.response.length > 0) {
                     setPost(response.data.response[0]);
+                } else if (response.data && response.data.id) {
+                    // Handle different response structure
+                    setPost(response.data);
                 } else {
                     setError('Post not found');
                 }
