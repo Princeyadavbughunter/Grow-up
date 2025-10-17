@@ -7,7 +7,7 @@ import AddBioMain from './AddBioMain';
 const AddBio = () => {
 
     return (
-        <div className='pb-2'>
+        <div className='pb-40'>
             <ProfileData />
             <AddBioMain />
         </div>

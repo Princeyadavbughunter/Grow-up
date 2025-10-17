@@ -151,8 +151,8 @@ export default function EventsPage() {
             key={tab}
             variant="ghost"
             onClick={() => setActiveTab(tabKey)}
-            className={`px-3 py-2 text-sm sm:text-base hover:bg-gray-100 transition-colors ${
-              activeTab === tabKey
+            className={`px-0 text-sm sm:text-base ${
+ activeTab === tabKey
                 ? "text-black font-semibold border-b-2 border-black rounded-none"
                 : "text-gray-500"
             }`}

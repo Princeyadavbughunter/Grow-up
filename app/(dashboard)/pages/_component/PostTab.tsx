@@ -5,11 +5,9 @@ import Posts from '../../_components/Posts'
 
 interface PostTabProps {
   pageId: string;
-  pageName?: string;
-  pageProfilePicture?: string;
 }
 
-const PostTab: React.FC<PostTabProps> = ({ pageId, pageName, pageProfilePicture }) => {
+const PostTab: React.FC<PostTabProps> = ({ pageId }) => {
   const [pagePosts, setPagePosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { api } = useAuthenticatedApi();
@@ -18,14 +16,7 @@ const PostTab: React.FC<PostTabProps> = ({ pageId, pageName, pageProfilePicture 
     const fetchPagePosts = async () => {
       try {
         const response = await api.get(`/post/app/page-posts/?page=${pageId}`);
-        // Enrich posts with page information if provided
-        const enrichedPosts = response.data.map((post: any) => ({
-          ...post,
-          page_id: pageId,
-          page_name: pageName || post.page_name,
-          profile_picture: post.profile_picture || pageProfilePicture,
-        }));
-        setPagePosts(enrichedPosts);
+        setPagePosts(response.data);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching page posts:', error);
@@ -36,7 +27,7 @@ const PostTab: React.FC<PostTabProps> = ({ pageId, pageName, pageProfilePicture 
     if (pageId) {
       fetchPagePosts();
     }
-  }, [pageId, pageName, pageProfilePicture]);
+  }, [pageId]);
 
   if (loading) {
     return <div className="text-center py-10">Loading...</div>;

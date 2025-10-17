@@ -78,7 +78,7 @@ const ProgressProfile: React.FC = () => {
       if (response.data && response.data.length > 0) {
         setProfileData(response.data[0]);
       }
-    } catch (error) { 
+    } catch (error) {
       console.error('Error fetching profile data:', error);
     }
   };
