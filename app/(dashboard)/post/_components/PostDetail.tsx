@@ -3,22 +3,13 @@
 import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { FiUser } from 'react-icons/fi';
-import { MessageSquare, Heart, Share, MoreVertical, Edit, Trash2 } from 'lucide-react';
-import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
+import { MessageSquare, Heart, Share } from 'lucide-react';
+import { useAuthenticatedApi } from '@/context/AuthContext';
 import SharePopup from './SharePopup';
 import EmptyState from '@/components/ui/empty-state';
 import { CommentModal } from '@/components/ui/comment-modal';
 import { formatTimeAgo } from '@/lib/utils';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { toast } from 'sonner';
-import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 
 interface ImageData {
     id: string;
@@ -36,8 +27,6 @@ interface Post {
     last_name: string | null;
     company_name: string | null;
     company_logo: string | null;
-    page_name: string | null;
-    page_id: string | null;
     role: string;
     title: string;
     content: string;
@@ -46,11 +35,11 @@ interface Post {
     is_take_down: boolean;
     like_count: number;
     comment_count: number;
-    share_count?: number;
+    share_count: number;
     author: string;
     club: string;
     club_name: string;
-    freelancer_profile: string | null;
+    freelancer_profile: string;
     is_liked?: boolean;
     link: string;
 }
@@ -99,23 +88,7 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
     const [showSharePopup, setShowSharePopup] = useState<boolean>(false);
     const [showCommentModal, setShowCommentModal] = useState<boolean>(false);
     const [isSubmittingComment, setIsSubmittingComment] = useState<boolean>(false);
-    const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
-    const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const { api } = useAuthenticatedApi();
-    const { userId } = useAuth();
-    const router = useRouter();
-
-    // Check if current user is the post owner
-    const isOwner = userId === post.author;
-
-    // Helper function to safely get hostname from URL
-    const getHostname = (url: string) => {
-        try {
-            return new URL(url).hostname.replace('www.', '');
-        } catch {
-            return url;
-        }
-    };
 
     // Memoize formatted date to prevent recalculation on every render
     const formattedDate = useMemo(() =>
@@ -171,170 +144,61 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
         fetchComments();
     }, [fetchComments]);
 
-    // Determine the profile link based on whether it's a page post or user post
-    const profileLink = post.page_id 
-        ? `/pages` 
-        : post.freelancer_profile 
-            ? `/profile/${post.freelancer_profile}`
-            : '#';
-
-    const displayName = post.page_name || post.first_name || post.company_name || 'Anonymous';
-
-    const handleDelete = useCallback(async () => {
-        setIsDeleting(true);
-        try {
-            // Use PATCH to mark post as taken down (soft delete)
-            const formData = new FormData();
-            formData.append('title', post.title);
-            formData.append('content', post.content || '');
-            formData.append('is_take_down', 'true');
-            
-            if (post.link) {
-                formData.append('link', post.link);
-            }
-            
-            await api.patch(`/post/app/posts/?id=${post.id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                }
-            });
-            toast.success('Post deleted successfully');
-            setShowDeleteDialog(false);
-            router.push('/'); // Redirect to home or feed after deletion
-        } catch (error) {
-            console.error('Error deleting post:', error);
-            toast.error('Failed to delete post');
-        } finally {
-            setIsDeleting(false);
-        }
-    }, [post.id, post.title, post.content, post.link, api, router]);
-
-    const handleEdit = useCallback(() => {
-        router.push(`/create-post?edit=${post.id}&clubId=${post.club}`);
-    }, [post.id, post.club, router]);
-
     return (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             {/* Post Header */}
             <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4 flex-1">
-                        {(post.page_id || post.freelancer_profile) ? (
-                            <Link href={profileLink} className="flex items-center gap-4">
-                                <div>
-                                    {post.profile_picture ? (
-                                        <Image
-                                            src={post.profile_picture}
-                                            alt="Profile"
-                                            width={50}
-                                            height={50}
-                                            className="rounded-full w-12 h-12"
-                                        />
-                                    ) : (
-                                        <div className="rounded-full bg-gray-200 flex items-center justify-center w-12 h-12">
-                                            <FiUser className="text-gray-600 w-6 h-6" />
-                                        </div>
-                                    )}
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-lg">
-                                        {displayName}
-                                    </h3>
-                                    <p className="text-sm text-gray-500">{formattedDate}</p>
-                                </div>
-                            </Link>
-                        ) : (
-                            <div className="flex items-center gap-4">
-                                <div>
-                                    {post.profile_picture ? (
-                                        <Image
-                                            src={post.profile_picture}
-                                            alt="Profile"
-                                            width={50}
-                                            height={50}
-                                            className="rounded-full w-12 h-12"
-                                        />
-                                    ) : (
-                                        <div className="rounded-full bg-gray-200 flex items-center justify-center w-12 h-12">
-                                            <FiUser className="text-gray-600 w-6 h-6" />
-                                        </div>
-                                    )}
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-lg">
-                                        {displayName}
-                                    </h3>
-                                    <p className="text-sm text-gray-500">{formattedDate}</p>
-                                </div>
+                    <div className="flex items-center gap-4">
+                        <Link href={`/profile/${post.freelancer_profile}`} className="flex items-center gap-4">
+                            <div>
+                                {post.profile_picture ? (
+                                    <Image
+                                        src={post.profile_picture}
+                                        alt="Profile"
+                                        width={50}
+                                        height={50}
+                                        className="rounded-full w-12 h-12"
+                                    />
+                                ) : (
+                                    <div className="rounded-full bg-gray-200 flex items-center justify-center w-12 h-12">
+                                        <FiUser className="text-gray-600 w-6 h-6" />
+                                    </div>
+                                )}
                             </div>
-                        )}
+                            <div>
+                                <h3 className="font-semibold text-lg">
+                                    {post.first_name || post.company_name || 'Anonymous'}
+                                </h3>
+                                <p className="text-sm text-gray-500">{formattedDate}</p>
+                            </div>
+                        </Link>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col items-end gap-2">
                         <Link
                             href={`/clubs/${post.club}`}
-                            className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium hover:bg-green-200 transition-colors cursor-pointer whitespace-nowrap"
+                            className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium hover:bg-green-200 transition-colors cursor-pointer"
                         >
                             {post.club_name}
                         </Link>
-                        {isOwner && (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                                        <MoreVertical className="w-5 h-5 text-gray-600" />
-                                    </button>
-                                </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48">
-                                <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
-                                    <Edit className="w-4 h-4 mr-2" />
-                                    Edit Post
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} className="cursor-pointer text-red-600 focus:text-red-600">
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    Delete Post
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    )}
+                        {post.link && (
+                            <a
+                                href={post.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-500 hover:text-blue-700 underline text-right"
+                            >
+                                Link
+                            </a>
+                        )}
+                    </div>
                 </div>
-            </div>
 
-            {/* Delete Confirmation Dialog */}
-            <DeleteConfirmDialog
-                isOpen={showDeleteDialog}
-                onClose={() => setShowDeleteDialog(false)}
-                onConfirm={handleDelete}
-                isDeleting={isDeleting}
-            />
-
-            {/* Post Title and Content */}
+                {/* Post Title and Content */}
                 <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">{post.title}</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-3">{post.title}</h2>
                     {post.content && (
-                        <p className="text-gray-700 text-base leading-relaxed mb-4 whitespace-pre-wrap">
-                            {post.content}
-                        </p>
-                    )}
-
-                    {/* Link Preview */}
-                    {post.link && (
-                        <a
-                            href={post.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors group"
-                        >
-                            <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                            </svg>
-                            <div className="flex flex-col items-start min-w-0">
-                                <span className="text-sm text-blue-600 font-medium group-hover:underline">
-                                    {getHostname(post.link)}
-                                </span>
-                                <span className="text-xs text-gray-500 truncate w-full">
-                                    {post.link}
-                                </span>
-                            </div>
-                        </a>
+                        <p className="text-gray-700 text-lg leading-relaxed">{post.content}</p>
                     )}
                 </div>
 
@@ -398,9 +262,7 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                         onClick={() => setShowSharePopup(true)}
                     >
                         <Share className="w-5 h-5" />
-                        {post.share_count !== undefined && (
-                            <span className="font-medium">{post.share_count}</span>
-                        )}
+                        <span className="font-medium">{post.share_count}</span>
                     </button>
                 </div>
             </div>

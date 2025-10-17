@@ -300,31 +300,27 @@ const AddBioMain = () => {
   };
 
   const renderExperienceCard = (experience: WorkExperience) => (
-    <div key={experience.id} className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start gap-4">
-        <div className="flex-1">
-          <h3 className="font-semibold text-base sm:text-lg text-gray-800">{experience.job_title || experience.position}</h3>
-          <p className="text-gray-600 text-sm sm:text-base font-medium">{experience.company_name}</p>
-          <p className="text-gray-500 text-xs sm:text-sm mt-1">
+    <div key={experience.id} className="bg-white rounded-lg shadow p-4 mb-4">
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="font-semibold text-lg">{experience.job_title || experience.position}</h3>
+          <p className="text-gray-600">{experience.company_name}</p>
+          <p className="text-gray-500 text-sm">
             {experience.start_date} - {experience.currently_working ? 'Present' : experience.end_date}
           </p>
-          {(experience.location || experience.job_location) && (
-            <p className="text-gray-500 text-xs sm:text-sm">{experience.location || experience.job_location}</p>
-          )}
-          {experience.description && (
-            <p className="mt-2 text-sm text-gray-600">{experience.description}</p>
-          )}
+          <p className="text-gray-500 text-sm">{experience.location || experience.job_location}</p>
+          <p className="mt-2">{experience.description}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex space-x-2">
           <button 
             onClick={() => openEditExperienceModal(experience)}
-            className="text-[#7052FF] hover:text-[#5a42cc] text-sm font-medium transition-colors"
+            className="text-blue-500 hover:text-blue-700"
           >
             Edit
           </button>
           <button 
             onClick={() => deleteExperience(experience.id)}
-            className="text-red-500 hover:text-red-700 transition-colors"
+            className="text-red-500 hover:text-red-700"
           >
             <X size={16} />
           </button>
@@ -336,12 +332,12 @@ const AddBioMain = () => {
   const renderSummaryContent = () => {
     if (profileData?.bio) {
       return (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow">
-          <div className="flex justify-between items-start gap-4">
-            <p className="text-gray-700 text-sm sm:text-base">{profileData.bio}</p>
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex justify-between items-start">
+            <p>{profileData.bio}</p>
             <button 
               onClick={openSummaryModal}
-              className="text-[#7052FF] hover:text-[#5a42cc] text-sm font-medium whitespace-nowrap transition-colors"
+              className="text-blue-500 hover:text-blue-700"
             >
               Edit
             </button>
@@ -351,33 +347,26 @@ const AddBioMain = () => {
     }
     
     return (
-      <button 
-        onClick={openSummaryModal}
-        className="w-full bg-gradient-to-br from-[#F6F8FF] to-[#EEF2FF] rounded-lg p-6 sm:p-8 border-2 border-dashed border-gray-300 hover:border-[#7052FF] hover:bg-gradient-to-br hover:from-[#EEF2FF] hover:to-[#E0E7FF] transition-all duration-200 group"
-      >
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-            <PlusIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#7052FF]" />
-          </div>
-          <p className="text-gray-600 group-hover:text-[#7052FF] font-medium text-sm sm:text-base transition-colors">
-            Add Summary
-          </p>
-          <p className="text-gray-400 text-xs sm:text-sm">Click to add your professional summary</p>
-        </div>
-      </button>
+      <div className="bg-[#F6F8FF] rounded-lg p-20">
+        <p 
+          className='text-blue-500 text-center cursor-pointer text-lg flex justify-center items-center'
+          onClick={openSummaryModal}
+        >
+          add<PlusIcon color='gray' />
+        </p>
+      </div>
     );
   };
 
   const renderExperienceContent = () => {
     if (experiences.length > 0) {
       return (
-        <div className="space-y-3">
+        <div>
           {experiences.map(experience => renderExperienceCard(experience))}
           <Button 
             onClick={openAddExperienceModal}
-            className="mt-4 bg-[#7052FF] text-white hover:bg-[#5a42cc] flex items-center gap-2 transition-colors"
+            className="mt-4 bg-blue-500 text-white hover:bg-blue-600"
           >
-            <PlusIcon className="w-4 h-4" />
             Add More Experience
           </Button>
         </div>
@@ -385,39 +374,33 @@ const AddBioMain = () => {
     }
     
     return (
-      <button 
-        onClick={openAddExperienceModal}
-        className="w-full bg-gradient-to-br from-[#F6F8FF] to-[#EEF2FF] rounded-lg p-6 sm:p-8 border-2 border-dashed border-gray-300 hover:border-[#7052FF] hover:bg-gradient-to-br hover:from-[#EEF2FF] hover:to-[#E0E7FF] transition-all duration-200 group"
-      >
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-            <PlusIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#7052FF]" />
-          </div>
-          <p className="text-gray-600 group-hover:text-[#7052FF] font-medium text-sm sm:text-base transition-colors">
-            Add Work Experience
-          </p>
-          <p className="text-gray-400 text-xs sm:text-sm">Share your professional journey</p>
-        </div>
-      </button>
+      <div className="bg-[#F6F8FF] rounded-lg p-20">
+        <p 
+          className='text-blue-500 text-center cursor-pointer text-lg flex justify-center items-center'
+          onClick={openAddExperienceModal}
+        >
+          add<PlusIcon color='gray' />
+        </p>
+      </div>
     );
   };
 
   const renderEducationContent = () => {
     if (profileData?.university_name) {
       return (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow">
-          <div className="flex justify-between items-start gap-4">
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex justify-between items-start">
             <div>
-              <h3 className="font-semibold text-base sm:text-lg text-gray-800">{profileData.degree_name}</h3>
-              <p className="text-gray-600 text-sm sm:text-base">{profileData.university_name}</p>
-              <p className="text-gray-500 text-xs sm:text-sm mt-1">
+              <h3 className="font-semibold text-lg">{profileData.degree_name}</h3>
+              <p className="text-gray-600">{profileData.university_name}</p>
+              <p className="text-gray-500 text-sm">
                 {profileData.graduation_year_from} - {profileData.passing_year}
               </p>
-              <p className="mt-2 text-sm text-gray-600">{profileData.highest_qualification}</p>
+              <p className="mt-2">{profileData.highest_qualification}</p>
             </div>
             <button 
               onClick={openEducationModal}
-              className="text-[#7052FF] hover:text-[#5a42cc] text-sm font-medium whitespace-nowrap transition-colors"
+              className="text-blue-500 hover:text-blue-700"
             >
               Edit
             </button>
@@ -427,20 +410,14 @@ const AddBioMain = () => {
     }
     
     return (
-      <button 
-        onClick={openEducationModal}
-        className="w-full bg-gradient-to-br from-[#F6F8FF] to-[#EEF2FF] rounded-lg p-6 sm:p-8 border-2 border-dashed border-gray-300 hover:border-[#7052FF] hover:bg-gradient-to-br hover:from-[#EEF2FF] hover:to-[#E0E7FF] transition-all duration-200 group"
-      >
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-            <PlusIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#7052FF]" />
-          </div>
-          <p className="text-gray-600 group-hover:text-[#7052FF] font-medium text-sm sm:text-base transition-colors">
-            Add Education
-          </p>
-          <p className="text-gray-400 text-xs sm:text-sm">Add your educational background</p>
-        </div>
-      </button>
+      <div className="bg-[#F6F8FF] rounded-lg p-20">
+        <p 
+          className='text-blue-500 text-center cursor-pointer text-lg flex justify-center items-center'
+          onClick={openEducationModal}
+        >
+          add<PlusIcon color='gray' />
+        </p>
+      </div>
     );
   };
 
@@ -450,13 +427,13 @@ const AddBioMain = () => {
       const softSkillsArray = profileData.soft_skills ? profileData.soft_skills.split(',') : [];
       
       return (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow">
-          <div className="flex justify-between items-start gap-4">
-            <div className="flex-1">
-              <h3 className="font-semibold text-sm sm:text-base text-gray-800 mb-3">Technical Skills</h3>
-              <div className="flex flex-wrap gap-2 mb-4">
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="font-semibold text-lg">Technical Skills</h3>
+              <div className="flex flex-wrap gap-2 mt-2">
                 {skillsArray.map((skill, index) => (
-                  <span key={index} className="bg-[#F0EDFF] text-[#7052FF] px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium">
+                  <span key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
                     {skill.trim()}
                   </span>
                 ))}
@@ -464,10 +441,10 @@ const AddBioMain = () => {
               
               {softSkillsArray.length > 0 && (
                 <>
-                  <h3 className="font-semibold text-sm sm:text-base text-gray-800 mb-3 mt-4">Soft Skills</h3>
-                  <div className="flex flex-wrap gap-2">
+                  <h3 className="font-semibold text-lg mt-4">Soft Skills</h3>
+                  <div className="flex flex-wrap gap-2 mt-2">
                     {softSkillsArray.map((skill, index) => (
-                      <span key={index} className="bg-[#E0F2FE] text-[#0369A1] px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium">
+                      <span key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
                         {skill.trim()}
                       </span>
                     ))}
@@ -477,7 +454,7 @@ const AddBioMain = () => {
             </div>
             <button 
               onClick={openSkillsModal}
-              className="text-[#7052FF] hover:text-[#5a42cc] text-sm font-medium whitespace-nowrap transition-colors"
+              className="text-blue-500 hover:text-blue-700"
             >
               Edit
             </button>
@@ -487,34 +464,26 @@ const AddBioMain = () => {
     }
     
     return (
-      <button 
-        onClick={openSkillsModal}
-        className="w-full bg-gradient-to-br from-[#F6F8FF] to-[#EEF2FF] rounded-lg p-6 sm:p-8 border-2 border-dashed border-gray-300 hover:border-[#7052FF] hover:bg-gradient-to-br hover:from-[#EEF2FF] hover:to-[#E0E7FF] transition-all duration-200 group"
-      >
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-            <PlusIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#7052FF]" />
-          </div>
-          <p className="text-gray-600 group-hover:text-[#7052FF] font-medium text-sm sm:text-base transition-colors">
-            Add Skills
-          </p>
-          <p className="text-gray-400 text-xs sm:text-sm">Showcase your expertise</p>
-        </div>
-      </button>
+      <div className="bg-[#F6F8FF] rounded-lg p-20">
+        <p 
+          className='text-blue-500 text-center cursor-pointer text-lg flex justify-center items-center'
+          onClick={openSkillsModal}
+        >
+          add<PlusIcon color='gray' />
+        </p>
+      </div>
     );
   };
 
   return (
-    <div className='space-y-4'>
-      <h2 className='text-base sm:text-lg font-semibold text-gray-800 mb-4'>Your Bio</h2>
-      <div className="flex flex-wrap gap-2 sm:gap-3">
+    <div className=''>
+      <p className='underline font-semibold'>Your bio</p>
+      <div className="flex space-x-4 py-4">
         {["About", "Skills", "Porfolio", "Post"].map((tab) => (
           <Button
             key={tab}
             variant={activeJobTypeTab === tab ? "default" : "ghost"}
-            className={activeJobTypeTab === tab 
-              ? "bg-[#7052FF] hover:bg-[#5a42cc] text-white rounded-full px-4 sm:px-6 text-sm sm:text-base" 
-              : "rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 sm:px-6 text-sm sm:text-base"}
+            className={activeJobTypeTab === tab ? "bg-[#979797] hover:bg-[#dcdcdc] rounded-full" : "rounded-full bg-[#dcdcdc]"}
             onClick={() => setActiveJobTypeTab(tab)}
           >
             {tab}
@@ -523,34 +492,34 @@ const AddBioMain = () => {
       </div>
 
       {activeJobTypeTab === "About" && (
-        <div className="space-y-6 sm:space-y-8">
-          <div>
-            <h3 className='text-gray-800 font-semibold text-sm sm:text-base mb-3'>Summary</h3>
+        <>
+          <div className="py-10">
+            <p className='text-black font-semibold'>Summary</p>
             {renderSummaryContent()}
           </div>
           
-          <div>
-            <h3 className='text-gray-800 font-semibold text-sm sm:text-base mb-3'>Work Experience</h3>
+          <div className="py-10">
+            <p className='text-black font-semibold'>My Experience</p>
             {renderExperienceContent()}
           </div>
           
-          <div>
-            <h3 className='text-gray-800 font-semibold text-sm sm:text-base mb-3'>Education</h3>
+          <div className="py-10">
+            <p className='text-black font-semibold'>My Education</p>
             {renderEducationContent()}
           </div>
-        </div>
+        </>
       )}
 
       {activeJobTypeTab === "Skills" && (
-        <div className="pt-4">
-          <h3 className='text-gray-800 font-semibold text-sm sm:text-base mb-3'>My Skills</h3>
+        <div className="py-10">
+          <p className='text-black font-semibold'>My Skills</p>
           {renderSkillsContent()}
         </div>
       )}
 
       {/* Summary Modal */}
       <Dialog open={modalType === "summary"} onOpenChange={() => modalType === "summary" && setModalType("")}>
-        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{profileData?.bio ? "Edit Summary" : "Add Summary"}</DialogTitle>
           </DialogHeader>
@@ -710,7 +679,7 @@ const AddBioMain = () => {
 
       {/* Education Modal */}
       <Dialog open={modalType === "education"} onOpenChange={() => modalType === "education" && setModalType("")}>
-        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{profileData?.university_name ? "Edit Education" : "Add Education"}</DialogTitle>
           </DialogHeader>
@@ -816,7 +785,7 @@ const AddBioMain = () => {
 
       {/* Skills Modal */}
       <Dialog open={modalType === "skills"} onOpenChange={() => modalType === "skills" && setModalType("")}>
-        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{profileData?.skills ? "Edit Skills" : "Add Skills"}</DialogTitle>
           </DialogHeader>
@@ -876,7 +845,7 @@ const AddBioMain = () => {
           }
         }}
       >
-        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{isEditingExperience ? "Edit Experience" : "Add Experience"}</DialogTitle>
           </DialogHeader>

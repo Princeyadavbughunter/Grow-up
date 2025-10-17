@@ -28,7 +28,7 @@ const LandingFooter = () => {
       links: [
         { name: 'contact@growupbuddy.com', href: 'mailto:contact@growupbuddy.com', icon: <Mail className="w-4 h-4" /> },
         { name: '+919691762703', href: 'tel:+919691762703', icon: <Phone className="w-4 h-4" /> },
-        { name: 'New Delhi, India', href: '#', icon: <MapPin className="w-4 h-4" /> },
+        { name: 'New Delhim, India', href: '#', icon: <MapPin className="w-4 h-4" /> },
       ],
     },
   ]
@@ -205,7 +205,7 @@ const LandingFooter = () => {
         <div className="border-t border-gray-700 mt-8 sm:mt-12 pt-6 sm:pt-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-center sm:text-left">
             <p className="text-gray-500 text-xs sm:text-sm">
-              © 2025 GrowUp Buddy. All Rights Reserved. Made with ❤️ by the GrowUp Buddy Team
+              © 2024 GrowUp Buddy. All Rights Reserved. Made with ❤️ by the GrowUp Buddy Team
             </p>
             <div className="flex justify-center sm:justify-end gap-4 sm:gap-6 text-xs sm:text-sm">
               <a href="/privacy-policy" className="text-gray-500 hover:text-white transition-colors duration-300">

@@ -14,8 +14,6 @@ interface Participant {
   user_id: string;
   email: string;
   username: string;
-  first_name: string | null;
-  last_name: string | null;
   joined_at: string;
   is_admin: boolean;
   profile_picture: string | null;
@@ -144,9 +142,7 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
               <NetworkCard
                 key={participant.user_id}
                 id={participant.freelancer_id}
-                name={participant.first_name && participant.last_name 
-                  ? `${participant.first_name} ${participant.last_name}` 
-                  : participant.username || "User"}
+                name={participant.username || "User"}
                 title={participant.position || "Member"}
                 location={participant.city && participant.state ? `${participant.city}, ${participant.state}` : ""}
                 imageUrl={participant.profile_picture || ""}
@@ -204,7 +200,7 @@ export function NetworkCard({
   const router = useRouter();
   
   return (
-    <div onClick={() => router.push(`/profile/${id}`)} className="flex cursor-pointer items-center gap-2 lg:gap-3 p-2 lg:p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+    <div onClick={() => router.push(`/profile/${id}`)} className="flex cursor-pointer overflow-scroll items-center gap-2 lg:gap-3 p-2 lg:p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
       <div className="relative flex-shrink-0">
         <Avatar className="h-8 w-8 lg:h-12 lg:w-12">
           <AvatarImage src={imageUrl} />
@@ -227,6 +223,11 @@ export function NetworkCard({
             {followerCount} {followerCount === 1 ? 'follower' : 'followers'}
           </p>
         )}
+      </div>
+      <div className="flex-shrink-0">
+        <svg className="w-3 h-3 lg:w-4 lg:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
       </div>
     </div>
   );
