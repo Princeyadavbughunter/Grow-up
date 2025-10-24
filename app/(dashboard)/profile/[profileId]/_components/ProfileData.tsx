@@ -22,6 +22,7 @@ interface ProfileDataProps {
     state: string;
     skills: string;
     follower_count: number;
+    connection_count?: number;
     github_account: string | null;
     dribble_account: string | null;
     figma_account: string | null;
@@ -43,21 +44,51 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   const [isFollowing, setIsFollowing] = useState(profileData?.is_following || false);
   const [followRequestSent, setFollowRequestSent] = useState(profileData?.follow_request_sent || false);
   const [isLoading, setIsLoading] = useState(false);
+  const [followerCount, setFollowerCount] = useState(profileData?.follower_count || 0);
+  const [connectionCount, setConnectionCount] = useState(profileData?.connection_count || 0);
   const { profileData: userProfileData } = useAuth();
+
+  // Fetch follow statistics for the profile
+  useEffect(() => {
+    const fetchFollowStats = async () => {
+      if (!profileData?.id) return;
+      
+      try {
+        // For viewing other users' profiles, we get their follow stats
+        const response = await api.get(`/freelancer/follow-stats/?freelancer_id=${profileData.id}`);
+        if (response.data) {
+          setFollowerCount(response.data.follower_count || 0);
+          setConnectionCount(response.data.connection_count || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching follow stats:', error);
+        // Fallback to the profile data if API doesn't exist
+        setFollowerCount(profileData?.follower_count || 0);
+        // Calculate connection count if API doesn't provide it
+        // Connection = people who follow each other mutually
+      }
+    };
+
+    if (profileData?.id) {
+      fetchFollowStats();
+    }
+  }, [profileData?.id, api]);
 
   // Sync state with props when profileData changes (e.g., after page reload)
   useEffect(() => {
     if (profileData) {
       setIsFollowing(profileData.is_following || false);
       setFollowRequestSent(profileData.follow_request_sent || false);
+      setFollowerCount(profileData.follower_count || 0);
+      setConnectionCount(profileData.connection_count || 0);
     }
-  }, [profileData?.is_following, profileData?.follow_request_sent]);
+  }, [profileData?.is_following, profileData?.follow_request_sent, profileData?.follower_count, profileData?.connection_count]);
 
   if (!profileData) {
     return <div>Loading profile data...</div>;
   }
 
-  const { first_name, last_name, bio, profile_picture, address, city, state, skills, follower_count } = profileData;
+  const { first_name, last_name, bio, profile_picture, address, city, state, skills } = profileData;
   const skillsArray = skills ? skills.split(',') : [];
   const fullName = `${first_name} ${last_name}`;
   const location = `${address ? address + ', ' : ''}${city ? city + ', ' : ''}${state || ''}`;
@@ -130,12 +161,16 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
             <h3 className="font-medium text-xl sm:text-2xl">{fullName}</h3>
           </div>
-          <p className="text-gray-600 text-sm sm:text-base mb-2">
-            {bio || "Founder - Finzie | Ex Groww | BITS Pilani"}
-          </p>
-          <p className="text-gray-500 text-sm sm:text-base flex items-center justify-center sm:justify-start gap-1">
-            <IoLocationSharp /> {location || "Lakshman Puri, Delhi"}
-          </p>
+          {bio && (
+            <p className="text-gray-600 text-sm sm:text-base mb-2">
+              {bio}
+            </p>
+          )}
+          {location && (
+            <p className="text-gray-500 text-sm sm:text-base flex items-center justify-center sm:justify-start gap-1">
+              <IoLocationSharp /> {location}
+            </p>
+          )}
         </div>
       </div>
 
@@ -199,9 +234,16 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto">
-                <ImUsers /> {follower_count || 0} Followers
-              </Button>
+              <div className="flex gap-3">
+                <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
+                  <ImUsers /> {followerCount || 0} Followers
+                </Button>
+                {connectionCount > 0 && (
+                  <Button className="bg-green-600 hover:bg-green-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
+                    <ImUsers /> {connectionCount} Connections
+                  </Button>
+                )}
+              </div>
               <Button
                 onClick={handleFollowAction}
                 disabled={isLoading}
@@ -214,9 +256,16 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
           )
         )}
         {userProfileData?.id === profileData.id && (
-          <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto">
-            <ImUsers /> {follower_count || 0} Followers
-          </Button>
+          <div className="flex gap-3">
+            <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
+              <ImUsers /> {followerCount || 0} Followers
+            </Button>
+            {connectionCount > 0 && (
+              <Button className="bg-green-600 hover:bg-green-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
+                <ImUsers /> {connectionCount} Connections
+              </Button>
+            )}
+          </div>
         )}
       </div>
     </div>

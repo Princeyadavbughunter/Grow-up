@@ -34,6 +34,8 @@ interface Chatroom {
   chatting_with_current_user: Participant;
   created_at: string;
   is_accepted: boolean;
+  created_by?: string;
+  initiator?: string;
 }
 
 interface Message {
@@ -130,7 +132,29 @@ const ChatInterface: React.FC = () => {
   const fetchPendingChatrooms = async (): Promise<void> => {
     try {
       const response = await api.get('/individualchats/chatrooms-pending/');
-      setPendingChatrooms(response.data.results);
+      const allPendingChats = response.data.results || [];
+      
+      // Filter to only show requests where current user is the RECIPIENT (not the sender)
+      // The API should ideally handle this, but we add client-side filtering as a safeguard
+      const currentUserId = userId || profileData?.user;
+      const receivedRequests = allPendingChats.filter((chatroom: Chatroom) => {
+        // If there's a created_by or initiator field, use it
+        if (chatroom.created_by && chatroom.created_by !== currentUserId) {
+          return true;
+        }
+        if (chatroom.initiator && chatroom.initiator !== currentUserId) {
+          return true;
+        }
+        // Otherwise, assume the first participant is the initiator
+        if (chatroom.participants && chatroom.participants.length > 0) {
+          const firstParticipant = chatroom.participants[0];
+          return firstParticipant.id !== currentUserId;
+        }
+        // If no clear way to determine, include it (backend should handle this)
+        return true;
+      });
+      
+      setPendingChatrooms(receivedRequests);
     } catch (error) {
       console.error('Error fetching pending chatrooms:', error);
     }
@@ -318,18 +342,26 @@ const ChatInterface: React.FC = () => {
 
   const handleChatroomAction = async (roomId: string, accept: boolean): Promise<void> => {
     try {
-      await api.patch(`/individualchats/chatroom/?room_id=${roomId}&is_accepted=${accept ? 'True' : 'False'}`);
-      
-      // Refresh lists
-      fetchChatrooms();
-      fetchPendingChatrooms();
-      
-      // If accepted, select the chatroom
       if (accept) {
+        // Accept the chat request
+        await api.patch(`/individualchats/chatroom/?room_id=${roomId}&is_accepted=True`);
+        
+        // Refresh lists
+        fetchChatrooms();
+        fetchPendingChatrooms();
+        
+        // Select the accepted chatroom
         const acceptedRoom = pendingChatrooms.find(room => room.id === roomId);
         if (acceptedRoom) {
           handleChatroomSelect(acceptedRoom);
         }
+      } else {
+        // Reject/delete the chat request
+        await api.delete(`/individualchats/chatroom/?room_id=${roomId}`);
+        
+        // Refresh lists
+        fetchChatrooms();
+        fetchPendingChatrooms();
       }
     } catch (error) {
       console.error('Error handling chatroom request:', error);
@@ -529,14 +561,21 @@ const ChatInterface: React.FC = () => {
                       <img
                         src={chatroom.chatting_with_current_user.image}
                         alt={chatroom.chatting_with_current_user.name}
-                        className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0"
+                        className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0 cursor-pointer"
+                        onClick={() => window.location.href = `/profile/${chatroom.chatting_with_current_user.id}`}
                       />
                     ) : (
-                      <div className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                      <div 
+                        className="h-10 w-10 md:h-12 md:w-12 rounded-full mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center cursor-pointer"
+                        onClick={() => window.location.href = `/profile/${chatroom.chatting_with_current_user.id}`}
+                      >
                         <FaUser className="h-5 w-5 md:h-6 md:w-6 text-gray-500" />
                       </div>
                     )}
-                    <div className="flex-1 min-w-0">
+                    <div 
+                      className="flex-1 min-w-0 cursor-pointer hover:text-blue-600"
+                      onClick={() => window.location.href = `/profile/${chatroom.chatting_with_current_user.id}`}
+                    >
                       <h3 className="font-medium text-sm md:text-base truncate">{chatroom.chatting_with_current_user.name}</h3>
                       <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                       <div className="text-xs text-gray-400 flex items-center">
