@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 import { useState, useEffect } from 'react';
-import { Search, Plus, Briefcase, ChevronLeft } from "lucide-react";
+import { Search, Plus, Briefcase, ChevronLeft, Bookmark } from "lucide-react";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import { useRouter } from 'next/navigation';
 import JobPostingsList from '../_component/job-postings-list';
@@ -118,6 +118,14 @@ export default function ManageJobsPage() {
                                     <Search className="w-4 h-4" />
                                     <span className="hidden sm:inline">Browse Gigs</span>
                                     <span className="sm:hidden">Gigs</span>
+                                </Link>
+                                <Link 
+                                    href="/gigs/saved" 
+                                    className="text-gray-600 hover:text-purple-600 font-medium transition-colors flex items-center gap-2 whitespace-nowrap text-sm sm:text-base"
+                                >
+                                    <Bookmark className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Saved Jobs</span>
+                                    <span className="sm:hidden">Saved</span>
                                 </Link>
                                 <span className="text-purple-600 font-medium border-b-2 border-purple-600 pb-1 flex items-center gap-2 whitespace-nowrap text-sm sm:text-base">
                                     <Briefcase className="w-4 h-4" />
