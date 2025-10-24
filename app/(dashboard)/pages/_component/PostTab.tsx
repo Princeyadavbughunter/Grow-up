@@ -18,11 +18,14 @@ const PostTab: React.FC<PostTabProps> = ({ pageId, pageName, pageProfilePicture 
     const fetchPagePosts = async () => {
       try {
         const response = await api.get(`/post/app/page-posts/?page=${pageId}`);
-        // Enrich posts with page information if provided
+        // Enrich posts with page information and mark as page posts
         const enrichedPosts = response.data.map((post: any) => ({
           ...post,
+          type: 'page_post',
           page_id: pageId,
+          page: pageId,
           page_name: pageName || post.page_name,
+          page_profile_picture: post.profile_picture || pageProfilePicture,
           profile_picture: post.profile_picture || pageProfilePicture,
         }));
         setPagePosts(enrichedPosts);

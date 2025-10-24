@@ -75,18 +75,24 @@ const HomeTab: React.FC<HomeTabProps> = ({ pageId }) => {
           <p className="text-gray-500">No posts yet</p>
         ) : (
           pagePosts.map((post) => (
-            <div key={post.id} className="border rounded-xl p-4 mb-4">
+            <div key={post.id} className="border rounded-xl p-4 mb-4 bg-white shadow-sm">
+              <div className="mb-4">
+                <h3 className="font-bold text-xl text-gray-900 mb-3 leading-tight">{post.title}</h3>
+                <div className="border-l-4 border-gray-200 pl-4">
+                  <p className="text-gray-700 text-base leading-relaxed">{post.content}</p>
+                </div>
+              </div>
               {post.images && post.images.length > 0 && (
-                <img 
-                  src={post.images[0].file} 
-                  alt="Post image" 
-                  className="w-full h-auto object-cover rounded-lg mb-4"
-                />
+                <div className="mb-4">
+                  <img 
+                    src={post.images[0].file} 
+                    alt="Post image" 
+                    className="w-full h-auto object-cover rounded-lg border"
+                  />
+                </div>
               )}
-              <h3 className="font-semibold text-lg mb-2">{post.title}</h3>
-              <p className="text-gray-600 mb-2">{post.content}</p>
-              <div className="text-sm text-gray-500">
-                Posted on {formatTimeAgo(post.created_at)}
+              <div className="text-sm text-gray-500 pt-2 border-t border-gray-100">
+                Posted {formatTimeAgo(post.created_at)}
               </div>
             </div>
           ))
