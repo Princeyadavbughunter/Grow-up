@@ -430,7 +430,14 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
 
             {/* Post Content */}
             <div className="mb-4">
-                <Link href={`/post/${post.id}`} className="block">
+                <Link 
+                    href={
+                        post.type === 'page_post' 
+                            ? `/post/${post.id}?type=page&pageId=${post.page_id || post.page}`
+                            : `/post/${post.id}`
+                    } 
+                    className="block"
+                >
                     <h2 className="text-lg font-bold text-gray-900 mb-2 hover:text-purple-600 transition-colors">
                         {post.title}
                     </h2>
@@ -467,7 +474,14 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
 
                 {/* Post Images */}
                 {post.images && post.images.length > 0 && (
-                    <Link href={`/post/${post.id}`} className="block">
+                    <Link 
+                        href={
+                            post.type === 'page_post' 
+                                ? `/post/${post.id}?type=page&pageId=${post.page_id || post.page}`
+                                : `/post/${post.id}`
+                        } 
+                        className="block"
+                    >
                         <Image
                             src={post.images[0].file}
                             alt="Post"

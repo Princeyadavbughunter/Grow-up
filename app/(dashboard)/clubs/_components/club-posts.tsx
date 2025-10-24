@@ -8,7 +8,7 @@ import { FiUser } from 'react-icons/fi';
 import SharePopup from '../../post/_components/SharePopup';
 import { CommentModal } from '@/components/ui/comment-modal';
 import { formatTimeAgo } from '@/lib/utils';
-
+import { Heart, MessageSquare, Share } from 'lucide-react';
 interface ImageData {
     id: string;
     file: string;
@@ -24,6 +24,7 @@ interface VideoType {
 }
 
 interface Post {
+    type?: 'user_post' | 'page_post';
     id: string;
     images: ImageData[];
     videos: VideoType[];
@@ -32,6 +33,10 @@ interface Post {
     last_name: string | null;
     company_name: string | null;
     company_logo: string | null;
+    page_name?: string | null;
+    page_profile_picture?: string | null;
+    page_id?: string | null;
+    page?: string;
     role: string;
     title: string;
     content: string;
@@ -43,9 +48,10 @@ interface Post {
     author: string;
     club: string;
     club_name: string;
-    freelancer_profile: string;
+    club_id?: string;
+    freelancer_profile: string | null;
     is_liked?: boolean;
-    link: string;
+    link?: string;
 }
 
 interface Comment {
@@ -95,11 +101,14 @@ const Posts = ({ clubId }: PostsProps) => {
         const fetchPosts = async () => {
             try {
                 const response = await api.get(`/post/app/post-creation/?club_id=${clubId}`);
-                console.log(response.data.response);
+                console.log('Club posts response:', response.data);
                 
-                setPosts(response.data || []);
+                // Handle different response structures
+                const postsData = response.data.response || response.data.results || response.data || [];
+                setPosts(Array.isArray(postsData) ? postsData : []);
             } catch (error) {
                 console.error('Error fetching posts:', error);
+                setPosts([]);
             } finally {
                 setLoading(false);
             }
@@ -131,6 +140,16 @@ const Posts = ({ clubId }: PostsProps) => {
         }
     };
 
+    const handleUpdateCommentCount = (postId: string, newCount: number) => {
+        setPosts(prevPosts =>
+            prevPosts.map(post =>
+                post.id === postId
+                    ? { ...post, comment_count: newCount }
+                    : post
+            )
+        );
+    };
+
     if (loading) {
         return <div className="text-center py-10">Loading posts...</div>;
     }
@@ -143,6 +162,7 @@ const Posts = ({ clubId }: PostsProps) => {
                         key={post.id} 
                         post={post} 
                         onLike={handleLikePost}
+                        onUpdateCommentCount={handleUpdateCommentCount}
                     />
                 ))
             ) : (
@@ -157,21 +177,32 @@ const Posts = ({ clubId }: PostsProps) => {
 interface PostCardProps {
     post: Post;
     onLike: (postId: string) => void;
+    onUpdateCommentCount?: (postId: string, newCount: number) => void;
 }
 
-const PostCard = ({ post, onLike }: PostCardProps) => {
+const PostCard = ({ post, onLike, onUpdateCommentCount }: PostCardProps) => {
     const [showComments, setShowComments] = useState(false);
     const [comments, setComments] = useState<Comment[]>([]);
     const [showSharePopup, setShowSharePopup] = useState(false);
     const [showCommentModal, setShowCommentModal] = useState(false);
     const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+    const [localCommentCount, setLocalCommentCount] = useState(post.comment_count);
     const { api } = useAuthenticatedApi();
     const formattedDate = formatTimeAgo(post.created_at);
 
     const fetchComments = async () => {
         try {
             const response = await api.get(`/post/app/comments/?post_id=${post.id}`);
-            setComments(response.data.response);
+            const commentsData = response.data.response || response.data || [];
+            setComments(commentsData);
+            
+            // Update comment count based on fetched comments
+            if (Array.isArray(commentsData)) {
+                setLocalCommentCount(commentsData.length);
+                if (onUpdateCommentCount) {
+                    onUpdateCommentCount(post.id, commentsData.length);
+                }
+            }
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
@@ -196,7 +227,14 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
             });
 
             setShowCommentModal(false);
-            fetchComments();
+            await fetchComments();
+            
+            // Update local comment count
+            const newCount = localCommentCount + 1;
+            setLocalCommentCount(newCount);
+            if (onUpdateCommentCount) {
+                onUpdateCommentCount(post.id, newCount);
+            }
         } catch (error) {
             console.error('Error adding comment:', error);
         } finally {
@@ -208,35 +246,78 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
         return path;
     };
 
+    // Determine the profile link based on whether it's a page post or user post
+    const profileLink = post.type === 'page_post' && post.page_id
+        ? `/pages`
+        : post.freelancer_profile 
+            ? `/profile/${post.freelancer_profile}`
+            : '#';
+    
+    // Determine the profile picture based on post type
+    const profilePicture = post.type === 'page_post' 
+        ? post.page_profile_picture 
+        : post.profile_picture;
+    
+    // Determine the display name based on post type
+    const displayName = post.type === 'page_post'
+        ? post.page_name
+        : (post.first_name && post.last_name 
+            ? `${post.first_name} ${post.last_name}` 
+            : post.company_name || 'Anonymous');
+
     return (
         <div className="bg-white rounded-xl p-4 mb-4 shadow-lg">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                    <Link href={`/profile/${post.freelancer_profile}`} className="flex items-center gap-3">
-                        <div>
-                            {post.profile_picture ? (
-                                <Image
-                                    src={getImageUrl(post.profile_picture)}
-                                    alt="Profile"
-                                    width={40}
-                                    height={40}
-                                    className="rounded-full md:w-10 md:h-10 w-8 h-8"
-                                />
-                            ) : (
-                                <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
-                                    <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
-                                </div>
-                            )}
+                    {(post.type === 'page_post' || post.freelancer_profile) ? (
+                        <Link href={profileLink} className="flex items-center gap-3">
+                            <div>
+                                {profilePicture ? (
+                                    <Image
+                                        src={getImageUrl(profilePicture)}
+                                        alt="Profile"
+                                        width={40}
+                                        height={40}
+                                        className="rounded-full md:w-10 md:h-10 w-8 h-8"
+                                    />
+                                ) : (
+                                    <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
+                                        <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <h3 className="font-semibold">
+                                    {displayName}
+                                </h3>
+                                <p className="text-sm text-gray-500">{formattedDate}</p>
+                            </div>
+                        </Link>
+                    ) : (
+                        <div className="flex items-center gap-3">
+                            <div>
+                                {profilePicture ? (
+                                    <Image
+                                        src={getImageUrl(profilePicture)}
+                                        alt="Profile"
+                                        width={40}
+                                        height={40}
+                                        className="rounded-full md:w-10 md:h-10 w-8 h-8"
+                                    />
+                                ) : (
+                                    <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
+                                        <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <h3 className="font-semibold">
+                                    {displayName}
+                                </h3>
+                                <p className="text-sm text-gray-500">{formattedDate}</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="font-semibold">
-                                {post.first_name && post.last_name 
-                                    ? `${post.first_name} ${post.last_name}` 
-                                    : post.company_name || 'Anonymous'}
-                            </h3>
-                            <p className="text-sm text-gray-500">{formattedDate}</p>
-                        </div>
-                    </Link>
+                    )}
                 </div>
                 <div className="flex flex-col items-end gap-2">
                     {post.club_name && (
@@ -292,26 +373,28 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                 </div>
             </Link>
 
-            <div className="flex items-center justify-between mt-4 text-gray-500">
+            <div className="flex items-center gap-4 py-3 text-gray-500">
                 <button
-                    className={`flex items-center gap-2 ${post.is_liked ? 'text-red-500' : 'text-gray-500'}`}
+                    className={`flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors ${
+                        post.is_liked ? 'text-red-500 bg-red-50' : 'text-gray-500'
+                    }`}
                     onClick={() => onLike(post.id)}
                 >
-                    <span>❤️</span>
-                    <span>{post.like_count}</span>
+                    <Heart className={`w-5 h-5 ${post.is_liked ? 'fill-current' : ''}`} />
+                    <span className="font-medium">{post.like_count}</span>
                 </button>
                 <button
-                    className="flex items-center gap-2 text-sm md:text-base"
+                    className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors"
                     onClick={handleCommentToggle}
                 >
-                    <span>💬</span>
-                    <span>{post.comment_count}</span>
+                    <MessageSquare className="w-5 h-5" />
+                    <span className="font-medium">{post.comment_count}</span>
                 </button>
                 <button
                     onClick={() => setShowSharePopup(true)}
-                    className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded transition-colors"
+                    className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors"
                 >
-                    <span>📤</span>
+                    <Share className="w-5 h-5" />
                 </button>
             </div>
 

@@ -8,7 +8,7 @@ import { FiUser } from 'react-icons/fi';
 import SharePopup from '../../../post/_components/SharePopup';
 import { CommentModal } from '@/components/ui/comment-modal';
 import { formatTimeAgo } from '@/lib/utils';
-
+import { Heart, MessageSquare, Share } from 'lucide-react';
 interface ImageData {
     id: string;
     file: string;
@@ -278,26 +278,28 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                 )}
             </Link>
 
-            <div className="flex items-center justify-between text-gray-500">
+            <div className="flex items-center gap-4 text-gray-500">
                 <button
-                    className={`flex items-center gap-2 ${post.is_liked ? 'text-red-500' : 'text-gray-500'}`}
+                    className={`flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors ${
+                        post.is_liked ? 'text-red-500 bg-red-50' : 'text-gray-500'
+                    }`}
                     onClick={() => onLike(post.id)}
                 >
-                    <span>❤️</span>
-                    <span>{post.like_count}</span>
+                    <Heart className={`w-5 h-5 ${post.is_liked ? 'fill-current' : ''}`} />
+                    <span className="font-medium">{post.like_count}</span>
                 </button>
                 <button
-                    className="flex items-center gap-2 text-sm md:text-base"
+                    className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors"
                     onClick={handleCommentToggle}
                 >
-                    <span>💬</span>
-                    <span>{post.comment_count}</span>
+                    <MessageSquare className="w-5 h-5" />
+                    <span className="font-medium">{post.comment_count}</span>
                 </button>
                 <button
                     onClick={() => setShowSharePopup(true)}
-                    className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded transition-colors"
+                    className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors"
                 >
-                    <span>📤</span>
+                    <Share className="w-5 h-5" />
                 </button>
             </div>
 

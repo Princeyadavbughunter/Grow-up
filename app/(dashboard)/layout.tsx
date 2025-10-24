@@ -2,6 +2,7 @@ import Navbar from '@/components/Navbar'
 import BottomNavbar from '@/components/BottomNavbar'
 import { AuthProvider } from '@/context/AuthContext'
 import ProfileRequired from './_components/ProfileRequired'
+import { Toaster } from '@/components/ui/sonner'
 
 interface LayoutProps {
     children: React.ReactNode
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: LayoutProps) {
                     <BottomNavbar />
                 </div>
             </div>
+            <Toaster />
         </AuthProvider>
     )
 }

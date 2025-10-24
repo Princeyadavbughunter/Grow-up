@@ -47,6 +47,7 @@ interface FreelancerProfile {
   gender: string;
   saved_jobs_count: number;
   follower_count: number;
+  connection_count?: number;
   dribble_account: string | null;
   github_account: string | null;
   figma_account: string | null;
@@ -90,8 +91,35 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [followerCount, setFollowerCount] = useState(profileData?.follower_count || 0);
+  const [connectionCount, setConnectionCount] = useState(profileData?.connection_count || 0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resumeInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch follow statistics
+  React.useEffect(() => {
+    const fetchFollowStats = async () => {
+      if (!profileData?.id) return;
+      
+      try {
+        // Try to get follow stats from API
+        const response = await apiCaller.get(`/freelancer/follow-stats/?freelancer_id=${profileData.id}`);
+        if (response.data) {
+          setFollowerCount(response.data.follower_count || 0);
+          setConnectionCount(response.data.connection_count || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching follow stats:', error);
+        // Fallback to profile data
+        setFollowerCount(profileData?.follower_count || 0);
+        setConnectionCount(profileData?.connection_count || 0);
+      }
+    };
+
+    if (profileData?.id) {
+      fetchFollowStats();
+    }
+  }, [profileData?.id, apiCaller]);
 
   const initialFormData: ProfileFormData = {
     first_name: profileData?.first_name || "",
@@ -539,7 +567,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     );
   }
 
-  const { first_name, last_name, bio, profile_picture, address, city, state, skills, follower_count, resume } = profileData;
+  const { first_name, last_name, bio, profile_picture, address, city, state, skills, resume } = profileData;
   const skillsArray = skills ? skills.split(',') : [];
   const fullName = `${first_name} ${last_name}`;
   const location = `${address ? address + ', ' : ''}${city ? city + ', ' : ''}${state || ''}`;
@@ -626,9 +654,16 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
       {/* Action Buttons - Responsive */}
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start">
-        <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto">
-          <ImUsers /> {follower_count || 0} Followers
-        </Button>
+        <div className="flex gap-3">
+          <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
+            <ImUsers /> {followerCount || 0} Followers
+          </Button>
+          {connectionCount > 0 && (
+            <Button className="bg-green-600 hover:bg-green-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
+              <ImUsers /> {connectionCount} Connections
+            </Button>
+          )}
+        </div>
         {resume && (
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3">
             <Button 

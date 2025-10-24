@@ -28,6 +28,7 @@ interface ImageData {
 }
 
 interface Post {
+    type?: 'user_post' | 'page_post';
     id: string;
     images: ImageData[];
     videos: any[];
@@ -37,7 +38,9 @@ interface Post {
     company_name: string | null;
     company_logo: string | null;
     page_name: string | null;
+    page_profile_picture: string | null;
     page_id: string | null;
+    page?: string;
     role: string;
     title: string;
     content: string;
@@ -172,11 +175,16 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
     }, [fetchComments]);
 
     // Determine the profile link based on whether it's a page post or user post
-    const profileLink = post.page_id 
+    const profileLink = post.type === 'page_post' || post.page_id
         ? `/pages` 
         : post.freelancer_profile 
             ? `/profile/${post.freelancer_profile}`
             : '#';
+    
+    // Determine the profile picture based on post type
+    const profilePicture = post.type === 'page_post' || post.page_id
+        ? post.page_profile_picture
+        : post.profile_picture;
 
     const displayName = post.page_name || post.first_name || post.company_name || 'Anonymous';
 
@@ -219,12 +227,12 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
             <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4 flex-1">
-                        {(post.page_id || post.freelancer_profile) ? (
+                        {(post.type === 'page_post' || post.page_id || post.freelancer_profile) ? (
                             <Link href={profileLink} className="flex items-center gap-4">
                                 <div>
-                                    {post.profile_picture ? (
+                                    {profilePicture ? (
                                         <Image
-                                            src={post.profile_picture}
+                                            src={profilePicture}
                                             alt="Profile"
                                             width={50}
                                             height={50}
@@ -246,9 +254,9 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                         ) : (
                             <div className="flex items-center gap-4">
                                 <div>
-                                    {post.profile_picture ? (
+                                    {profilePicture ? (
                                         <Image
-                                            src={post.profile_picture}
+                                            src={profilePicture}
                                             alt="Profile"
                                             width={50}
                                             height={50}
@@ -270,12 +278,14 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                         )}
                     </div>
                     <div className="flex items-center gap-2">
-                        <Link
-                            href={`/clubs/${post.club}`}
-                            className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium hover:bg-green-200 transition-colors cursor-pointer whitespace-nowrap"
-                        >
-                            {post.club_name}
-                        </Link>
+                        {post.type === 'user_post' && post.club_name && (
+                            <Link
+                                href={`/clubs/${post.club}`}
+                                className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium hover:bg-green-200 transition-colors cursor-pointer whitespace-nowrap"
+                            >
+                                {post.club_name}
+                            </Link>
+                        )}
                         {isOwner && (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>

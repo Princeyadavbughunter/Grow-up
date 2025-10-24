@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 import PostDetail from '../_components/PostDetail';
 import { ArrowLeft } from 'lucide-react';
@@ -14,6 +14,7 @@ interface ImageData {
 }
 
 interface Post {
+    type?: 'user_post' | 'page_post';
     id: string;
     images: ImageData[];
     videos: any[];
@@ -23,7 +24,9 @@ interface Post {
     company_name: string | null;
     company_logo: string | null;
     page_name: string | null;
+    page_profile_picture: string | null;
     page_id: string | null;
+    page?: string;
     role: string;
     title: string;
     content: string;
@@ -44,11 +47,16 @@ interface Post {
 const PostDetailPage = () => {
     const params = useParams();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { api } = useAuthenticatedApi();
     const { authToken } = useAuth();
     const [post, setPost] = useState<Post | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    
+    // Get query parameters
+    const postType = searchParams.get('type');
+    const pageId = searchParams.get('pageId');
 
     useEffect(() => {
         const fetchPostDetails = async () => {
@@ -56,15 +64,68 @@ const PostDetailPage = () => {
 
             try {
                 setLoading(true);
-                const response = await api.get(`/post/app/post-chat-details/?id=${params.id}`);
+                setError(null);
                 
-                if (response.data.response && response.data.response.length > 0) {
-                    setPost(response.data.response[0]);
-                } else if (response.data && response.data.id) {
-                    // Handle different response structure
-                    setPost(response.data);
+                // Check if this is a page post based on query parameters
+                if (postType === 'page' && pageId) {
+                    // Fetch page posts for this page
+                    try {
+                        const pagePostResponse = await api.get(`/post/app/page-posts/?page=${pageId}`);
+                        
+                        if (pagePostResponse.data) {
+                            let pagePosts = [];
+                            
+                            // Handle different response structures
+                            if (Array.isArray(pagePostResponse.data)) {
+                                pagePosts = pagePostResponse.data;
+                            } else if (pagePostResponse.data.response && Array.isArray(pagePostResponse.data.response)) {
+                                pagePosts = pagePostResponse.data.response;
+                            }
+                            
+                            // Find the specific post by ID
+                            const pagePost = pagePosts.find((p: any) => p.id === params.id);
+                            
+                            if (pagePost) {
+                                setPost({ ...pagePost, type: 'page_post' });
+                                return;
+                            }
+                        }
+                        
+                        setError('Post not found');
+                    } catch (pagePostError: any) {
+                        console.error('Error fetching page post:', pagePostError);
+                        setError('Failed to load post details');
+                    }
                 } else {
-                    setError('Post not found');
+                    // Fetch as a user post
+                    try {
+                        const response = await api.get(`/post/app/post-chat-details/?id=${params.id}`);
+                        
+                        if (response.data.response && response.data.response.length > 0) {
+                            const postData = response.data.response[0];
+                            // Check if it's a page post and mark it accordingly
+                            if (postData.page_id || postData.page) {
+                                setPost({ ...postData, type: 'page_post' });
+                            } else {
+                                setPost({ ...postData, type: 'user_post' });
+                            }
+                            return;
+                        } else if (response.data && response.data.id) {
+                            // Handle different response structure
+                            const postData = response.data;
+                            if (postData.page_id || postData.page) {
+                                setPost({ ...postData, type: 'page_post' });
+                            } else {
+                                setPost({ ...postData, type: 'user_post' });
+                            }
+                            return;
+                        }
+                        
+                        setError('Post not found');
+                    } catch (userPostError: any) {
+                        console.error('Error fetching user post:', userPostError);
+                        setError('Failed to load post details');
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching post details:', error);
@@ -75,7 +136,7 @@ const PostDetailPage = () => {
         };
 
         fetchPostDetails();
-    }, [authToken, params.id]);
+    }, [authToken, params.id, postType, pageId]);
 
     const handleLikePost = useCallback(async (postId: string) => {
         if (!post) return;

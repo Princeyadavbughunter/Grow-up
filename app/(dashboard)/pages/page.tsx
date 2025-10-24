@@ -278,13 +278,13 @@ const ChatInterface = () => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-5rem)] bg-gray-50 overflow-hidden">
+    <div className="flex flex-col min-h-[calc(100vh-5rem)] bg-gray-50">
 
-      <div className='p-3 md:p-4 border-b flex-shrink-0 bg-white'>
+      <div className='p-3 md:p-4 border-b bg-white sticky top-0 z-10'>
         <h1 className="text-lg md:text-xl font-bold mb-3">
           Recommended Pages
         </h1>
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 pt-1">
           {pages.map((page) => (
             <div
               key={page.id}
@@ -318,7 +318,7 @@ const ChatInterface = () => {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 relative">
         {/* Mobile Sidebar Overlay */}
         {showSidebar && (
           <>
@@ -394,7 +394,7 @@ const ChatInterface = () => {
         )}
 
         {/* Desktop Sidebar */}
-        <div className="hidden md:block border-r border-gray-200 bg-white w-1/3 lg:w-1/4 overflow-y-auto scrollbar-hide">
+        <div className="hidden md:block border-r border-gray-200 bg-white w-1/3 lg:w-1/4 overflow-y-auto scrollbar-hide sticky top-[12.5rem] self-start max-h-[calc(100vh-8rem)]">
           <div className="p-4">
             <div className="mb-4">
               <div className="relative">
@@ -454,14 +454,14 @@ const ChatInterface = () => {
 
         {/* Main Content Area */}
         {showProfile && selectedPage ? (
-          <div className="flex-1 overflow-hidden h-full">
+          <div className="flex-1 overflow-y-auto sticky top-[12.5rem] self-start max-h-[calc(100vh-8rem)]">
             <ProfileView
               onBack={() => setShowProfile(false)}
               pageId={selectedPage.id}
             />
           </div>
         ) : selectedPage ? (
-          <div className="flex flex-1 flex-col overflow-hidden">
+          <div className="flex flex-1 flex-col overflow-hidden sticky top-[12.5rem] self-start max-h-[calc(100vh-8rem)]">
             {/* Chat Header */}
             <div className="flex items-center justify-between border-b border-gray-200 bg-white p-3 md:p-4 flex-shrink-0">
               <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -591,7 +591,7 @@ const ChatInterface = () => {
             )}
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-gray-50 p-4">
+          <div className="flex-1 flex items-center justify-center bg-gray-50 p-4 sticky top-[7.5rem] self-start max-h-[calc(100vh-8rem)]">
             <div className="text-center text-gray-500">
               <RiBroadcastFill className="h-16 w-16 mx-auto mb-4 text-gray-300" />
               <h3 className="text-lg font-medium mb-2">Select a page to view broadcasts</h3>
