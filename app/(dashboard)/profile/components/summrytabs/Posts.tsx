@@ -96,7 +96,28 @@ const Posts = ({ profileId }: PostsProps) => {
             try {
                 if (profileId) {
                     const response = await api.get(`/post/app/freelancer-posts/?freelancer_id=${profileId}`);
-                    setPosts(response.data || []);
+                    const postsData = response.data || [];
+                    
+                    // Get liked posts from localStorage cache
+                    const likedPostsCache = JSON.parse(localStorage.getItem('likedPosts') || '{}');
+                    
+                    const normalizedPosts = (Array.isArray(postsData) ? postsData : []).map((post: any) => {
+                        let isLiked = post.is_liked ?? post.user_liked ?? post.liked;
+                        
+                        // Fall back to localStorage cache
+                        if (isLiked === undefined && likedPostsCache[post.id] !== undefined) {
+                            isLiked = likedPostsCache[post.id];
+                        } else if (isLiked === undefined) {
+                            isLiked = false;
+                        }
+                        
+                        return {
+                            ...post,
+                            is_liked: isLiked,
+                            like_count: post.like_count ?? post.likes_count ?? 0
+                        };
+                    });
+                    setPosts(normalizedPosts);
                 }
             } catch (error) {
                 console.error('Error fetching posts:', error);
@@ -111,23 +132,99 @@ const Posts = ({ profileId }: PostsProps) => {
     }, [authToken, profileId]);
 
     const handleLikePost = async (postId: string) => {
+        // Store the original state before optimistic update
+        const originalPost = posts.find(p => p.id === postId);
+        if (!originalPost) return;
+
+        const originalLiked = originalPost.is_liked;
+        const originalCount = originalPost.like_count;
+
+        // Optimistic update - update UI immediately
+        setPosts(prevPosts =>
+            prevPosts.map(post =>
+                post.id === postId
+                    ? { 
+                        ...post, 
+                        like_count: originalLiked ? originalCount - 1 : originalCount + 1,
+                        is_liked: !originalLiked 
+                    }
+                    : post
+            )
+        );
+
         try {
-            const response = await api.post(`/post/app/toggle-like/?post_id=${postId}`);
-            const { post: updatedPost, is_like } = response.data;
+            // Check if this is a page post - they use a different endpoint
+            const isPagePost = originalPost.type === 'page_post' || originalPost.page_id || originalPost.page;
             
+            let response;
+            
+            if (isPagePost) {
+                // Page posts use the /page-like/ endpoint
+                response = await api.post(`/post/app/page-like/?post_id=${postId}`);
+            } else {
+                // Regular user posts use /toggle-like/ endpoint
+                response = await api.post(`/post/app/toggle-like/?post_id=${postId}`);
+            }
+            
+            // Handle different response structures between endpoints
+            let updatedPost, is_like, likeCount;
+            
+            if (response.data.post && response.data.is_like !== undefined) {
+                updatedPost = response.data.post;
+                is_like = response.data.is_like;
+                likeCount = updatedPost.like_count ?? updatedPost.likes_count;
+            } else if (response.data.page_post) {
+                updatedPost = response.data.page_post;
+                is_like = response.data.is_like ?? response.data.liked;
+                likeCount = updatedPost.like_count ?? updatedPost.likes_count;
+            } else if (response.data.like_count !== undefined) {
+                likeCount = response.data.like_count;
+                is_like = response.data.is_liked ?? response.data.is_like;
+            } else {
+                likeCount = response.data.like_count ?? response.data.likes_count;
+                is_like = response.data.is_liked ?? response.data.is_like ?? response.data.liked;
+            }
+            
+            // Update localStorage cache
+            const likedPostsCache = JSON.parse(localStorage.getItem('likedPosts') || '{}');
+            likedPostsCache[postId] = is_like;
+            localStorage.setItem('likedPosts', JSON.stringify(likedPostsCache));
+            
+            // Update with actual server response
+            setPosts(prevPosts =>
+                prevPosts.map(post =>
+                    post.id === postId
+                        ? {
+                            ...post,
+                            like_count: likeCount ?? (is_like ? originalCount + 1 : originalCount - 1),
+                            is_liked: is_like
+                        }
+                        : post
+                )
+            );
+        } catch (error: any) {
+            console.error('Error toggling like:', error);
+            
+            // Check if this is a page post error
+            const isPagePostError = error?.response?.data?.details?.includes('No Post matches') ||
+                                   error?.response?.data?.error?.includes('No Post matches');
+            
+            if (isPagePostError && (originalPost.type === 'page_post' || originalPost.page_id)) {
+                console.warn('⚠️ Page posts cannot be liked. Backend does not support liking page posts.');
+            }
+            
+            // Revert to original state on error
             setPosts(prevPosts =>
                 prevPosts.map(post =>
                     post.id === postId
                         ? { 
                             ...post, 
-                            like_count: updatedPost.like_count,
-                            is_liked: is_like 
+                            like_count: originalCount,
+                            is_liked: originalLiked 
                         }
                         : post
                 )
             );
-        } catch (error) {
-            console.error('Error toggling like:', error);
         }
     };
 
@@ -177,7 +274,13 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
 
     const fetchComments = async () => {
         try {
-            const response = await api.get(`/post/app/comments/?post_id=${post.id}`);
+            // Check if this is a page post
+            const isPagePost = post.type === 'page_post' || post.page_id;
+            const endpoint = isPagePost 
+                ? `/post/app/page-comments/?post_id=${post.id}`
+                : `/post/app/comments/?post_id=${post.id}`;
+            
+            const response = await api.get(endpoint);
             setComments(response.data.response);
         } catch (error) {
             console.error('Error fetching comments:', error);
@@ -196,7 +299,13 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
 
         setIsSubmittingComment(true);
         try {
-            await api.post('/post/app/comments/', {
+            // Check if this is a page post
+            const isPagePost = post.type === 'page_post' || post.page_id;
+            const endpoint = isPagePost 
+                ? '/post/app/page-comments/'
+                : '/post/app/comments/';
+            
+            await api.post(endpoint, {
                 post: post.id,
                 content: content,
                 is_take_down: "False"

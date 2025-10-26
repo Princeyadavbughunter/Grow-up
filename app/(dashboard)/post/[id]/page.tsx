@@ -5,6 +5,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 import PostDetail from '../_components/PostDetail';
 import { ArrowLeft } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ImageData {
     id: string;
@@ -86,7 +87,13 @@ const PostDetailPage = () => {
                             const pagePost = pagePosts.find((p: any) => p.id === params.id);
                             
                             if (pagePost) {
-                                setPost({ ...pagePost, type: 'page_post' });
+                                const isLiked = pagePost.is_liked ?? pagePost.user_liked ?? pagePost.liked ?? false;
+                                setPost({ 
+                                    ...pagePost, 
+                                    type: 'page_post', 
+                                    is_liked: isLiked,
+                                    like_count: pagePost.like_count ?? pagePost.likes_count ?? 0
+                                });
                                 return;
                             }
                         }
@@ -103,20 +110,42 @@ const PostDetailPage = () => {
                         
                         if (response.data.response && response.data.response.length > 0) {
                             const postData = response.data.response[0];
+                            const isLiked = postData.is_liked ?? postData.user_liked ?? postData.liked ?? false;
                             // Check if it's a page post and mark it accordingly
                             if (postData.page_id || postData.page) {
-                                setPost({ ...postData, type: 'page_post' });
+                                setPost({ 
+                                    ...postData, 
+                                    type: 'page_post', 
+                                    is_liked: isLiked,
+                                    like_count: postData.like_count ?? postData.likes_count ?? 0
+                                });
                             } else {
-                                setPost({ ...postData, type: 'user_post' });
+                                setPost({ 
+                                    ...postData, 
+                                    type: 'user_post', 
+                                    is_liked: isLiked,
+                                    like_count: postData.like_count ?? postData.likes_count ?? 0
+                                });
                             }
                             return;
                         } else if (response.data && response.data.id) {
                             // Handle different response structure
                             const postData = response.data;
+                            const isLiked = postData.is_liked ?? postData.user_liked ?? postData.liked ?? false;
                             if (postData.page_id || postData.page) {
-                                setPost({ ...postData, type: 'page_post' });
+                                setPost({ 
+                                    ...postData, 
+                                    type: 'page_post', 
+                                    is_liked: isLiked,
+                                    like_count: postData.like_count ?? postData.likes_count ?? 0
+                                });
                             } else {
-                                setPost({ ...postData, type: 'user_post' });
+                                setPost({ 
+                                    ...postData, 
+                                    type: 'user_post', 
+                                    is_liked: isLiked,
+                                    like_count: postData.like_count ?? postData.likes_count ?? 0
+                                });
                             }
                             return;
                         }
@@ -141,19 +170,78 @@ const PostDetailPage = () => {
     const handleLikePost = useCallback(async (postId: string) => {
         if (!post) return;
 
-        try {
-            const response = await api.post(`/post/app/toggle-like/?post_id=${postId}`);
-            const { post: updatedPost, is_like } = response.data;
+        // Store the original state before optimistic update
+        const originalLiked = post.is_liked;
+        const originalCount = post.like_count;
 
+        // Optimistic update - update UI immediately
+        setPost(prevPost =>
+            prevPost ? {
+                ...prevPost,
+                like_count: originalLiked ? originalCount - 1 : originalCount + 1,
+                is_liked: !originalLiked
+            } : null
+        );
+
+        try {
+            // Check if this is a page post - they use a different endpoint
+            const isPagePost = post.type === 'page_post' || post.page_id;
+            
+            let response;
+            
+            if (isPagePost) {
+                // Page posts use the /page-like/ endpoint
+                response = await api.post(`/post/app/page-like/?post_id=${postId}`);
+            } else {
+                // Regular user posts use /toggle-like/ endpoint
+                response = await api.post(`/post/app/toggle-like/?post_id=${postId}`);
+            }
+            
+            console.log('🔍 Like API Response:', {
+                postType: isPagePost ? 'page_post' : 'user_post',
+                fullResponse: response.data
+            });
+            
+            // Handle different response structures between endpoints
+            let updatedPost, is_like, likeCount;
+            
+            if (response.data.post && response.data.is_like !== undefined) {
+                updatedPost = response.data.post;
+                is_like = response.data.is_like;
+                likeCount = updatedPost.like_count ?? updatedPost.likes_count;
+            } else if (response.data.page_post) {
+                updatedPost = response.data.page_post;
+                is_like = response.data.is_like ?? response.data.liked;
+                likeCount = updatedPost.like_count ?? updatedPost.likes_count;
+            } else if (response.data.like_count !== undefined) {
+                likeCount = response.data.like_count;
+                is_like = response.data.is_liked ?? response.data.is_like;
+            } else {
+                likeCount = response.data.like_count ?? response.data.likes_count;
+                is_like = response.data.is_liked ?? response.data.is_like ?? response.data.liked;
+            }
+            
+            console.log('✅ Parsed like data:', { likeCount, is_like });
+            
+            // Update with actual server response
             setPost(prevPost =>
                 prevPost ? {
                     ...prevPost,
-                    like_count: updatedPost.like_count,
+                    like_count: likeCount ?? (is_like ? originalCount + 1 : originalCount - 1),
                     is_liked: is_like
                 } : null
             );
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error toggling like:', error);
+            
+            // Revert to original state on error
+            setPost(prevPost =>
+                prevPost ? {
+                    ...prevPost,
+                    like_count: originalCount,
+                    is_liked: originalLiked
+                } : null
+            );
         }
     }, [post]);
 

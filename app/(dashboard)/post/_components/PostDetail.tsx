@@ -129,12 +129,18 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
     // Memoize fetchComments function to prevent recreation on every render
     const fetchComments = useCallback(async () => {
         try {
-            const response = await api.get(`/post/app/comments/?post_id=${post.id}`);
+            // Check if this is a page post
+            const isPagePost = post.type === 'page_post' || post.page_id;
+            const endpoint = isPagePost 
+                ? `/post/app/page-comments/?post_id=${post.id}`
+                : `/post/app/comments/?post_id=${post.id}`;
+            
+            const response = await api.get(endpoint);
             setComments(response.data.response);
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
-    }, [post.id]);
+    }, [post.id, post.type, post.page_id]);
 
     // Memoize handleCommentToggle to prevent recreation
     const handleCommentToggle = useCallback(() => {
@@ -154,7 +160,13 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
 
         setIsSubmittingComment(true);
         try {
-            await api.post('/post/app/comments/', {
+            // Check if this is a page post
+            const isPagePost = post.type === 'page_post' || post.page_id;
+            const endpoint = isPagePost 
+                ? '/post/app/page-comments/'
+                : '/post/app/comments/';
+            
+            await api.post(endpoint, {
                 post: post.id,
                 content: content,
                 is_take_down: "False"
@@ -167,7 +179,7 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
         } finally {
             setIsSubmittingComment(false);
         }
-    }, [post.id, fetchComments]);
+    }, [post.id, post.type, post.page_id, fetchComments]);
 
     // Load comments on mount - only run when post.id changes
     useEffect(() => {

@@ -121,66 +121,64 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           </button>
         </div>
 
-        {activeTab !== 'Post' && (
-          <div className="mb-4">
-            <div className="flex items-center gap-4 mb-3">
-              {/* Desktop Back Button - Hidden on mobile */}
-              <button onClick={onBack} className="rounded-full p-2 hover:bg-gray-100 flex-shrink-0 hidden md:flex">
-                <BsArrowLeft className="h-5 w-5" />
-              </button>
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                {pageDetails.profile_picture ? (
-                  <img
-                    src={pageDetails.profile_picture}
-                    alt={pageDetails.name}
-                    className="h-12 w-12 rounded-full flex-shrink-0"
-                  />
-                ) : (
-                  <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                    <FaUser className="h-6 w-6 text-gray-500" />
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <h1 className="text-xl font-bold truncate">{pageDetails.name}</h1>
-                  <p className="text-sm text-gray-600 truncate">{pageDetails.description}</p>
-                  <div className="flex items-center gap-4 mt-1">
-                    <p className="text-sm text-purple-600 font-medium">
-                      {pageDetails.followers_count} followers
-                    </p>
-                    {pageDetails.location && (
-                      <div className="flex items-center gap-1 text-gray-500 text-sm">
-                        <IoLocationOutline className="h-4 w-4" />
-                        <span className="truncate">{pageDetails.location}</span>
-                      </div>
-                    )}
-                  </div>
+        <div className="mb-4">
+          <div className="flex items-center gap-4 mb-3">
+            {/* Desktop Back Button - Hidden on mobile */}
+            <button onClick={onBack} className="rounded-full p-2 hover:bg-gray-100 flex-shrink-0 hidden md:flex">
+              <BsArrowLeft className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              {pageDetails.profile_picture ? (
+                <img
+                  src={pageDetails.profile_picture}
+                  alt={pageDetails.name}
+                  className="h-12 w-12 rounded-full flex-shrink-0"
+                />
+              ) : (
+                <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                  <FaUser className="h-6 w-6 text-gray-500" />
                 </div>
-              </div>
-              <div className="flex items-center gap-3 flex-shrink-0">
-                {!pageDetails.is_admin && (
-                  <button
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      pageDetails.is_following
-                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        : 'bg-[#7052FF] text-white hover:bg-[#5a42cc]'
-                    }`}
-                    onClick={handleFollowToggle}
-                  >
-                    {pageDetails.is_following ? 'Unfollow' : 'Follow'}
-                  </button>
-                )}
-                <div className="flex gap-2">
-                  {pageDetails.social_links?.linkedin && <FaLinkedin className="h-5 w-5 text-gray-500 hover:text-blue-600 cursor-pointer" />}
-                  {pageDetails.social_links?.twitter && <FaTwitter className="h-5 w-5 text-gray-500 hover:text-blue-400 cursor-pointer" />}
-                  {pageDetails.social_links?.instagram && <FaInstagram className="h-5 w-5 text-gray-500 hover:text-pink-500 cursor-pointer" />}
-                  {pageDetails.social_links?.facebook && <FaFacebook className="h-5 w-5 text-gray-500 hover:text-blue-600 cursor-pointer" />}
+              )}
+              <div className="flex-1 min-w-0">
+                <h1 className="text-xl font-bold truncate">{pageDetails.name}</h1>
+                <p className="text-sm text-gray-600 truncate">{pageDetails.description}</p>
+                <div className="flex items-center gap-4 mt-1">
+                  <p className="text-sm text-purple-600 font-medium">
+                    {pageDetails.followers_count} followers
+                  </p>
+                  {pageDetails.location && (
+                    <div className="flex items-center gap-1 text-gray-500 text-sm">
+                      <IoLocationOutline className="h-4 w-4" />
+                      <span className="truncate">{pageDetails.location}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {!pageDetails.is_admin && (
+                <button
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    pageDetails.is_following
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      : 'bg-[#7052FF] text-white hover:bg-[#5a42cc]'
+                  }`}
+                  onClick={handleFollowToggle}
+                >
+                  {pageDetails.is_following ? 'Unfollow' : 'Follow'}
+                </button>
+              )}
+              <div className="flex gap-2">
+                {pageDetails.social_links?.linkedin && <FaLinkedin className="h-5 w-5 text-gray-500 hover:text-blue-600 cursor-pointer" />}
+                {pageDetails.social_links?.twitter && <FaTwitter className="h-5 w-5 text-gray-500 hover:text-blue-400 cursor-pointer" />}
+                {pageDetails.social_links?.instagram && <FaInstagram className="h-5 w-5 text-gray-500 hover:text-pink-500 cursor-pointer" />}
+                {pageDetails.social_links?.facebook && <FaFacebook className="h-5 w-5 text-gray-500 hover:text-blue-600 cursor-pointer" />}
+              </div>
+            </div>
           </div>
-        )}
+        </div>
 
-        <div className={`mb-6 ${activeTab === 'Post' ? 'flex gap-2 md:gap-4 justify-center flex-nowrap overflow-x-auto' : 'flex gap-2 md:gap-4 justify-center flex-nowrap overflow-x-auto'}`}>
+        <div className="mb-6 flex gap-2 md:gap-4 justify-center flex-nowrap overflow-x-auto">
           {['Home', 'About', 'Post', 'People'].map((tab) => (
             <button
               key={tab}
@@ -194,11 +192,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           ))}
         </div>
 
-        <div className={`mb-3 md:mb-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent ${
-          activeTab === 'Post'
-            ? 'h-[calc(100vh-10rem)] md:h-[calc(100vh-12rem)] lg:h-[calc(100vh-15rem)]'
-            : 'h-[calc(100vh-16rem)] md:h-[calc(100vh-20rem)] lg:h-[calc(100vh-27rem)]'
-        }`}>
+        <div className="mb-3 md:mb-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent h-[calc(100vh-16rem)] md:h-[calc(100vh-20rem)] lg:h-[calc(100vh-27rem)]">
           {renderTabContent()}
         </div>
       </div>

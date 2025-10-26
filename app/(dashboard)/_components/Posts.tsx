@@ -104,10 +104,28 @@ const Posts = ({ posts: propPosts }: PostsProps = {}) => {
     const { api } = useAuthenticatedApi();
     const { authToken, userId } = useAuth();
 
+
     useEffect(() => {
         // Only fetch posts if not provided via props
         if (propPosts) {
-            setPosts(propPosts);
+            // Normalize posts - handle different field names from API
+            const likedPostsCache = JSON.parse(localStorage.getItem('likedPosts') || '{}');
+            const normalizedPosts = propPosts.map((post: any) => {
+                let isLiked = post.is_liked ?? post.user_liked ?? post.liked;
+                
+                if (isLiked === undefined && likedPostsCache[post.id] !== undefined) {
+                    isLiked = likedPostsCache[post.id];
+                } else if (isLiked === undefined) {
+                    isLiked = false;
+                }
+                
+                return {
+                    ...post,
+                    is_liked: isLiked,
+                    like_count: post.like_count ?? post.likes_count ?? 0
+                };
+            });
+            setPosts(normalizedPosts);
             setLoading(false);
             return;
         }
@@ -117,7 +135,32 @@ const Posts = ({ posts: propPosts }: PostsProps = {}) => {
                 setLoading(true);
                 setError(null);
                 const response = await api.get('/post/app/posts/');
-                setPosts(response.data.results || []);
+                const postsData = response.data.results || [];
+                
+                // Get liked posts from localStorage (temporary cache since API doesn't provide it)
+                const likedPostsCache = JSON.parse(localStorage.getItem('likedPosts') || '{}');
+                
+                // Normalize posts - handle different field names from API
+                const normalizedPosts = postsData.map((post: any) => {
+                    // Check API fields first, then fall back to localStorage cache
+                    let isLiked = post.is_liked ?? post.user_liked ?? post.liked;
+                    
+                    // If API doesn't provide liked status, check localStorage cache
+                    if (isLiked === undefined && likedPostsCache[post.id] !== undefined) {
+                        isLiked = likedPostsCache[post.id];
+                    } else if (isLiked === undefined) {
+                        isLiked = false;
+                    }
+                    
+                    return {
+                        ...post,
+                        is_liked: isLiked,
+                        like_count: post.like_count ?? post.likes_count ?? 0
+                    };
+                });
+                
+                setPosts(normalizedPosts);
+                
             } catch (error) {
                 console.error('Error fetching posts:', error);
                 setError('Failed to load posts. Please try again.');
@@ -132,23 +175,103 @@ const Posts = ({ posts: propPosts }: PostsProps = {}) => {
     }, [authToken, propPosts]);
 
     const handleLikePost = async (postId: string) => {
+        // Store the original state before optimistic update
+        const originalPost = posts.find(p => p.id === postId);
+        if (!originalPost) return;
+
+        const originalLiked = originalPost.is_liked;
+        const originalCount = originalPost.like_count;
+
+        // Optimistic update - update UI immediately
+        setPosts(prevPosts =>
+            prevPosts.map(post =>
+                post.id === postId
+                    ? { 
+                        ...post, 
+                        like_count: originalLiked ? originalCount - 1 : originalCount + 1,
+                        is_liked: !originalLiked 
+                    }
+                    : post
+            )
+        );
+
         try {
-            const response = await api.post(`/post/app/toggle-like/?post_id=${postId}`);
-            const { post: updatedPost, is_like } = response.data;
+            // Check if this is a page post - they use a different endpoint
+            const isPagePost = originalPost.type === 'page_post' || originalPost.page_id || originalPost.page;
             
+            let response;
+            
+            if (isPagePost) {
+                // Page posts use the /page-like/ endpoint
+                response = await api.post(`/post/app/page-like/?post_id=${postId}`);
+            } else {
+                // Regular user posts use /toggle-like/ endpoint
+                response = await api.post(`/post/app/toggle-like/?post_id=${postId}`);
+            }
+            
+            // Debug: Log the full response to see structure
+            console.log('🔍 Like API Response:', {
+                postType: isPagePost ? 'page_post' : 'user_post',
+                fullResponse: response.data
+            });
+            
+            // Handle different response structures between endpoints
+            let updatedPost, is_like, likeCount;
+            
+            if (response.data.post && response.data.is_like !== undefined) {
+                // Structure: { post: {...}, is_like: boolean }
+                updatedPost = response.data.post;
+                is_like = response.data.is_like;
+                likeCount = updatedPost.like_count ?? updatedPost.likes_count;
+            } else if (response.data.page_post) {
+                // Structure for page posts: { page_post: {...}, is_like: boolean } or similar
+                updatedPost = response.data.page_post;
+                is_like = response.data.is_like ?? response.data.liked;
+                likeCount = updatedPost.like_count ?? updatedPost.likes_count;
+            } else if (response.data.like_count !== undefined) {
+                // Structure: { like_count: number, is_liked: boolean }
+                likeCount = response.data.like_count;
+                is_like = response.data.is_liked ?? response.data.is_like;
+            } else {
+                // Fallback: use response directly
+                likeCount = response.data.like_count ?? response.data.likes_count;
+                is_like = response.data.is_liked ?? response.data.is_like ?? response.data.liked;
+            }
+            
+            console.log('✅ Parsed like data:', { likeCount, is_like });
+            
+            // Update localStorage cache with the actual like status
+            const likedPostsCache = JSON.parse(localStorage.getItem('likedPosts') || '{}');
+            likedPostsCache[postId] = is_like;
+            localStorage.setItem('likedPosts', JSON.stringify(likedPostsCache));
+            
+            // Update with actual server response
             setPosts(prevPosts =>
                 prevPosts.map(post =>
                     post.id === postId
                         ? { 
                             ...post, 
-                            like_count: updatedPost.like_count,
+                            like_count: likeCount ?? (is_like ? originalCount + 1 : originalCount - 1),
                             is_liked: is_like 
                         }
                         : post
                 )
             );
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error toggling like:', error);
+            
+            // Revert to original state on error
+            setPosts(prevPosts =>
+                prevPosts.map(post =>
+                    post.id === postId
+                        ? { 
+                            ...post, 
+                            like_count: originalCount,
+                            is_liked: originalLiked 
+                        }
+                        : post
+                )
+            );
         }
     };
 
@@ -270,7 +393,13 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
 
     const fetchComments = async () => {
         try {
-            const response = await api.get(`/post/app/comments/?post_id=${post.id}`);
+            // Check if this is a page post
+            const isPagePost = post.type === 'page_post' || post.page_id;
+            const endpoint = isPagePost 
+                ? `/post/app/page-comments/?post_id=${post.id}`
+                : `/post/app/comments/?post_id=${post.id}`;
+            
+            const response = await api.get(endpoint);
             setComments(response.data.response);
         } catch (error) {
             console.error('Error fetching comments:', error);
@@ -289,7 +418,13 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
 
         setIsSubmittingComment(true);
         try {
-            await api.post('/post/app/comments/', {
+            // Check if this is a page post
+            const isPagePost = post.type === 'page_post' || post.page_id;
+            const endpoint = isPagePost 
+                ? '/post/app/page-comments/'
+                : '/post/app/comments/';
+            
+            await api.post(endpoint, {
                 post: post.id,
                 content: content,
                 is_take_down: "False"
@@ -499,6 +634,7 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
                         post.is_liked ? 'text-red-500 bg-red-50' : 'text-gray-500'
                     }`}
                     onClick={() => onLike(post.id)}
+                    title={`${post.is_liked ? 'Unlike' : 'Like'} this post (Debug: is_liked=${post.is_liked})`}
                 >
                     <Heart className={`w-5 h-5 ${post.is_liked ? 'fill-current' : ''}`} />
                     <span className="font-medium">{post.like_count}</span>
