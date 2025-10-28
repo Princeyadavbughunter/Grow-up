@@ -3,6 +3,18 @@ import Image from "next/image";
 import Link from "next/link";
 
 const Download = () => {
+  const phoneColors = [
+    "bg-gradient-to-br from-[#FFF7E3] to-[#F5F0E8]", // Warm cream
+    "bg-gradient-to-br from-[#F0F9FF] to-[#E0F2FE]", // Cool blue
+    "bg-gradient-to-br from-[#FEF7ED] to-[#FED7AA]", // Soft orange
+  ];
+
+  const phoneBorders = [
+    "border-[#FED7AA]", // Warm orange border
+    "border-[#0EA5E9]", // Blue border
+    "border-[#F97316]", // Orange border
+  ];
+
   const features = [
     {
       id: 1,
@@ -45,53 +57,46 @@ const Download = () => {
         </div>
       </div>
       {/* Features Section */}
-      <div className="space-y-6 sm:space-y-8 md:space-y-12">
+      <div className="space-y-8 sm:space-y-12 md:space-y-16">
         {features.map((feature, index) => (
           <div key={feature.id} className="w-full">
-            {/* Feature Content Card */}
-            <div
-              className={`flex flex-col lg:flex-row items-center bg-[#FFF7E3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 ${
-                index % 2 === 1 ? "lg:flex-row-reverse" : ""
-              }`}
-            >
-              {/* Text Content */}
-              <div className="flex-1 p-6 sm:p-8 md:p-10 lg:p-12 xl:p-16">
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[#4A4A4A] mb-4 sm:mb-6 md:mb-8 leading-tight">
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 xl:gap-12 ${
+              index % 2 === 1 ? "lg:grid-flow-col-dense" : ""
+            }`}>
+              {/* Data Card */}
+              <div className={`bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 lg:p-12 shadow-sm flex flex-col justify-center ${
+                index % 2 === 1 ? "lg:col-start-2" : ""
+              }`}>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#4A4A4A] mb-4 leading-tight">
                   {feature.title}
                 </h2>
-                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-[#696C78] leading-relaxed max-w-2xl">
-                  {feature.description}
-                </p>
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-[#7052FF] rounded-lg flex items-center justify-center mt-1">
+                    <span className="text-white font-bold text-sm">{feature.id}</span>
+                  </div>
+                  <p className="text-sm sm:text-base md:text-lg text-[#696C78] leading-relaxed flex-1">
+                    {feature.description}
+                  </p>
+                </div>
               </div>
 
-              {/* Image Container */}
-              <div className="flex-shrink-0 w-full lg:w-auto flex justify-center items-center p-4 sm:p-6 md:p-8">
-                <div className="relative  w-[280px] sm:w-[320px] md:w-[360px] lg:w-[400px] aspect-[3/4]">
-                  <Image
-                    src={feature.image}
-                    alt={feature.imageAlt}
-                    fill
-                    className="object-contain rounded-lg sm:rounded-xl"
-                    sizes="(max-width: 640px) 280px, (max-width: 768px) 320px, (max-width: 1024px) 360px, 400px"
-                  />
+              {/* Phone Card */}
+              <div className={`flex justify-center items-center ${
+                index % 2 === 1 ? "lg:col-start-1 lg:row-start-1" : ""
+              }`}>
+                <div className={`${phoneColors[index]} border-2 ${phoneBorders[index]} rounded-3xl p-3 sm:p-4 shadow-sm hover:shadow-md transition-all duration-300`}>
+                  <div className="relative w-[240px] sm:w-[280px] md:w-[320px] aspect-[3/4]">
+                    <Image
+                      src={feature.image}
+                      alt={feature.imageAlt}
+                      fill
+                      className="object-contain rounded-2xl"
+                      sizes="(max-width: 640px) 240px, (max-width: 768px) 280px, 320px"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* Mobile Image (shown separately on very small screens for better layout) */}
-            {/* <div className="block sm:hidden mt-4">
-              <div className="flex justify-center">
-                <div className="relative w-full max-w-[250px] aspect-[3/4] bg-[#FFF7E3] rounded-xl p-2 shadow-md">
-                  <Image 
-                    src={feature.image} 
-                    alt={feature.imageAlt}
-                    fill
-                    className="object-contain rounded-lg"
-                    sizes="250px"
-                  />
-                </div>
-              </div>
-            </div> */}
           </div>
         ))}
       </div>
