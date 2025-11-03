@@ -2,7 +2,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-
+import { ArrowRightIcon } from '@/components/ui/arrow-right'
 const Future = () => {
   const router = useRouter()
 
@@ -93,9 +93,7 @@ const Future = () => {
                 className={`opacity-0 group-hover:opacity-100 inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold bg-[#7052FF] text-white hover:bg-[#5a42d4] transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/30 shadow-md hover:shadow-lg cursor-pointer`}
               >
                 View
-                <span className="transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
+                <ArrowRightIcon />
               </button>
 
             </div>

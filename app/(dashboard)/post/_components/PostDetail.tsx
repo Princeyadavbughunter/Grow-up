@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FiUser } from 'react-icons/fi';
-import { MessageSquare, Heart, Share, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { MessageSquare, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 import SharePopup from './SharePopup';
 import EmptyState from '@/components/ui/empty-state';
@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from 'sonner';
 import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
+import { HeartIcon } from '@/components/ui/heart';  
+import {UploadIcon} from "@/components/ui/upload";
 
 interface ImageData {
     id: string;
@@ -53,6 +55,7 @@ interface Post {
     author: string;
     club: string;
     club_name: string;
+    clubs_data?: Array<{ id: string; name: string; description?: string }>;
     freelancer_profile: string | null;
     is_liked?: boolean;
     link: string;
@@ -290,6 +293,7 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                         )}
                     </div>
                     <div className="flex items-center gap-2">
+                        {/* Show club badge for user posts */}
                         {post.type === 'user_post' && post.club_name && (
                             <Link
                                 href={`/clubs/${post.club}`}
@@ -297,6 +301,20 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                             >
                                 {post.club_name}
                             </Link>
+                        )}
+                        {/* Show club badges for page posts */}
+                        {post.type === 'page_post' && post.clubs_data && post.clubs_data.length > 0 && (
+                            <>
+                                {post.clubs_data.map((club) => (
+                                    <Link
+                                        key={club.id}
+                                        href={`/clubs/${club.id}`}
+                                        className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium hover:bg-green-200 transition-colors cursor-pointer whitespace-nowrap"
+                                    >
+                                        {club.name}
+                                    </Link>
+                                ))}
+                            </>
                         )}
                         {isOwner && (
                             <DropdownMenu>
@@ -403,9 +421,12 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                                 ? 'text-red-500 bg-red-50'
                                 : 'text-gray-500 hover:bg-gray-100'
                         }`}
-                        onClick={() => onLike(post.id)}
-                    >
-                        <Heart className={`w-5 h-5 ${post.is_liked ? 'fill-current' : ''}`} />
+                        onClick={() => onLike(post.id)}  title={`${post.is_liked ? "Unlike" : "Like"} this post`}
+                        >
+                          <HeartIcon
+                            className="w-5 h-5"
+                            filled={post.is_liked} // Add this prop
+                          />
                         <span className="font-medium">{post.like_count}</span>
                     </button>
                     <button
@@ -419,7 +440,7 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                         className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                         onClick={() => setShowSharePopup(true)}
                     >
-                        <Share className="w-5 h-5" />
+                        <UploadIcon size={20} />
                         {post.share_count !== undefined && (
                             <span className="font-medium">{post.share_count}</span>
                         )}

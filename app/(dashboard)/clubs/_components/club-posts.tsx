@@ -8,7 +8,9 @@ import { FiUser } from 'react-icons/fi';
 import SharePopup from '../../post/_components/SharePopup';
 import { CommentModal } from '@/components/ui/comment-modal';
 import { formatTimeAgo } from '@/lib/utils';
-import { Heart, MessageSquare, Share } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
+import { HeartIcon } from '@/components/ui/heart';
+import {UploadIcon} from "@/components/ui/upload";
 interface ImageData {
     id: string;
     file: string;
@@ -49,6 +51,7 @@ interface Post {
     club: string;
     club_name: string;
     club_id?: string;
+    clubs_data?: Array<{ id: string; name: string; description?: string }>;
     freelancer_profile: string | null;
     is_liked?: boolean;
     link?: string;
@@ -487,8 +490,12 @@ const PostCard = ({ post, onLike, onUpdateCommentCount }: PostCardProps) => {
                         post.is_liked ? 'text-red-500 bg-red-50' : 'text-gray-500'
                     }`}
                     onClick={() => onLike(post.id)}
-                >
-                    <Heart className={`w-5 h-5 ${post.is_liked ? 'fill-current' : ''}`} />
+                    title={`${post.is_liked ? "Unlike" : "Like"} this post`}
+                    >
+                      <HeartIcon
+                        className="w-5 h-5"
+                        filled={post.is_liked} // Add this prop
+                      />
                     <span className="font-medium">{post.like_count}</span>
                 </button>
                 <button
@@ -502,7 +509,7 @@ const PostCard = ({ post, onLike, onUpdateCommentCount }: PostCardProps) => {
                     onClick={() => setShowSharePopup(true)}
                     className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors"
                 >
-                    <Share className="w-5 h-5" />
+                    <UploadIcon size={20} />
                 </button>
             </div>
 

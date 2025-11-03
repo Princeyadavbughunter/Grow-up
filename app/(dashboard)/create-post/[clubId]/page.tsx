@@ -180,6 +180,7 @@ const CreatePost = (): JSX.Element => {
                 formData.append('title', title);
                 formData.append('content', content);
                 formData.append('page', selectedPage);
+                formData.append('club_ids', clubId);
                 formData.append('is_take_down', false);
 
                 images.forEach((image) => {

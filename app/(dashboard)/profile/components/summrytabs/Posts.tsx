@@ -8,7 +8,9 @@ import { FiUser } from 'react-icons/fi';
 import SharePopup from '../../../post/_components/SharePopup';
 import { CommentModal } from '@/components/ui/comment-modal';
 import { formatTimeAgo } from '@/lib/utils';
-import { Heart, MessageSquare, Share } from 'lucide-react';
+import { MessageSquare} from 'lucide-react';
+import { HeartIcon } from '@/components/ui/heart';
+import {UploadIcon} from "@/components/ui/upload";
 interface ImageData {
     id: string;
     file: string;
@@ -24,6 +26,7 @@ interface VideoType {
 }
 
 interface Post {
+    type?: "user_post" | "page_post";
     id: string;
     images: ImageData[];
     videos: VideoType[];
@@ -32,6 +35,9 @@ interface Post {
     last_name: string | null;
     company_name: string | null;
     company_logo: string | null;
+    page_name?: string | null;
+    page_profile_picture?: string | null;
+    page_id?: string | null;
     role: string;
     title: string;
     content: string;
@@ -43,6 +49,7 @@ interface Post {
     author: string;
     club: string;
     club_name: string;
+    clubs_data?: Array<{ id: string; name: string; description?: string }>;
     freelancer_profile: string;
     is_liked?: boolean;
     link: string;
@@ -325,7 +332,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
     };
 
     return (
-        <div className="bg-white rounded-xl p-4 mb-4 shadow-lg">
+        <div className="bg-white rounded-xl px-4 py-4 mb-4 border border-gray-200 mx-0">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                     <Link href={`/profile/${post.freelancer_profile}`} className="flex items-center gap-3">
@@ -353,12 +360,29 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                     </Link>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                    <Link
-                        href={`/clubs/${post.club}`}
-                        className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 transition-colors cursor-pointer"
-                    >
-                        {post.club_name}
-                    </Link>
+                    {/* Show club badge for regular posts */}
+                    {post.club_name && !post.clubs_data && (
+                        <Link
+                            href={`/clubs/${post.club}`}
+                            className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 transition-colors cursor-pointer"
+                        >
+                            {post.club_name}
+                        </Link>
+                    )}
+                    {/* Show club badges for page posts */}
+                    {post.clubs_data && post.clubs_data.length > 0 && (
+                        <>
+                            {post.clubs_data.map((club) => (
+                                <Link
+                                    key={club.id}
+                                    href={`/clubs/${club.id}`}
+                                    className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 transition-colors cursor-pointer"
+                                >
+                                    {club.name}
+                                </Link>
+                            ))}
+                        </>
+                    )}
                     {post.link && (
                         <a
                             href={post.link}
@@ -393,8 +417,12 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                         post.is_liked ? 'text-red-500 bg-red-50' : 'text-gray-500'
                     }`}
                     onClick={() => onLike(post.id)}
-                >
-                    <Heart className={`w-5 h-5 ${post.is_liked ? 'fill-current' : ''}`} />
+                    title={`${post.is_liked ? "Unlike" : "Like"} this post`}
+                    >
+                      <HeartIcon
+                        className="w-5 h-5"
+                        filled={post.is_liked} // Add this prop
+                      />
                     <span className="font-medium">{post.like_count}</span>
                 </button>
                 <button
@@ -408,7 +436,7 @@ const PostCard = ({ post, onLike }: PostCardProps) => {
                     onClick={() => setShowSharePopup(true)}
                     className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors"
                 >
-                    <Share className="w-5 h-5" />
+                    <UploadIcon size={20} />
                 </button>
             </div>
 
