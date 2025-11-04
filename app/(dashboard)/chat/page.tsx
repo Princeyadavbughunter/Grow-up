@@ -632,15 +632,24 @@ const ChatInterface: React.FC = () => {
                 <img
                   src={selectedChatroom.chatting_with_current_user.image}
                   alt={selectedChatroom.chatting_with_current_user.name}
-                  className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0"
+                  className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => window.location.href = `/profile/${selectedChatroom.chatting_with_current_user.id}`}
                 />
               ) : (
-                <div className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                <div 
+                  className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors"
+                  onClick={() => window.location.href = `/profile/${selectedChatroom.chatting_with_current_user.id}`}
+                >
                   <FaUser className="h-4 w-4 md:h-5 md:w-5 text-gray-500" />
                 </div>
               )}
               <div className="min-w-0 flex-1">
-                <h2 className="font-medium text-sm md:text-base truncate">{selectedChatroom.chatting_with_current_user.name}</h2>
+                <h2 
+                  className="font-medium text-sm md:text-base truncate cursor-pointer hover:text-blue-600 transition-colors"
+                  onClick={() => window.location.href = `/profile/${selectedChatroom.chatting_with_current_user.id}`}
+                >
+                  {selectedChatroom.chatting_with_current_user.name}
+                </h2>
                 <p className="text-xs md:text-sm text-gray-500 flex items-center">
                   {wsConnected ? 
                     <span className="text-green-500 flex items-center"><span className="h-2 w-2 bg-green-500 rounded-full mr-1"></span>Online</span> : 
