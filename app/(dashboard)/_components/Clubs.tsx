@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
+import { ArrowRightIcon } from "@/components/ui/arrow-right";
 
 interface Club {
     id: string;
@@ -35,8 +36,8 @@ const Clubs = () => {
         <div className="p-4">
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Suggested Clubs</h2>
-                <Link href="/clubs" className="text-sm text-purple-600 hover:text-purple-700 font-medium transition-colors">
-                    View all →
+                <Link href="/clubs" className="inline-flex items-center gap-1 text-sm text-purple-600 hover:text-purple-700 font-medium transition-colors border border-purple-200 hover:border-purple-300 px-3 py-1.5 rounded-lg">
+                    View all <ArrowRightIcon size={16} />
                 </Link>
             </div>
 

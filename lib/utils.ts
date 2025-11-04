@@ -9,10 +9,20 @@ export function formatTimeAgo(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
   const diffInMilliseconds = now.getTime() - date.getTime();
+  
+  // Handle negative differences (future dates or clock skew) and very recent comments
+  if (diffInMilliseconds < 0 || diffInMilliseconds < 60000) { // Less than 1 minute
+    return 'Just now';
+  }
+  
+  const diffInMinutes = Math.floor(diffInMilliseconds / (1000 * 60));
+  const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
   const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
 
-  if (diffInDays === 0) {
-    return 'Today';
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
+  } else if (diffInHours < 24) {
+    return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
   } else if (diffInDays === 1) {
     return 'Yesterday';
   } else if (diffInDays < 7) {

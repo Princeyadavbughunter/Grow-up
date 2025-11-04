@@ -68,9 +68,12 @@ const OtherSimilarProfile: React.FC<OtherSimilarProfileProps> = ({ freelancerId 
                     followerCount: freelancer.follower_count || 0,
                     requestSent: freelancer.follow_request_sent || false
                 }))
-                
+
+                // Filter out the current user's profile from similar profiles
+                const filteredProfiles = processedProfiles.filter(profile => profile.id !== profileData?.id)
+
                 // Limit to 5 profiles
-                setSimilarProfiles(processedProfiles.slice(0, 5))
+                setSimilarProfiles(filteredProfiles.slice(0, 5))
             } catch (error) {
                 console.error('Error fetching similar profiles:', error)
                 setSimilarProfiles([])

@@ -71,6 +71,29 @@ const ChatInterface = () => {
   const { userId, authToken } = useAuth();
   const { api } = useAuthenticatedApi();
 
+  // Function to convert URLs in text to clickable links
+  const linkifyText = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    
+    return parts.map((part, index) => {
+      if (part.match(urlRegex)) {
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline break-all"
+          >
+            {part}
+          </a>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -454,14 +477,14 @@ const ChatInterface = () => {
 
         {/* Main Content Area */}
         {showProfile && selectedPage ? (
-          <div className="flex-1 overflow-y-auto sticky top-[12.5rem] self-start max-h-[calc(100vh-8rem)]">
+          <div className="flex-1 overflow-y-auto sticky top-[11.5rem] self-start max-h-[calc(76vh-8rem)]">
             <ProfileView
               onBack={() => setShowProfile(false)}
               pageId={selectedPage.id}
             />
           </div>
         ) : selectedPage ? (
-          <div className="flex flex-1 flex-col overflow-hidden sticky top-[12.5rem] self-start max-h-[calc(100vh-8rem)]">
+          <div className="flex flex-1 flex-col overflow-hidden sticky top-[11.5rem] self-start max-h-[calc(78vh-8rem)]">
             {/* Chat Header */}
             <div className="flex items-center justify-between border-b border-gray-200 bg-white p-3 md:p-4 flex-shrink-0">
               <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -536,7 +559,7 @@ const ChatInterface = () => {
                       {selectedPage?.name || 'Unknown Page'}
                     </div>
                     <div className="p-3 rounded-lg bg-white shadow-sm border text-sm md:text-base">
-                      {message.message}
+                      {linkifyText(message.message)}
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
                       {formatTimeAgo(message.timestamp)}

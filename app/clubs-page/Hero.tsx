@@ -4,14 +4,14 @@ import { useState, useEffect, useRef } from "react"
 import { motion, LayoutGroup, AnimatePresence } from "framer-motion"
 
 // Roles and colors
-const roles = ["Founder", "Designer", "Developer", "Investor", "Marketer"] as const
+const roles = ["Founder", "Designer", "Developer", "Memer", "Marketer"] as const
 type Role = (typeof roles)[number]
 
 const roleColors: Record<Role, string> = {
   Founder: "#FF6B6B",
   Designer: "#4ECDC4",
   Developer: "#7052FF",
-  Investor: "#FFD93D",
+  Memer: "#FFD93D",
   Marketer: "#FF8B94",
 }
 
@@ -19,7 +19,7 @@ const roleClubs: Record<Role, string> = {
   Founder: "Startup Club",
   Designer: "Design Club", 
   Developer: "Coding Club",
-  Investor: "Investor's Club",
+  Memer : "Memes Club",
   Marketer: "Growth Club",
 }
 

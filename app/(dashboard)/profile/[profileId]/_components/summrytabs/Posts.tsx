@@ -91,7 +91,7 @@ const Posts: React.FC<PostsProps> = ({ profileId }) => {
       ) : (
         <div>
           {posts.map((post) => (
-            <div key={post.id} className="bg-white rounded-xl p-4 mb-4 shadow-lg">
+            <div key={post.id} className="bg-white rounded-xl p-4 mb-4 border border-gray-200 mx-0">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <img
