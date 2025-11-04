@@ -83,7 +83,7 @@ interface ProfileFormData {
 }
 
 const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
-  const { apiCaller, refreshProfile, logout } = useAuth();
+  const { apiCaller, refreshProfile, logout, isAuthenticated, authToken } = useAuth();
   
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -99,14 +99,25 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   // Fetch follow statistics
   React.useEffect(() => {
     const fetchFollowStats = async () => {
-      if (!profileData?.id) return;
+      // Wait for authentication before fetching
+      if (!profileData?.id || !isAuthenticated || !authToken) return;
       
       try {
-        // Try to get follow stats from API
-        const response = await apiCaller.get(`/freelancer/follow-stats/?freelancer_id=${profileData.id}`);
+        // Use the existing follow-request endpoint
+        const response = await apiCaller.get('/freelancer/follow-request/');
         if (response.data) {
-          setFollowerCount(response.data.follower_count || 0);
-          setConnectionCount(response.data.connection_count || 0);
+          const { approved_followers, following_approved } = response.data;
+          
+          // Count followers
+          const followersList = approved_followers || [];
+          setFollowerCount(followersList.length);
+          
+          // Calculate connections (mutual follows)
+          // Connections = people who follow you AND you follow them back
+          const followingList = following_approved || [];
+          const followerIds = new Set(followersList.map((f: any) => f.profile_id));
+          const connections = followingList.filter((f: any) => followerIds.has(f.freelancer_id));
+          setConnectionCount(connections.length);
         }
       } catch (error) {
         console.error('Error fetching follow stats:', error);
@@ -116,10 +127,10 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
       }
     };
 
-    if (profileData?.id) {
+    if (profileData?.id && isAuthenticated && authToken) {
       fetchFollowStats();
     }
-  }, [profileData?.id, apiCaller]);
+  }, [profileData?.id, apiCaller, isAuthenticated, authToken]);
 
   const initialFormData: ProfileFormData = {
     first_name: profileData?.first_name || "",

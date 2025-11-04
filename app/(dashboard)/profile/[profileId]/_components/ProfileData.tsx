@@ -46,33 +46,43 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [followerCount, setFollowerCount] = useState(profileData?.follower_count || 0);
   const [connectionCount, setConnectionCount] = useState(profileData?.connection_count || 0);
-  const { profileData: userProfileData } = useAuth();
+  const { profileData: userProfileData, isAuthenticated, authToken } = useAuth();
 
   // Fetch follow statistics for the profile
   useEffect(() => {
     const fetchFollowStats = async () => {
-      if (!profileData?.id) return;
+      // Wait for authentication before fetching
+      if (!profileData?.id || !isAuthenticated || !authToken) return;
       
       try {
-        // For viewing other users' profiles, we get their follow stats
-        const response = await api.get(`/freelancer/follow-stats/?freelancer_id=${profileData.id}`);
+        // Use the existing follow-request endpoint
+        const response = await api.get('/freelancer/follow-request/');
         if (response.data) {
-          setFollowerCount(response.data.follower_count || 0);
-          setConnectionCount(response.data.connection_count || 0);
+          const { approved_followers, following_approved } = response.data;
+          
+          // Count followers
+          const followersList = approved_followers || [];
+          setFollowerCount(followersList.length);
+          
+          // Calculate connections (mutual follows)
+          // Connections = people who follow you AND you follow them back
+          const followingList = following_approved || [];
+          const followerIds = new Set(followersList.map((f: any) => f.profile_id));
+          const connections = followingList.filter((f: any) => followerIds.has(f.freelancer_id));
+          setConnectionCount(connections.length);
         }
       } catch (error) {
         console.error('Error fetching follow stats:', error);
         // Fallback to the profile data if API doesn't exist
         setFollowerCount(profileData?.follower_count || 0);
-        // Calculate connection count if API doesn't provide it
-        // Connection = people who follow each other mutually
+        setConnectionCount(profileData?.connection_count || 0);
       }
     };
 
-    if (profileData?.id) {
+    if (profileData?.id && isAuthenticated && authToken) {
       fetchFollowStats();
     }
-  }, [profileData?.id, api]);
+  }, [profileData?.id, api, isAuthenticated, authToken]);
 
   // Sync state with props when profileData changes (e.g., after page reload)
   useEffect(() => {

@@ -139,7 +139,7 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
       
       <div className="w-full h-full pb-12 overflow-y-auto">
         {participants.length > 0 ? (
-          <div className="space-y-0">
+          <div className="space-y-2">
             {participants.map((participant) => (
               <NetworkCard
                 key={participant.user_id}
@@ -202,9 +202,14 @@ export function NetworkCard({
 }: NetworkCardProps) {
   const nameInitial = name && name.length > 0 ? name.charAt(0) : "U";
   const router = useRouter();
+
+  // Truncate summary to 100 characters
+  const truncatedSummary = summary && summary.length > 100
+    ? summary.substring(0, 100) + "..."
+    : summary;
   
   return (
-    <div onClick={() => router.push(`/profile/${id}`)} className="flex cursor-pointer items-center gap-2 lg:gap-3 p-2 lg:p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+    <div onClick={() => router.push(`/profile/${id}`)} className="flex cursor-pointer items-center gap-2 lg:gap-3 p-2 lg:p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:shadow-sm transition-all">
       <div className="relative flex-shrink-0">
         <Avatar className="h-8 w-8 lg:h-12 lg:w-12">
           <AvatarImage src={imageUrl} />
@@ -219,8 +224,8 @@ export function NetworkCard({
           <h3 className="font-medium text-gray-900 truncate text-sm lg:text-base">{name}</h3>
         </div>
         {location && <p className="text-xs text-gray-500 truncate hidden lg:block">{location}</p>}
-        {summary && (
-          <p className="text-xs text-gray-500 mt-0.5 lg:mt-1 line-clamp-1 hidden lg:block">{summary}</p>
+        {truncatedSummary && (
+          <p className="text-xs text-gray-500 mt-0.5 lg:mt-1 line-clamp-1 hidden lg:block">{truncatedSummary}</p>
         )}
         {followerCount !== undefined && (
           <p className="text-xs text-gray-400 mt-0.5 lg:mt-1 hidden lg:block">

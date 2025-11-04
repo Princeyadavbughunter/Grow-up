@@ -377,7 +377,7 @@ const PostCard = ({ post, onLike, onUpdateCommentCount }: PostCardProps) => {
             : post.company_name || 'Anonymous');
 
     return (
-        <div className="bg-white rounded-xl p-4 mb-4 shadow-lg">
+        <div className="bg-white rounded-xl p-4 mb-4 border border-gray-200 mx-0">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                     {(post.type === 'page_post' || post.freelancer_profile) ? (
