@@ -714,22 +714,15 @@ const ChatInterface: React.FC = () => {
                                 <img
                                     src={selectedChatroom.chatting_with_current_user.image}
                                     alt={selectedChatroom.chatting_with_current_user.name}
-                                    className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-                                    onClick={() => selectedChatroom.chatting_with_current_user && (window.location.href = `/profile/${selectedChatroom.chatting_with_current_user.id}`)}
+                                    className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0"
                                 />
                             ) : (
-                                <div 
-                                    className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors"
-                                    onClick={() => selectedChatroom.chatting_with_current_user && (window.location.href = `/profile/${selectedChatroom.chatting_with_current_user.id}`)}
-                                >
+                                <div className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center">
                                     <FaUser className="h-4 w-4 md:h-5 md:w-5 text-gray-500" />
                                 </div>
                             )}
                             <div className="min-w-0 flex-1">
-                                <h2 
-                                    className="font-medium text-sm md:text-base truncate cursor-pointer hover:text-blue-600 transition-colors"
-                                    onClick={() => selectedChatroom.chatting_with_current_user && (window.location.href = `/profile/${selectedChatroom.chatting_with_current_user.id}`)}
-                                >
+                                <h2 className="font-medium text-sm md:text-base truncate">
                                     {selectedChatroom.chatting_with_current_user ? selectedChatroom.chatting_with_current_user.name : 'Unknown User'}
                                 </h2>
                                 <p className="text-xs md:text-sm text-gray-500 flex items-center">
