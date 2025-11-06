@@ -679,7 +679,7 @@ const ChatInterface: React.FC = () => {
               )}
               
               {messages.length === 0 ? (
-                <div className="flex-1 flex  items-center justify-center text-gray-500">
+                <div className="flex-1 flex items-center justify-center text-gray-500">
                   <p className="text-sm md:text-base">No messages yet. Start the conversation!</p>
                 </div>
               ) : (
@@ -687,16 +687,30 @@ const ChatInterface: React.FC = () => {
                   {messages.map((message) => {
                     const isCurrentUser = message.is_sender;
                     return (
-                      <div 
-                        key={message.message_id} 
+                      <div
+                        key={message.message_id}
                         className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} group`}
                       >
-                        <div 
+                        <div
                           className={`max-w-[85%] md:max-w-[70%] rounded-lg mb-2 p-2 md:p-3 ${
                             isCurrentUser ? 'bg-blue-500 text-white' : 'bg-white border'
-                          } relative group`}
+                          } relative group break-words overflow-hidden`} // ensures wrapping and no overflow
+                          style={{
+                            wordBreak: 'break-word',
+                            overflowWrap: 'break-word',
+                            hyphens: 'auto',
+                          }}
                         >
-                          <p className="text-sm md:text-base">{message.message}</p>
+                          <p
+                            className="text-sm md:text-base whitespace-pre-line break-words"
+                            style={{
+                              wordBreak: 'break-word',
+                              overflowWrap: 'break-word',
+                              hyphens: 'auto',
+                            }}
+                          >
+                            {message.message}
+                          </p>
                           <div className={`text-xs mt-1 ${isCurrentUser ? 'text-blue-100' : 'text-gray-500'} flex items-center justify-between`}>
                             <span>
                               {(() => {
@@ -704,7 +718,7 @@ const ChatInterface: React.FC = () => {
                                   return 'No time';
                                 }
                                 const date = new Date(message.timestamp);
-                                return isNaN(date.getTime()) ? 'Invalid time' : date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                                return isNaN(date.getTime()) ? 'Invalid time' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                               })()}
                             </span>
                             {isCurrentUser && (
