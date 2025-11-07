@@ -1,10 +1,11 @@
 // @ts-nocheck
 'use client'
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { BiSearch, BiArrowBack } from 'react-icons/bi';
+import { BiSearch } from 'react-icons/bi';
 import { FaUser } from 'react-icons/fa';
 import { RiBroadcastFill } from 'react-icons/ri';
 import { HiMenuAlt3 } from 'react-icons/hi';
+import { X } from 'lucide-react';
 import ProfileView from './_component/profile';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 import { Send } from 'lucide-react';
@@ -56,6 +57,7 @@ const ChatInterface = () => {
   const [messageInput, setMessageInput] = useState('');
   const [showProfile, setShowProfile] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [activeTab, setActiveTab] = useState<'buddies' | 'discover'>('buddies');
   const [pages, setPages] = useState<Page[]>([]);
   const [followedPages, setFollowedPages] = useState<Page[]>([]);
   const [selectedPage, setSelectedPage] = useState<Page | null>(null);
@@ -301,103 +303,98 @@ const ChatInterface = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-5rem)] bg-gray-50">
-
-      <div className='p-3 md:p-4 border-b bg-white sticky top-0 z-10'>
-        <h1 className="text-lg md:text-xl font-bold mb-3">
-          Recommended Pages
-        </h1>
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 pt-1">
-          {pages.map((page) => (
-            <div
-              key={page.id}
-              className="flex items-center gap-3 border border-gray-200 p-3 md:p-4 rounded-xl cursor-pointer hover:shadow-lg hover:border-blue-300 transition-all duration-200 bg-white min-w-max"
-              onClick={() => handlePageSelect(page)}
-            >
-              {page.profile_picture ? (
-                <img
-                  src={page.profile_picture}
-                  alt={page.name}
-                  className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover"
-                />
-              ) : (
-                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-gray-200 flex items-center justify-center">
-                  <FaUser className="h-5 w-5 md:h-6 md:w-6 text-gray-500" />
-                </div>
-              )}
-              <div>
-                <span className="text-sm font-medium block truncate max-w-[120px]">{page.name}</span>
-                <div className="text-xs text-gray-500 font-medium flex items-center">
-                  {page.followers_count} followers
-                  {page.is_owner_of_page && (
-                    <span className="ml-2 text-blue-500 flex items-center">
-                      <RiBroadcastFill className="mr-1" /> Creator
-                    </span>
-                  )}
-                </div>
+    <div className="flex bg-gray-50" style={{ position: 'fixed', top: '5rem', left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+      {/* Mobile Sidebar Overlay */}
+      {showSidebar && (
+        <>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+            onClick={() => setShowSidebar(false)}
+          />
+          <div className="fixed left-0 top-0 bottom-0 w-80 bg-white z-50 md:hidden shadow-xl flex flex-col">
+            <div className="p-4 border-b flex-shrink-0">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">Pages</h2>
+                <button
+                  onClick={() => setShowSidebar(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-600" />
+                </button>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex flex-1 relative">
-        {/* Mobile Sidebar Overlay */}
-        {showSidebar && (
-          <>
-            <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-              onClick={() => setShowSidebar(false)}
-            />
-            <div className="fixed left-0 top-0 bottom-0 w-80 bg-white z-50 md:hidden">
-              <div className="p-4 border-b">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold">My Buddies</h2>
-                  <button
-                    onClick={() => setShowSidebar(false)}
-                    className="p-2 hover:bg-gray-100 rounded-lg"
-                  >
-                    <BiArrowBack className="h-5 w-5" />
-                  </button>
-                </div>
+              
+              {/* Tabs */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => setActiveTab('buddies')}
+                  className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'buddies'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  My Buddies
+                </button>
+                <button
+                  onClick={() => setActiveTab('discover')}
+                  className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'discover'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Discover
+                </button>
+              </div>
+              
+              {activeTab === 'buddies' && (
                 <div className="relative">
-                  <BiSearch className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <BiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="text"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     placeholder="Search pages..."
-                    className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
                   />
                 </div>
-              </div>
-              <div className="p-4 overflow-y-auto scrollbar-hide h-full">
+              )}
+            </div>
+            
+            <div className="flex-1 overflow-y-auto scrollbar-hide p-4 min-h-0">
+              {activeTab === 'buddies' ? (
                 <div className="space-y-2">
+                  <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
+                    {filteredFollowedPages.length} {filteredFollowedPages.length === 1 ? 'Page' : 'Pages'}
+                  </p>
                   {filteredFollowedPages.length > 0 ? (
                     filteredFollowedPages.map((page) => (
                       <div
                         key={page.id}
-                        className={`flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-all duration-150 ${selectedPage?.id === page.id ? 'bg-blue-50 border border-blue-300 shadow-sm' : 'border border-transparent'
-                          }`}
+                        className={`flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-all duration-150 ${
+                          selectedPage?.id === page.id
+                            ? 'bg-blue-50 border border-blue-300 shadow-sm'
+                            : 'border border-transparent'
+                        }`}
                         onClick={() => handlePageSelect(page)}
                       >
                         {page.profile_picture ? (
                           <img
                             src={page.profile_picture}
                             alt={page.name}
-                            className="h-10 w-10 rounded-full object-cover"
+                            className="h-10 w-10 rounded-full object-cover flex-shrink-0"
                           />
                         ) : (
-                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
                             <FaUser className="h-5 w-5 text-gray-500" />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium truncate">{page.name}</h3>
+                          <h3 className="font-medium truncate text-gray-900">{page.name}</h3>
                           <p className="text-sm text-gray-500 flex items-center">
                             {page.followers_count} followers
                             {page.is_admin && (
-                              <span className="ml-2 text-blue-500 flex items-center">
+                              <span className="ml-2 text-blue-500 flex items-center text-xs">
                                 Admin
                               </span>
                             )}
@@ -406,60 +403,133 @@ const ChatInterface = () => {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      <p>No pages found</p>
+                    <div className="text-center py-12 text-gray-500">
+                      <FaUser className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                      <p className="text-sm">No pages found</p>
                     </div>
                   )}
                 </div>
-              </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
+                    Recommended for you
+                  </p>
+                  {pages.map((page) => (
+                    <div
+                      key={page.id}
+                      className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm cursor-pointer transition-all duration-200 bg-white"
+                      onClick={() => handlePageSelect(page)}
+                    >
+                      {page.profile_picture ? (
+                        <img
+                          src={page.profile_picture}
+                          alt={page.name}
+                          className="h-12 w-12 rounded-full object-cover flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                          <FaUser className="h-6 w-6 text-gray-500" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-gray-900 mb-1">{page.name}</h3>
+                        <p className="text-xs text-gray-500 mb-2 line-clamp-2">{page.description || 'No description available'}</p>
+                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                          <span>{page.followers_count} followers</span>
+                          {page.is_owner_of_page && (
+                            <span className="text-blue-500 flex items-center">
+                              <RiBroadcastFill className="mr-1" /> Your Page
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </>
-        )}
+          </div>
+        </>
+      )}
 
-        {/* Desktop Sidebar */}
-        <div className="hidden md:block border-r border-gray-200 bg-white w-1/3 lg:w-1/4 overflow-y-auto scrollbar-hide sticky top-[12.5rem] self-start max-h-[calc(100vh-8rem)]">
-          <div className="p-4">
-            <div className="mb-4">
-              <div className="relative">
-                <BiSearch className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  placeholder="Search pages..."
-                  className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex md:flex-col border-r border-gray-200 bg-white flex-shrink-0 overflow-hidden" style={{ width: '320px', height: '100%' }}>
+        <div className="p-4 border-b flex-shrink-0">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Pages</h2>
+          
+          {/* Tabs */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setActiveTab('buddies')}
+              className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeTab === 'buddies'
+                  ? 'bg-purple-600 text-white shadow-sm'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              My Buddies
+            </button>
+            <button
+              onClick={() => setActiveTab('discover')}
+              className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeTab === 'discover'
+                  ? 'bg-purple-600 text-white shadow-sm'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Discover
+            </button>
+          </div>
+          
+          {activeTab === 'buddies' && (
+            <div className="relative">
+              <BiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Search pages..."
+                className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors text-sm"
+              />
             </div>
-
+          )}
+        </div>
+        
+        <div className="flex-1 overflow-y-auto scrollbar-hide p-4 min-h-0">
+          {activeTab === 'buddies' ? (
             <div className="space-y-2">
-              <h2 className="mb-3 text-base md:text-lg font-semibold text-gray-800">My Buddies ({filteredFollowedPages.length})</h2>
+              <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
+                {filteredFollowedPages.length} {filteredFollowedPages.length === 1 ? 'Page' : 'Pages'}
+              </p>
               {filteredFollowedPages.length > 0 ? (
                 filteredFollowedPages.map((page) => (
                   <div
                     key={page.id}
-                    className={`flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-all duration-150 ${selectedPage?.id === page.id ? 'bg-blue-50 border border-blue-300 shadow-sm' : 'border border-transparent'
-                      }`}
+                    className={`flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-all duration-150 ${
+                      selectedPage?.id === page.id
+                        ? 'bg-blue-50 border border-blue-300 shadow-sm'
+                        : 'border border-transparent'
+                    }`}
                     onClick={() => handlePageSelect(page)}
                   >
                     {page.profile_picture ? (
                       <img
                         src={page.profile_picture}
                         alt={page.name}
-                        className="h-10 w-10 rounded-full object-cover"
+                        className="h-10 w-10 rounded-full object-cover flex-shrink-0"
                       />
                     ) : (
-                      <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                      <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
                         <FaUser className="h-5 w-5 text-gray-500" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium truncate">{page.name}</h3>
-                      <p className="text-sm text-gray-500 flex items-center">
+                      <h3 className="font-medium truncate text-gray-900 text-sm">{page.name}</h3>
+                      <p className="text-xs text-gray-500 flex items-center">
                         {page.followers_count} followers
                         {page.is_admin && (
                           <span className="ml-2 text-blue-500 flex items-center">
-                            <RiBroadcastFill className="mr-1" /> Admin
+                            <RiBroadcastFill className="mr-1 h-3 w-3" /> Admin
                           </span>
                         )}
                       </p>
@@ -467,101 +537,157 @@ const ChatInterface = () => {
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <p>No pages found</p>
+                <div className="text-center py-12 text-gray-500">
+                  <FaUser className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">No pages found</p>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-
-        {/* Main Content Area */}
-        {showProfile && selectedPage ? (
-          <div className="flex-1 overflow-y-auto sticky top-[11.5rem] self-start max-h-[calc(76vh-8rem)]">
-            <ProfileView
-              onBack={() => setShowProfile(false)}
-              pageId={selectedPage.id}
-            />
-          </div>
-        ) : selectedPage ? (
-          <div className="flex flex-1 flex-col overflow-hidden sticky top-[11.5rem] self-start max-h-[calc(78vh-8rem)]">
-            {/* Chat Header */}
-            <div className="flex items-center justify-between border-b border-gray-200 bg-white p-3 md:p-4 flex-shrink-0">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                {selectedPage.profile_picture ? (
-                  <img
-                    src={selectedPage.profile_picture}
-                    alt={selectedPage.name}
-                    className="h-8 w-8 md:h-10 md:w-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                    <FaUser className="h-4 w-4 md:h-5 md:w-5 text-gray-500" />
+          ) : (
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
+                Recommended for you
+              </p>
+              {pages.map((page) => (
+                <div
+                  key={page.id}
+                  className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-400 hover:shadow-md cursor-pointer transition-all duration-200 bg-white"
+                  onClick={() => handlePageSelect(page)}
+                >
+                  {page.profile_picture ? (
+                    <img
+                      src={page.profile_picture}
+                      alt={page.name}
+                      className="h-12 w-12 rounded-full object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                      <FaUser className="h-6 w-6 text-gray-500" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-gray-900 mb-1 text-sm">{page.name}</h3>
+                    <p className="text-xs text-gray-500 mb-2 line-clamp-2">{page.description || 'Join this page to receive updates and broadcasts'}</p>
+                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                      <span>{page.followers_count} followers</span>
+                      {page.is_owner_of_page && (
+                        <span className="text-blue-500 flex items-center">
+                          <RiBroadcastFill className="mr-1 h-3 w-3" /> Your Page
+                        </span>
+                      )}
+                    </div>
                   </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <h2 className="font-semibold flex items-center text-sm md:text-base">
-                    <span className="truncate">{selectedPage.name}</span>
-                    <RiBroadcastFill className="ml-2 text-blue-500 flex-shrink-0" />
-                  </h2>
-                  <p className="text-xs md:text-sm text-gray-500 flex items-center">
-                    Broadcast Channel
-                    {wsConnected ?
-                      <span className="text-green-500 ml-2">● Connected</span> :
-                      <span className="text-red-500 ml-2">● Disconnected</span>
-                    }
-                  </p>
                 </div>
-              </div>
-              <button
-                className="rounded-lg bg-gray-100 px-3 py-2 text-sm hover:bg-gray-200 transition-colors flex-shrink-0"
-                onClick={() => setShowProfile(true)}
-              >
-                View page
-              </button>
+              ))}
             </div>
+          )}
+        </div>
+      </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 p-3 md:p-4 overflow-y-auto scrollbar-hide bg-gray-50">
+      {/* Main Content Area */}
+      {showProfile && selectedPage ? (
+        <div className="flex-1 overflow-y-auto bg-white h-full">
+          <ProfileView
+            onBack={() => setShowProfile(false)}
+            pageId={selectedPage.id}
+          />
+        </div>
+      ) : selectedPage ? (
+        <div className="flex flex-1 flex-col overflow-hidden bg-white h-full">
+          {/* Chat Header */}
+          <div className="flex items-center justify-between border-b border-gray-200 bg-white flex-shrink-0 p-3 md:p-4" style={{ minHeight: '70px' }}>
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <button
+                onClick={() => setShowSidebar(true)}
+                className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <HiMenuAlt3 className="h-5 w-5 text-gray-600" />
+              </button>
+              {selectedPage.profile_picture ? (
+                <img
+                  src={selectedPage.profile_picture}
+                  alt={selectedPage.name}
+                  className="h-8 w-8 md:h-10 md:w-10 rounded-full object-cover flex-shrink-0"
+                />
+              ) : (
+                <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                  <FaUser className="h-4 w-4 md:h-5 md:w-5 text-gray-500" />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <h2 className="font-semibold flex items-center text-sm md:text-base text-gray-900">
+                  <span className="truncate">{selectedPage.name}</span>
+                  <RiBroadcastFill className="ml-1 md:ml-2 text-blue-500 flex-shrink-0 h-3 w-3 md:h-4 md:w-4" />
+                </h2>
+                <p className="text-xs md:text-sm text-gray-500 flex items-center">
+                  <span className="hidden md:inline">Broadcast Channel</span>
+                  {wsConnected ? (
+                    <span className="text-green-500 ml-0 md:ml-2 flex items-center text-xs">
+                      <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full mr-1"></span>
+                      Connected
+                    </span>
+                  ) : (
+                    <span className="text-red-500 ml-0 md:ml-2 flex items-center text-xs">
+                      <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-red-500 rounded-full mr-1"></span>
+                      Disconnected
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+            <button
+              className="rounded-lg bg-gray-100 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-200 transition-colors flex-shrink-0 font-medium text-gray-700"
+              onClick={() => setShowProfile(true)}
+            >
+              <span className="hidden md:inline">View Page</span>
+              <span className="md:hidden">View</span>
+            </button>
+          </div>
+
+          {/* Messages Area */}
+          <div className="overflow-y-auto scrollbar-hide bg-gray-50" style={{ flex: '1 1 0', minHeight: 0, maxHeight: 'calc(100% - 200px)' }}>
+            <div className="p-3 md:p-4 space-y-3 md:space-y-4">
               {wsError && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                   <p>{wsError}</p>
                 </div>
               )}
 
               {selectedPage && !selectedPage.is_admin && messages.length === 0 && !wsError && (
-                <div className="flex flex-col items-center justify-center h-full text-gray-500 text-center px-4">
-                  <RiBroadcastFill className="h-12 w-12 mb-4 text-gray-300" />
-                  <p className="text-lg font-medium">No broadcasts yet</p>
-                  <p className="text-sm">Stay tuned for updates from {selectedPage.name}!</p>
+                <div className="flex flex-col items-center justify-center h-full text-gray-500 text-center px-4 py-12">
+                  <RiBroadcastFill className="h-16 w-16 mb-4 text-gray-300" />
+                  <p className="text-lg font-medium text-gray-700">No broadcasts yet</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Stay tuned for updates from {selectedPage.name}!
+                  </p>
                 </div>
               )}
 
               {messages.map((message) => (
                 <div
                   key={message.message_id}
-                  className="mb-4 flex items-start gap-2 md:gap-3"
+                  className="flex items-start gap-3"
                 >
                   {selectedPage?.profile_picture ? (
                     <img
                       src={selectedPage.profile_picture}
                       alt="Page"
-                      className="h-6 w-6 md:h-8 md:w-8 rounded-full object-cover flex-shrink-0"
+                      className="h-8 w-8 rounded-full object-cover flex-shrink-0"
                     />
                   ) : (
-                    <div className="h-6 w-6 md:h-8 md:w-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                      <FaUser className="h-3 w-3 md:h-4 md:w-4 text-gray-500" />
+                    <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                      <FaUser className="h-4 w-4 text-gray-500" />
                     </div>
                   )}
 
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-gray-800 mb-1 text-sm md:text-base">
+                    <div className="font-medium text-gray-900 mb-1 text-sm">
                       {selectedPage?.name || 'Unknown Page'}
                     </div>
-                    <div className="p-3 rounded-lg bg-white shadow-sm border text-sm md:text-base">
+                    <div className="p-3 rounded-lg bg-white shadow-sm border border-gray-200 text-sm">
                       {linkifyText(message.message)}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-gray-500 mt-1.5">
                       {formatTimeAgo(message.timestamp)}
                     </div>
                   </div>
@@ -569,66 +695,70 @@ const ChatInterface = () => {
               ))}
               <div ref={messagesEndRef} />
             </div>
-
-            {/* Message Input Area - Only for Admins */}
-            {selectedPage && selectedPage.is_admin && (
-              <div className="border-t border-gray-200 bg-white p-3 md:p-4 flex-shrink-0">
-                <div className="flex items-end gap-2 rounded-lg bg-gray-50 p-2">
-                  <textarea
-                    value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
-                    placeholder={wsConnected ? "Broadcast a message to followers..." : "Connecting to broadcast channel..."}
-                    className="flex-1 resize-none bg-transparent outline-none min-h-[40px] max-h-32 text-sm md:text-base"
-                    rows={1}
-                    disabled={!wsConnected || sendingMessage}
-                    onKeyDown={handleKeyDown}
-                  />
-                  <button
-                    className={`rounded-lg p-2 text-white flex items-center transition-colors text-sm ${wsConnected && !sendingMessage && messageInput.trim()
-                        ? 'bg-blue-500 hover:bg-blue-600'
-                        : 'bg-gray-400 cursor-not-allowed'
-                      }`}
-                    onClick={sendBroadcast}
-                    disabled={!wsConnected || sendingMessage || !messageInput.trim()}
-                  >
-                    <Send className="h-4 w-4 mr-1" />
-                    <span className="hidden sm:inline">{sendingMessage ? 'Sending...' : 'Send'}</span>
-                  </button>
-                </div>
-                {!wsConnected && (
-                  <div className="text-xs text-center mt-2 text-red-500">
-                    Connection to broadcast server lost. Attempting to reconnect...
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Non-Admin Message */}
-            {selectedPage && !selectedPage.is_admin && (
-              <div className="border-t border-gray-200 bg-white p-3 md:p-4 text-center text-gray-500 flex-shrink-0">
-                <div className="flex items-center justify-center text-sm">
-                  <RiBroadcastFill className="h-5 w-5 mr-2 text-blue-500" />
-                  <span>This is a broadcast channel. Only page owners can send messages.</span>
-                </div>
-              </div>
-            )}
           </div>
-        ) : (
-          <div className="flex-1 flex items-center justify-center bg-gray-50 p-4 sticky top-[7.5rem] self-start max-h-[calc(100vh-8rem)]">
-            <div className="text-center text-gray-500">
-              <RiBroadcastFill className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-              <h3 className="text-lg font-medium mb-2">Select a page to view broadcasts</h3>
-              <p className="text-sm">Choose a page from the sidebar to start viewing broadcasts</p>
-              <button
-                onClick={() => setShowSidebar(true)}
-                className="mt-4 md:hidden bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                Browse Pages
-              </button>
+
+          {/* Message Input Area - Only for Admins */}
+          {selectedPage && selectedPage.is_admin && (
+            <div className="border-t border-gray-200 bg-white flex-shrink-0 p-3 md:p-4" style={{ minHeight: '200px' }}>
+              <div className="flex items-end gap-2 rounded-lg bg-gray-50 p-3 border border-gray-200">
+                <textarea
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  placeholder={wsConnected ? "Broadcast a message to followers..." : "Connecting to broadcast channel..."}
+                  className="flex-1 resize-none bg-transparent outline-none text-sm md:text-base"
+                  style={{ minHeight: '44px', maxHeight: '80px' }}
+                  rows={1}
+                  disabled={!wsConnected || sendingMessage}
+                  onKeyDown={handleKeyDown}
+                />
+                <button
+                  className={`rounded-lg px-4 py-2.5 text-white flex items-center transition-colors text-sm font-medium flex-shrink-0 ${
+                    wsConnected && !sendingMessage && messageInput.trim()
+                      ? 'bg-blue-500 hover:bg-blue-600 shadow-sm'
+                      : 'bg-gray-400 cursor-not-allowed'
+                  }`}
+                  onClick={sendBroadcast}
+                  disabled={!wsConnected || sendingMessage || !messageInput.trim()}
+                >
+                  <Send className="h-4 w-4 mr-1.5" />
+                  <span className="hidden sm:inline">{sendingMessage ? 'Sending...' : 'Send'}</span>
+                </button>
+              </div>
+              {!wsConnected && (
+                <div className="text-xs text-center mt-2 text-red-500">
+                  Connection to broadcast server lost. Attempting to reconnect...
+                </div>
+              )}
             </div>
+          )}
+
+          {/* Non-Admin Message */}
+          {selectedPage && !selectedPage.is_admin && (
+            <div className="border-t border-gray-200 bg-white text-center text-gray-500 flex-shrink-0 p-3 md:p-4" style={{ minHeight: '140px' }}>
+              <div className="flex items-center justify-center text-sm">
+                <RiBroadcastFill className="h-5 w-5 mr-2 text-blue-500 flex-shrink-0" />
+                <span>This is a broadcast channel. Only page owners can send messages.</span>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="flex-1 flex items-center justify-center bg-gray-50 p-4 h-full">
+          <div className="text-center text-gray-500 max-w-md">
+            <RiBroadcastFill className="h-20 w-20 mx-auto mb-4 text-gray-300" />
+            <h3 className="text-xl font-medium mb-2 text-gray-700">Select a page to view broadcasts</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Choose a page from the sidebar to start viewing broadcasts
+            </p>
+            <button
+              onClick={() => setShowSidebar(true)}
+              className="md:hidden bg-blue-500 text-white px-6 py-2.5 rounded-lg hover:bg-blue-600 transition-colors font-medium shadow-sm"
+            >
+              Browse Pages
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
