@@ -192,7 +192,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
           ))}
         </div>
 
-        <div className="mb-3 md:mb-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent h-[calc(100vh-16rem)] md:h-[calc(100vh-20rem)] lg:h-[calc(100vh-27rem)]">
+        <div className="mb-3 md:mb-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           {renderTabContent()}
         </div>
       </div>
