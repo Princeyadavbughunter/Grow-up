@@ -11,7 +11,6 @@ import {
   FileText,
   Users,
   MoreVertical,
-  Edit,
   Trash2,
 } from "lucide-react";
 import { HeartIcon } from "@/components/ui/heart";
@@ -300,7 +299,27 @@ const Posts = ({ posts: propPosts }: PostsProps = {}) => {
   const handleDeletePost = async (postId: string) => {
     try {
       await api.delete(`/post/app/post-creation/?id=${postId}`);
+
+      // Update state after successful deletion
       setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+
+      // Force cleanup of any dialog overlays and restore body scroll
+      setTimeout(() => {
+        document.body.style.overflow = '';
+        document.body.style.pointerEvents = '';
+        document.body.style.paddingRight = '';
+        document.body.removeAttribute('data-scroll-locked');
+        
+        // Remove any lingering Radix UI overlays
+        const overlays = document.querySelectorAll('[role="dialog"], [data-radix-dialog-overlay]');
+        overlays.forEach(overlay => {
+          const state = overlay.getAttribute('data-state');
+          if (!state || state === 'closed') {
+            overlay.remove();
+          }
+        });
+      }, 100);
+
       toast.success("Post deleted successfully");
     } catch (error) {
       console.error("Error deleting post:", error);
@@ -400,12 +419,34 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { api } = useAuthenticatedApi();
   const router = useRouter();
   const formattedDate = formatTimeAgo(post.created_at);
 
   // Check if current user is the post owner
   const isOwner = currentUserId === post.author;
+
+  // Cleanup effect to ensure dialogs are closed and body scroll is unlocked on unmount
+  useEffect(() => {
+    return () => {
+      // Ensure body is scrollable when component unmounts
+      document.body.style.overflow = '';
+      document.body.style.pointerEvents = '';
+      document.body.style.paddingRight = '';
+      
+      // Remove any lingering data attributes from Radix UI
+      document.body.removeAttribute('data-scroll-locked');
+      
+      // Clean up any orphaned dialog overlays
+      const overlays = document.querySelectorAll('[data-radix-scroll-area-viewport]');
+      overlays.forEach(overlay => {
+        if (!overlay.closest('[data-state="open"]')) {
+          overlay.remove();
+        }
+      });
+    };
+  }, []);
 
   // Helper function to safely get hostname from URL
   const getHostname = (url: string) => {
@@ -484,20 +525,21 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
       ? post.page_name
       : post.first_name || post.company_name || "Anonymous";
 
-  const handleDelete = () => {
-    onDelete(post.id);
-    setShowDeleteDialog(false);
-  };
-
-  const handleEdit = () => {
-    // Navigate to edit page - you can adjust the route as needed
-    const clubId = post.club || post.club_id;
-    if (clubId) {
-      router.push(`/create-post?edit=${post.id}&clubId=${clubId}`);
-    } else {
-      router.push(`/create-post?edit=${post.id}`);
+  const handleDelete = async () => {
+    if (isDeleting) return; // Prevent double-clicks
+    
+    setIsDeleting(true);
+    
+    try {
+      await onDelete(post.id);
+      // Close dialog after successful deletion
+      setShowDeleteDialog(false);
+    } catch (error) {
+      console.error("Error in handleDelete:", error);
+      setIsDeleting(false);
     }
   };
+
 
   return (
     <div className="bg-white rounded-xl px-4 py-4 mb-4 border border-gray-200 mx-0">
@@ -582,13 +624,6 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
-                  onClick={handleEdit}
-                  className="cursor-pointer"
-                >
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit Post
-                </DropdownMenuItem>
-                <DropdownMenuItem
                   onClick={() => setShowDeleteDialog(true)}
                   className="cursor-pointer text-red-600 focus:text-red-600"
                 >
@@ -604,8 +639,9 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmDialog
         isOpen={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
+        onClose={() => !isDeleting && setShowDeleteDialog(false)}
         onConfirm={handleDelete}
+        isDeleting={isDeleting}
       />
 
       {/* Post Content */}
