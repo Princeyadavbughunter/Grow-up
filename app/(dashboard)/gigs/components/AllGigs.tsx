@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuthenticatedApi } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 interface Gig {
   id: string;
@@ -57,15 +58,26 @@ const AllGigs = ({
 
   const handleBookmark = async (e: React.MouseEvent, gig: Gig) => {
     e.stopPropagation();
+
     try {
+      // Backend treats POST as toggle operation
       await api.post('/freelancer/saving-jobs/', { job_posting: gig.id });
-      setLocalGigs(prevGigs =>
-        prevGigs.map(g =>
-          g.id === gig.id ? { ...g, is_bookmark: !g.is_bookmark } : g
-        )
-      );
+
+      // After successful API call, re-fetch gigs to get the updated bookmark state
+      // This ensures we have the correct bookmark state from the backend
+      const response = await api.get('/freelancer/get-all-gigs/', {
+        params: {
+          work_type: activeWorkType !== "Domain" ? activeWorkType.toLowerCase() : "",
+          job_type: activeJobType !== "All" ? activeJobType.toLowerCase() : ""
+        }
+      });
+
+      if (response.data) {
+        setLocalGigs(response.data);
+      }
     } catch (error) {
       console.error('Error toggling bookmark:', error);
+      toast.error('Failed to update bookmark. Please try again.');
     }
   };
 
