@@ -37,8 +37,11 @@ const SavedGigs = ({ onSelectGig }: SavedGigsProps) => {
   const fetchSavedGigs = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/freelancer/saving-jobs/');
-      setSavedGigs(response.data || []);
+      // Fetch all gigs and filter for saved ones (is_bookmark: true)
+      const response = await api.get('/freelancer/get-all-gigs/');
+      const allGigs = response.data || [];
+      const savedGigsOnly = allGigs.filter((gig: Gig) => gig.is_bookmark === true);
+      setSavedGigs(savedGigsOnly);
     } catch (error) {
       console.error('Error fetching saved gigs:', error);
       setSavedGigs([]);
@@ -62,20 +65,28 @@ const SavedGigs = ({ onSelectGig }: SavedGigsProps) => {
 
   const handleRemoveBookmark = async (e: React.MouseEvent, gig: Gig) => {
     e.stopPropagation();
+
     try {
       // The API might return job_posting field or use id
       const jobPostingId = gig.job_posting || gig.id;
+
+      // Use POST method (backend treats this as toggle operation)
       await api.post('/freelancer/saving-jobs/', { job_posting: jobPostingId });
-      
-      // Remove from local state
-      setSavedGigs(prevGigs => prevGigs.filter(g => g.id !== gig.id));
-      
-      // If the removed gig was selected, clear selection
-      if (selectedGigId === gig.id) {
+
+      // After successful API call, re-fetch all gigs and filter for saved ones
+      // This ensures we get the most up-to-date bookmark status from the backend
+      const response = await api.get('/freelancer/get-all-gigs/');
+      const allGigs = response.data || [];
+      const savedGigsOnly = allGigs.filter((g: Gig) => g.is_bookmark === true);
+      setSavedGigs(savedGigsOnly);
+
+      // If the removed gig was selected and is no longer in saved gigs, clear selection
+      const stillExists = savedGigsOnly.some(g => g.id === gig.id);
+      if (selectedGigId === gig.id && !stillExists) {
         setSelectedGigId(null);
         onSelectGig(null);
       }
-      
+
       toast.success('Job removed from saved');
     } catch (error) {
       console.error('Error removing bookmark:', error);

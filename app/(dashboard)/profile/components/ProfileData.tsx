@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { sanitizeFileName } from "@/lib/utils";
 
 // Use the exact same interface as in AuthContext
 interface FreelancerProfile {
@@ -696,7 +697,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                       </p>
                       {profileImageFile && (
                         <p className="text-sm text-green-600 mt-1">
-                          Selected: {profileImageFile.name}
+                          Selected: {sanitizeFileName(profileImageFile.name, 30)}
                         </p>
                       )}
                     </div>
@@ -731,7 +732,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                       </p>
                       {resumeFile && (
                         <p className="text-sm text-green-600 mt-1">
-                          Selected: {resumeFile.name}
+                          Selected: {sanitizeFileName(resumeFile.name, 30)}
                         </p>
                       )}
                     </div>
@@ -1114,7 +1115,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                     </p>
                     {profileImageFile && (
                       <p className="text-sm text-green-600 mt-1">
-                        Selected: {profileImageFile.name}
+                        Selected: {sanitizeFileName(profileImageFile.name, 30)}
                       </p>
                     )}
                   </div>
@@ -1160,7 +1161,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                     </p>
                     {resumeFile && (
                       <p className="text-sm text-green-600 mt-1">
-                        Selected: {resumeFile.name}
+                        Selected: {sanitizeFileName(resumeFile.name, 30)}
                       </p>
                     )}
                   </div>

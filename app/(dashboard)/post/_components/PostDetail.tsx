@@ -5,9 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FiUser } from 'react-icons/fi';
-import { MessageSquare, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { MessageSquare, MoreVertical, Trash2 } from 'lucide-react';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 import SharePopup from './SharePopup';
+import { SafeImage } from '@/components/ui/safe-image';
 import EmptyState from '@/components/ui/empty-state';
 import { CommentModal } from '@/components/ui/comment-modal';
 import { formatTimeAgo } from '@/lib/utils';
@@ -232,9 +233,6 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
         }
     }, [post.id, post.title, post.content, post.link, api, router]);
 
-    const handleEdit = useCallback(() => {
-        router.push(`/create-post?edit=${post.id}&clubId=${post.club}`);
-    }, [post.id, post.club, router]);
 
     return (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -324,10 +322,6 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                                     </button>
                                 </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
-                                <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
-                                    <Edit className="w-4 h-4 mr-2" />
-                                    Edit Post
-                                </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} className="cursor-pointer text-red-600 focus:text-red-600">
                                     <Trash2 className="w-4 h-4 mr-2" />
                                     Delete Post
@@ -384,7 +378,7 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                         <div className="space-y-4">
                             {post.images.map((image, index) => (
                                 <div key={image.id} className="relative w-full">
-                                    <Image
+                                    <SafeImage
                                         src={image.file}
                                         alt={`Post image ${index + 1}`}
                                         width={800}

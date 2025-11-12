@@ -103,31 +103,59 @@ const Posts = ({ clubId }: PostsProps) => {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await api.get(`/post/app/post-creation/?club_id=${clubId}`);
-                console.log('Club posts response:', response.data);
-                
+                // Fetch regular club posts
+                const regularPostsResponse = await api.get(`/post/app/post-creation/?club_id=${clubId}`);
+                console.log('Club posts response:', regularPostsResponse.data);
+
                 // Handle different response structures
-                const postsData = response.data.response || response.data.results || response.data || [];
-                
+                let regularPostsData = regularPostsResponse.data.response || regularPostsResponse.data.results || regularPostsResponse.data || [];
+
+                // Fetch all posts to get page posts that belong to this club
+                let pagePostsData: any[] = [];
+                try {
+                    const allPostsResponse = await api.get('/post/app/posts/');
+                    const allPostsData = allPostsResponse.data.results || allPostsResponse.data || [];
+
+                    // Filter page posts that belong to this club
+                    pagePostsData = allPostsData.filter((post: any) =>
+                        post.type === 'page_post' &&
+                        post.clubs_data &&
+                        Array.isArray(post.clubs_data) &&
+                        post.clubs_data.some((club: any) => club.id === clubId)
+                    );
+                } catch (error) {
+                    console.warn('Could not fetch page posts, proceeding with regular posts only:', error);
+                    pagePostsData = [];
+                }
+
+                // Combine regular posts and page posts
+                const combinedPostsData = [...regularPostsData, ...pagePostsData];
+
                 // Get liked posts from localStorage cache
                 const likedPostsCache = JSON.parse(localStorage.getItem('likedPosts') || '{}');
-                
-                const normalizedPosts = (Array.isArray(postsData) ? postsData : []).map((post: any) => {
+
+                const normalizedPosts = (Array.isArray(combinedPostsData) ? combinedPostsData : []).map((post: any) => {
                     let isLiked = post.is_liked ?? post.user_liked ?? post.liked;
-                    
+
                     // Fall back to localStorage cache if API doesn't provide it
                     if (isLiked === undefined && likedPostsCache[post.id] !== undefined) {
                         isLiked = likedPostsCache[post.id];
                     } else if (isLiked === undefined) {
                         isLiked = false;
                     }
-                    
+
                     return {
                         ...post,
                         is_liked: isLiked,
                         like_count: post.like_count ?? post.likes_count ?? 0
                     };
                 });
+
+                // Sort posts by creation date (newest first)
+                normalizedPosts.sort((a: any, b: any) =>
+                    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                );
+
                 setPosts(normalizedPosts);
             } catch (error) {
                 console.error('Error fetching posts:', error);
@@ -257,11 +285,12 @@ const Posts = ({ clubId }: PostsProps) => {
         <div className="p-4 space-y-4 h-[calc(100vh-18rem)] overflow-y-auto">
             {posts.length > 0 ? (
                 posts.map((post) => (
-                    <PostCard 
-                        key={post.id} 
-                        post={post} 
+                    <PostCard
+                        key={post.id}
+                        post={post}
                         onLike={handleLikePost}
                         onUpdateCommentCount={handleUpdateCommentCount}
+                        clubId={clubId}
                     />
                 ))
             ) : (
@@ -277,9 +306,10 @@ interface PostCardProps {
     post: Post;
     onLike: (postId: string) => void;
     onUpdateCommentCount?: (postId: string, newCount: number) => void;
+    clubId: string;
 }
 
-const PostCard = ({ post, onLike, onUpdateCommentCount }: PostCardProps) => {
+const PostCard = ({ post, onLike, onUpdateCommentCount, clubId }: PostCardProps) => {
     const [showComments, setShowComments] = useState(false);
     const [comments, setComments] = useState<Comment[]>([]);
     const [showSharePopup, setShowSharePopup] = useState(false);
@@ -431,8 +461,11 @@ const PostCard = ({ post, onLike, onUpdateCommentCount }: PostCardProps) => {
                     )}
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                    {post.club_name && (
-                        <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">{post.club_name}</span>
+                    {/* Show club badge for all posts in club view */}
+                    {(post.club_name || (post.type === 'page_post' && post.clubs_data && post.clubs_data.length > 0)) && (
+                        <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">
+                            {post.club_name || post.clubs_data.find((club: any) => club.id === clubId)?.name || 'Club Post'}
+                        </span>
                     )}
                     {post.link && (
                         <a
