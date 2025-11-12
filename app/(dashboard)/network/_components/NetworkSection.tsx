@@ -10,16 +10,16 @@ interface NetworkSectionProps {
 
 export function NetworkSection({ title, showAll, children }: NetworkSectionProps) {
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold">{title}</h2>
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
         {showAll && (
-          <button className="text-purple-600 text-sm hover:underline">
+          <button className="text-[#7052FF] text-xs font-medium hover:underline transition-colors">
             See All
           </button>
         )}
       </div>
-      <div className="space-y-6">
+      <div className="space-y-2">
         {children}
       </div>
     </div>
