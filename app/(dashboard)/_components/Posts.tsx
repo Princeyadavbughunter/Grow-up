@@ -6,6 +6,7 @@ import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FiUser } from "react-icons/fi";
+import { SafeImage } from "@/components/ui/safe-image";
 import {
   MessageSquare,
   FileText,
@@ -710,7 +711,7 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
             }
             className="block"
           >
-            <Image
+            <SafeImage
               src={post.images[0].file}
               alt="Post"
               width={800}

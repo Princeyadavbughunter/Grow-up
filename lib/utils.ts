@@ -9,12 +9,12 @@ export function formatTimeAgo(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
   const diffInMilliseconds = now.getTime() - date.getTime();
-  
+
   // Handle negative differences (future dates or clock skew) and very recent comments
   if (diffInMilliseconds < 0 || diffInMilliseconds < 60000) { // Less than 1 minute
     return 'Just now';
   }
-  
+
   const diffInMinutes = Math.floor(diffInMilliseconds / (1000 * 60));
   const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
   const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
@@ -37,4 +37,44 @@ export function formatTimeAgo(dateString: string): string {
     const years = Math.floor(diffInDays / 365);
     return `${years} year${years > 1 ? 's' : ''} ago`;
   }
+}
+
+/**
+ * Sanitizes file names for safe display in the UI
+ * Prevents XSS attacks by escaping HTML characters and limiting length
+ */
+export function sanitizeFileName(fileName: string, maxLength: number = 50): string {
+  if (!fileName) return '';
+
+  // Escape HTML characters to prevent XSS
+  const escaped = fileName
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+
+  // Limit length and add ellipsis if needed
+  if (escaped.length <= maxLength) {
+    return escaped;
+  }
+
+  // Find a good break point (preferably at a space or common separator)
+  const truncated = escaped.substring(0, maxLength - 3);
+  const lastSpaceIndex = truncated.lastIndexOf(' ');
+  const lastDotIndex = truncated.lastIndexOf('.');
+
+  // Break at space if available and not too far back
+  if (lastSpaceIndex > maxLength * 0.7) {
+    return truncated.substring(0, lastSpaceIndex) + '...';
+  }
+
+  // Otherwise break at file extension boundary if reasonable
+  if (lastDotIndex > maxLength * 0.5 && lastDotIndex < maxLength - 10) {
+    return truncated.substring(0, lastDotIndex) + '...';
+  }
+
+  // Default truncation
+  return truncated + '...';
 }

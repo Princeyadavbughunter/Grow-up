@@ -8,6 +8,7 @@ import { FiUser } from 'react-icons/fi';
 import { MessageSquare, MoreVertical, Trash2 } from 'lucide-react';
 import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 import SharePopup from './SharePopup';
+import { SafeImage } from '@/components/ui/safe-image';
 import EmptyState from '@/components/ui/empty-state';
 import { CommentModal } from '@/components/ui/comment-modal';
 import { formatTimeAgo } from '@/lib/utils';
@@ -377,7 +378,7 @@ const PostDetail = memo(({ post, onLike }: PostDetailProps) => {
                         <div className="space-y-4">
                             {post.images.map((image, index) => (
                                 <div key={image.id} className="relative w-full">
-                                    <Image
+                                    <SafeImage
                                         src={image.file}
                                         alt={`Post image ${index + 1}`}
                                         width={800}

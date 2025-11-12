@@ -6,6 +6,9 @@ import { useRouter, useParams } from "next/navigation";
 import { FaBackward, FaImage, FaLink, FaPoll } from "react-icons/fa";
 import { IoArrowBack } from 'react-icons/io5';
 import { Page } from '@/types';
+import { validateMultipleImages, checkImageProcessingSupport, DEFAULT_POST_IMAGE_OPTIONS } from '@/lib/image-validation';
+import { toast } from 'sonner';
+import { sanitizeFileName } from '@/lib/utils';
 
 interface PostResponse {
     id: string;
@@ -61,6 +64,8 @@ const CreatePost = (): JSX.Element => {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [editPostId, setEditPostId] = useState<string>('');
     const [existingImages, setExistingImages] = useState<any[]>([]);
+    const [imageValidationErrors, setImageValidationErrors] = useState<string[]>([]);
+    const [isValidatingImages, setIsValidatingImages] = useState<boolean>(false);
 
 
     useEffect(() => {
@@ -140,10 +145,44 @@ const CreatePost = (): JSX.Element => {
         }
     }, [authToken]);
 
-    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const files = Array.from(e.target.files);
-            setImages(files);
+
+            // Check browser support
+            if (!checkImageProcessingSupport()) {
+                toast.error('Your browser does not support image processing features. Please update your browser.');
+                return;
+            }
+
+            // Clear previous errors
+            setImageValidationErrors([]);
+            setIsValidatingImages(true);
+
+            try {
+                const { validFiles, errors } = await validateMultipleImages(files, DEFAULT_POST_IMAGE_OPTIONS);
+
+                if (errors.length > 0) {
+                    setImageValidationErrors(errors);
+                    // Show first error as toast
+                    toast.error(errors[0]);
+                }
+
+                if (validFiles.length > 0) {
+                    setImages(validFiles);
+                    toast.success(`${validFiles.length} image${validFiles.length > 1 ? 's' : ''} processed successfully`);
+                } else {
+                    // Clear the input if no valid files
+                    e.target.value = '';
+                }
+            } catch (error) {
+                console.error('Image validation error:', error);
+                toast.error('Failed to process images. Please try again.');
+                // Clear the input on error
+                e.target.value = '';
+            } finally {
+                setIsValidatingImages(false);
+            }
         }
     };
 
@@ -319,17 +358,34 @@ const CreatePost = (): JSX.Element => {
                 </div>
 
                 <div className="flex flex-col gap-6">
-                    <label className="flex items-center gap-2 text-gray-500 hover:text-purple-500 cursor-pointer">
+                    <label className={`flex items-center gap-2 cursor-pointer ${
+                        isValidatingImages
+                            ? 'text-gray-400 cursor-not-allowed'
+                            : 'text-gray-500 hover:text-purple-500'
+                    }`}>
                         <FaImage size={20} />
-                        <span>Add Image</span>
+                        <span>{isValidatingImages ? 'Processing Images...' : 'Add Image'}</span>
                         <input
                             type="file"
-                            accept="image/*"
+                            accept="image/jpeg,image/png,image/gif,image/webp"
                             multiple
                             className="hidden"
                             onChange={handleImageChange}
+                            disabled={isValidatingImages}
                         />
                     </label>
+
+                    {/* Validation Errors */}
+                    {imageValidationErrors.length > 0 && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-sm font-medium text-red-800 mb-2">Image Validation Errors:</p>
+                            <ul className="text-sm text-red-700 space-y-1">
+                                {imageValidationErrors.map((error, index) => (
+                                    <li key={index}>• {error}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     {/* Show existing images in edit mode */}
                     {isEditMode && existingImages.length > 0 && (
@@ -349,17 +405,37 @@ const CreatePost = (): JSX.Element => {
                         </div>
                     )}
 
+                    {isValidatingImages && (
+                        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div className="flex items-center space-x-2">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                <p className="text-sm text-blue-800">Processing and validating images...</p>
+                            </div>
+                        </div>
+                    )}
+
                     {images.length > 0 && (
-                        <div className="flex gap-2 flex-wrap">
-                            {images.map((file, index) => (
-                                <div key={index} className="relative">
-                                    <img
-                                        src={URL.createObjectURL(file)}
-                                        alt={`Preview ${index}`}
-                                        className="w-20 h-20 object-cover rounded"
-                                    />
-                                </div>
-                            ))}
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-600 mb-2">
+                                Selected Images ({images.length}):
+                                <span className="text-xs text-green-600 ml-1">✓ Validated and sanitized</span>
+                            </p>
+                            <div className="flex gap-2 flex-wrap">
+                                {images.map((file, index) => (
+                                    <div key={index} className="relative group">
+                                        <img
+                                            src={URL.createObjectURL(file)}
+                                            alt={`Preview ${index}`}
+                                            className="w-20 h-20 object-cover rounded border-2 border-green-200"
+                                        />
+                                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity rounded flex items-center justify-center">
+                                            <span className="text-white text-xs opacity-0 group-hover:opacity-100">
+                                                {sanitizeFileName(file.name, 12)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
 
@@ -378,10 +454,12 @@ const CreatePost = (): JSX.Element => {
 
                 <button
                     type="submit"
-                    disabled={isSubmitting || !title || (!isEditMode && postingType === 'page' && !selectedPage)}
+                    disabled={isSubmitting || isValidatingImages || !title || (!isEditMode && postingType === 'page' && !selectedPage)}
                     className="w-full bg-purple-500 text-white font-bold py-2 rounded-lg hover:bg-purple-600 disabled:bg-purple-300 disabled:cursor-not-allowed"
                 >
-                    {isSubmitting ? (isEditMode ? 'Updating...' : 'Posting...') : (isEditMode ? 'Update Post' : 'Post')}
+                    {isSubmitting ? (isEditMode ? 'Updating...' : 'Posting...') :
+                     isValidatingImages ? 'Processing Images...' :
+                     (isEditMode ? 'Update Post' : 'Post')}
                 </button>
             </form>
         </div>
