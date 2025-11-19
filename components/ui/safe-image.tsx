@@ -86,19 +86,38 @@ export const SafeImage: React.FC<SafeImageProps> = ({
 
   // If image is not safe or has error, show a placeholder
   if (!isSafe || imageError) {
+    // The placeholder should stay within the container size and style
     return (
       <div
-        className={`bg-gray-200 flex items-center justify-center text-gray-500 text-sm ${className}`}
-        style={{ width, height }}
+        className={`bg-gray-200 flex items-center justify-center text-gray-500 text-sm overflow-hidden ${className}`}
+        style={{ width: width, height: height, maxWidth: '100%', maxHeight: '100%' }}
         onClick={handleClick}
       >
-        {imageError ? 'Image failed to load' : 'Image not available'}
+        <span
+          style={{
+            textAlign: 'center',
+            wordBreak: 'break-word',
+            width: '100%',
+            fontSize: '14px'
+          }}
+        >
+          {imageError ? 'Image failed to load' : 'Image not available'}
+        </span>
       </div>
     );
   }
 
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      style={{
+        width: width,
+        height: height,
+        maxWidth: '100%',
+        maxHeight: '100%',
+        overflow: 'hidden'
+      }}
+    >
       <Image
         src={safeSrc}
         alt={alt}
@@ -110,7 +129,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
         blurDataURL={blurDataURL}
         onError={handleImageError}
         onClick={handleClick}
-        style={{ cursor: isSafe ? 'pointer' : 'not-allowed' }}
+        style={{ cursor: isSafe ? 'pointer' : 'not-allowed', width: '100%', height: '100%', objectFit: 'cover' }}
       />
       {/* Overlay to prevent right-click access to potentially dangerous images */}
       {!isSafe && (

@@ -650,9 +650,13 @@ const ChatInterface: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 {chatroomNote && (
-                  <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-md border border-yellow-200">
+                  <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-md border border-yellow-200 max-w-[100px]">
                     <FileText className="h-3 w-3 text-yellow-600" />
-                    <span className="text-xs text-yellow-700 truncate max-w-32">{chatroomNote}</span>
+                    <span className="text-xs text-yellow-700 truncate max-w-[100px]" title={chatroomNote}>
+                      {chatroomNote.length > 40
+                        ? `${chatroomNote.slice(0, 37)}...`
+                        : chatroomNote}
+                    </span>
                     {chatroomNotes.length > 1 && (
                       <span className="text-xs text-yellow-600 ml-1">
                         ({chatroomNotes.length})
