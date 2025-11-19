@@ -6,6 +6,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
+import { MessageCircle, Clock } from 'lucide-react';
 
 interface Comment {
   id: string;
@@ -35,80 +36,123 @@ export function EventComments({ comments, onAddReply, onUserClick }: EventCommen
   const [replyText, setReplyText] = useState<string>('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
-  const renderComments = (comments: Comment[]) => (
-    <div className="space-y-1 sm:space-y-2 ml-2 pl-2 border-l border-gray-200">
-      {comments.map((comment) => (
-        <div key={comment.id} className="group bg-white border border-gray-100 rounded-lg p-1 sm:p-2 hover:shadow-sm transition-all duration-200 hover:border-purple-200">
-          <div className="flex items-start gap-2">
-            <Avatar 
-              className="h-6 w-6 sm:h-8 sm:w-8 ring-1 ring-purple-50 cursor-pointer hover:ring-purple-200 transition-all duration-200"
-              onClick={() => onUserClick(comment.user_freelancer_profile.freelancer_id)}
-            >
-              <AvatarImage src={comment.user_profile_picture} alt={comment.user_name} />
-              <AvatarFallback className="bg-purple-100 text-purple-700 text-xs sm:text-sm font-medium">
-                {comment.user_name[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-1 sm:mb-1">
-                <span 
-                  className="font-semibold text-sm sm:text-base text-gray-900 truncate cursor-pointer hover:text-purple-600 transition-colors duration-200"
-                  onClick={() => onUserClick(comment.user_freelancer_profile.freelancer_id)}
-                >
-                  {comment.user_name}
-                </span>
-                <span className="text-xs text-gray-500 flex-shrink-0 ml-1">
-                  {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                </span>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-1 sm:p-2 group-hover:bg-purple-50 transition-colors duration-200">
-                <p className="text-sm sm:text-base text-gray-700 leading-relaxed break-words">
-                  {comment.comment_text}
-                </p>
+  // Flatten the comment tree with depth tracking
+  const flattenComments = (comments: Comment[], depth: number = 0): Array<Comment & { depth: number }> => {
+    return comments.flatMap(comment => [
+      { ...comment, depth },
+      ...(comment.replies ? flattenComments(comment.replies, depth + 1) : [])
+    ]);
+  };
+
+  const flattened = flattenComments(comments);
+
+  return (
+    <div className="space-y-2 h-[calc(100vh-25rem)] overflow-y-auto overflow-x-hidden pr-2">
+      {flattened.map((comment) => {
+        // Cap the visual indentation at 5 levels
+        const visualDepth = Math.min(comment.depth, 5);
+        const paddingLeft = visualDepth * 12; // 12px per level, max 60px
+        const isReply = comment.depth > 0;
+        
+        return (
+          <div 
+            key={comment.id} 
+            className="relative"
+            style={{ paddingLeft: `${paddingLeft}px` }}
+          >
+            <div className={`group bg-white rounded-xl hover:shadow-lg transition-all duration-300 border-2 ${
+              isReply ? 'border-gray-100' : 'border-gray-200'
+            } hover:border-purple-200`}>
+              <div className="p-3 sm:p-4">
+                <div className="flex items-start gap-3">
+                  <Avatar 
+                    className="h-8 w-8 sm:h-10 sm:w-10 ring-2 ring-gray-100 group-hover:ring-purple-200 shadow-sm cursor-pointer transition-all duration-200 flex-shrink-0"
+                    onClick={() => onUserClick(comment.user_freelancer_profile.freelancer_id)}
+                  >
+                    <AvatarImage src={comment.user_profile_picture} alt={comment.user_name} />
+                    <AvatarFallback className="bg-gradient-to-br from-purple-400 to-purple-600 text-white text-xs sm:text-sm font-semibold">
+                      {comment.user_name[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <span 
+                        className="font-semibold text-sm sm:text-base text-gray-900 cursor-pointer hover:text-purple-600 transition-colors duration-200"
+                        onClick={() => onUserClick(comment.user_freelancer_profile.freelancer_id)}
+                      >
+                        {comment.user_name}
+                      </span>
+                      
+                      <span className="text-xs text-gray-500 flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                      </span>
+                    </div>
+                    
+                    <div className="bg-gray-50 rounded-lg p-3 group-hover:bg-purple-50/50 transition-all duration-300">
+                      <p className="text-sm sm:text-base text-gray-800 leading-relaxed break-words">
+                        {comment.comment_text}
+                      </p>
+                    </div>
+                    
+                    <div className="mt-3 flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                        className="text-xs h-8 px-3 hover:bg-purple-50 hover:text-purple-600 transition-colors rounded-full"
+                      >
+                        <MessageCircle className="w-3 h-3 mr-1" />
+                        {replyingTo === comment.id ? 'Cancel' : 'Reply'}
+                      </Button>
+                      
+                      {/* Show reply count if has replies */}
+                      {comment.replies && comment.replies.length > 0 && (
+                        <span className="text-xs text-gray-500 flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full">
+                          {comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {replyingTo === comment.id && (
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (replyText.trim()) {
+                            onAddReply(comment.id, replyText);
+                            setReplyText('');
+                            setReplyingTo(null);
+                          }
+                        }}
+                        className="flex gap-2 mt-3 p-3 bg-purple-50/50 rounded-lg border-2 border-purple-100"
+                      >
+                        <Input
+                          type="text"
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          placeholder={`Reply to ${comment.user_name}...`}
+                          className="flex-1 h-9 text-sm bg-white border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+                          autoFocus
+                        />
+                        <Button 
+                          type="submit" 
+                          size="sm" 
+                          className="h-9 px-4 text-sm bg-purple-600 hover:bg-purple-700 rounded-lg"
+                          disabled={!replyText.trim()}
+                        >
+                          Post
+                        </Button>
+                      </form>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div className="mt-1 flex gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setReplyingTo(comment.id)}
-            >
-              Reply
-            </Button>
-            {replyingTo === comment.id && (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (replyText.trim()) {
-                    onAddReply(comment.id, replyText);
-                    setReplyText('');
-                    setReplyingTo(null);
-                  }
-                }}
-                className="flex gap-1 w-full"
-              >
-                <Input
-                  type="text"
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  placeholder="Write a reply..."
-                  className="flex-1 p-1"
-                />
-                <Button type="submit" size="sm">Post Reply</Button>
-              </form>
-            )}
-          </div>
-          {comment.replies && comment.replies.length > 0 && renderComments(comment.replies)}
-        </div>
-      ))}
+        );
+      })}
       <div className="h-16"></div>
-    </div>
-  );
-
-  return (
-    <div className="space-y-2 sm:space-y-3 h-[calc(100vh-25rem)] overflow-y-auto overflow-x-hidden">
-      {renderComments(comments)}
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import _ from "lodash";
 import { useRouter } from "next/navigation";
+import Link from "next/link"; // Added for client-side navigation
 
 interface Participant {
   user_id: string;
@@ -141,19 +142,26 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
         {participants.length > 0 ? (
           <div className="space-y-2">
             {participants.map((participant) => (
-              <NetworkCard
+              // Make entire NetworkCard wrapped in a Link for accessibility & proper click
+              <Link
+                href={`/profile/${participant.freelancer_id}`}
                 key={participant.user_id}
-                id={participant.freelancer_id}
-                name={participant.first_name && participant.last_name 
-                  ? `${participant.first_name} ${participant.last_name}` 
-                  : participant.username || "User"}
-                title={participant.position || "Member"}
-                location={participant.city && participant.state ? `${participant.city}, ${participant.state}` : ""}
-                imageUrl={participant.profile_picture || ""}
-                isOnline={false}
-                summary={participant.bio || ""}
-                showFollow={true}
-              />
+                className="block"
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <NetworkCard
+                  id={participant.freelancer_id}
+                  name={participant.first_name && participant.last_name 
+                    ? `${participant.first_name} ${participant.last_name}` 
+                    : participant.username || "User"}
+                  title={participant.position || "Member"}
+                  location={participant.city && participant.state ? `${participant.city}, ${participant.state}` : ""}
+                  imageUrl={participant.profile_picture || ""}
+                  isOnline={false}
+                  summary={participant.bio || ""}
+                  showFollow={true}
+                />
+              </Link>
             ))}
           </div>
         ) : !isLoading && (
@@ -184,6 +192,7 @@ export function NetworkSection({ title, children, clubId }: NetworkSectionProps)
   );
 }
 
+// The NetworkCard is no longer responsible for handling navigation/click
 export function NetworkCard({ 
   id, 
   name = "User",
@@ -201,7 +210,7 @@ export function NetworkCard({
   onFollow
 }: NetworkCardProps) {
   const nameInitial = name && name.length > 0 ? name.charAt(0) : "U";
-  const router = useRouter();
+  // router logic removed, handled by Link above
 
   // Truncate summary to 100 characters
   const truncatedSummary = summary && summary.length > 100
@@ -209,7 +218,7 @@ export function NetworkCard({
     : summary;
   
   return (
-    <div onClick={() => router.push(`/profile/${id}`)} className="flex cursor-pointer items-center gap-2 lg:gap-3 p-2 lg:p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:shadow-sm transition-all">
+    <div className="flex cursor-pointer items-center gap-2 lg:gap-3 p-2 lg:p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:shadow-sm transition-all">
       <div className="relative flex-shrink-0">
         <Avatar className="h-8 w-8 lg:h-12 lg:w-12">
           <AvatarImage src={imageUrl} />

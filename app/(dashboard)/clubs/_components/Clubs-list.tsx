@@ -22,7 +22,14 @@ interface ClubsListProps {
 }
 
 const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
-    const [activeTab, setActiveTab] = useState("all");
+    // Initialize activeTab from localStorage to persist across renders
+    const [activeTab, setActiveTab] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('clubsActiveTab') || 'all';
+        }
+        return 'all';
+    });
+    
     const [allClubs, setAllClubs] = useState<Club[]>([]);
     const [myClubs, setMyClubs] = useState<Club[]>([]);
     const [loading, setLoading] = useState(false);
@@ -52,13 +59,21 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
         } finally {
             setLoading(false);
         }
-    }, [authToken, selectedClubId]);
+    }, [authToken, api]);
 
     useEffect(() => {
         if (authToken) {    
             fetchClubs();
         }
-    }, [authToken]);
+    }, [authToken]); // Removed fetchClubs from dependencies
+
+    // Handler to change tab and persist to localStorage
+    const handleTabChange = (tab: string) => {
+        setActiveTab(tab);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('clubsActiveTab', tab);
+        }
+    };
 
     const handleJoinToggle = async (clubId: string, isCurrentlyJoined: boolean) => {
         if (!api) return;
@@ -70,8 +85,10 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
                 await api.post(`/freelancer/join-club/?id=${clubId}`);
             }
             await fetchClubs();
+            
+            // Only switch to "my" tab and navigate when joining a new club
             if (!isCurrentlyJoined) {
-                setActiveTab("my");
+                handleTabChange("my");
                 router.push(`/clubs/${clubId}`);
             }
         } catch (error) {
@@ -81,6 +98,7 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
     };
 
     const handleClubSelect = (clubId: string) => {
+        // Just navigate, don't change the active tab
         router.push(`/clubs/${clubId}`);
     };
 
@@ -118,7 +136,7 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
             <div className="px-4 pt-4 pb-2 border-b border-gray-200 sticky top-0 z-10">
                 <div className="flex items-center gap-4 md:gap-6">
                     <button
-                        onClick={() => setActiveTab("all")}
+                        onClick={() => handleTabChange("all")}
                         className={`py-2 px-3 md:px-4 text-sm md:text-base font-medium transition-all rounded-t-lg whitespace-nowrap flex-shrink-0 ${
                             activeTab === "all" 
                                 ? "text-purple-600 border-b-2 border-purple-600 bg-purple-50/50" 
@@ -128,7 +146,7 @@ const ClubsList = ({ selectedClubId, setSelectedClubId }: ClubsListProps) => {
                         All Clubs ({allClubs.length})
                     </button>
                     <button
-                        onClick={() => setActiveTab("my")}
+                        onClick={() => handleTabChange("my")}
                         className={`py-2 px-3 md:px-4 text-sm md:text-base font-medium transition-all rounded-t-lg whitespace-nowrap flex-shrink-0 ${
                             activeTab === "my" 
                                 ? "text-purple-600 border-b-2 border-purple-600 bg-purple-50/50" 
@@ -223,7 +241,17 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
             {club.description && (
                 <div className="text-[11px] md:text-xs text-gray-700 mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-100">
                     <p className={`leading-relaxed ${showFullDescription ? 'whitespace-normal' : 'truncate'}`}>
-                        {showFullDescription ? club.description : truncatedDescription}
+                        {showFullDescription 
+                            ? (() => {
+                                // Show first 35 words only when expanded
+                                const words = club.description.split(' ');
+                                if (words.length > 35) {
+                                    return words.slice(0, 35).join(' ') + '...';
+                                }
+                                return club.description;
+                            })()
+                            : club.description
+                        }
                         {club.description.length > 60 && (
                             <button
                                 className="text-purple-600 ml-1 hover:text-purple-800 font-medium"
