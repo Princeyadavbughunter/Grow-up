@@ -241,7 +241,17 @@ const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCa
             {club.description && (
                 <div className="text-[11px] md:text-xs text-gray-700 mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-100">
                     <p className={`leading-relaxed ${showFullDescription ? 'whitespace-normal' : 'truncate'}`}>
-                        {showFullDescription ? club.description : truncatedDescription}
+                        {showFullDescription 
+                            ? (() => {
+                                // Show first 35 words only when expanded
+                                const words = club.description.split(' ');
+                                if (words.length > 35) {
+                                    return words.slice(0, 35).join(' ') + '...';
+                                }
+                                return club.description;
+                            })()
+                            : club.description
+                        }
                         {club.description.length > 60 && (
                             <button
                                 className="text-purple-600 ml-1 hover:text-purple-800 font-medium"

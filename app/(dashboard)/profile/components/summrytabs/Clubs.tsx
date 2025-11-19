@@ -35,7 +35,17 @@ const ClubCard = ({ club, onJoin, isMobile }: ClubCardProps) => {
                 <p className="text-xs text-gray-500">{club.participants_count} members</p>
                 <div className="text-xs text-gray-400">
                     <p className={`${isExpanded ? '' : `${isMobile ? 'line-clamp-2 overflow-hidden' : 'truncate'}`}`}>
-                        {club.description}
+                        {isExpanded 
+                            ? (() => {
+                                // Show first 35 words only when expanded
+                                const words = club.description.split(' ');
+                                if (words.length > 35) {
+                                    return words.slice(0, 35).join(' ') + '...';
+                                }
+                                return club.description;
+                            })()
+                            : club.description
+                        }
                     </p>
                     {club.description.length > (isMobile ? 40 : 60) && (
                         <button
