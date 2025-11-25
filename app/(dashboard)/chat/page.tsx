@@ -71,6 +71,19 @@ interface Note {
   updated_at: string;
 }
 
+const MAX_USERNAME_LENGTH = 18 ;
+
+const formatUserName = (name?: string | null, maxLength = MAX_USERNAME_LENGTH): string => {
+  if (!name || typeof name !== 'string') {
+    return 'Unknown User';
+  }
+  if (name.length <= maxLength) {
+    return name;
+  }
+  const visibleChars = Math.max(0, maxLength - 3);
+  return `${name.slice(0, visibleChars)}...`;
+};
+
 const ChatInterface: React.FC = () => {
   const [searchInput, setSearchInput] = useState<string>('');
   const [messageInput, setMessageInput] = useState<string>('');
@@ -532,7 +545,7 @@ const ChatInterface: React.FC = () => {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-sm md:text-base truncate">{chatroom.chatting_with_current_user.name}</h3>
+                      <h3 className="font-medium text-sm md:text-base truncate">{formatUserName(chatroom.chatting_with_current_user?.name)}</h3>
                       <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                     </div>
                     <div className="text-xs text-gray-400 flex-shrink-0">
@@ -576,7 +589,7 @@ const ChatInterface: React.FC = () => {
                       className="flex-1 min-w-0 cursor-pointer hover:text-blue-600"
                       onClick={() => window.location.href = `/profile/${chatroom.chatting_with_current_user.id}`}
                     >
-                      <h3 className="font-medium text-sm md:text-base truncate">{chatroom.chatting_with_current_user.name}</h3>
+                      <h3 className="font-medium text-sm md:text-base truncate">{formatUserName(chatroom.chatting_with_current_user?.name)}</h3>
                       <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                       <div className="text-xs text-gray-400 flex items-center">
                         <Clock className="h-3 w-3 mr-1" />
@@ -640,7 +653,7 @@ const ChatInterface: React.FC = () => {
                 </div>
               )}
               <div className="min-w-0 flex-1">
-                <h2 className="font-medium text-sm md:text-base truncate">{selectedChatroom.chatting_with_current_user.name}</h2>
+                <h2 className="font-medium text-sm md:text-base truncate">{formatUserName(selectedChatroom.chatting_with_current_user?.name)}</h2>
                 <p className="text-xs md:text-sm text-gray-500 flex items-center">
                   {wsConnected ? 
                     <span className="text-green-500 flex items-center"><span className="h-2 w-2 bg-green-500 rounded-full mr-1"></span>Online</span> : 

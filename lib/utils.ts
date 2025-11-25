@@ -78,3 +78,110 @@ export function sanitizeFileName(fileName: string, maxLength: number = 50): stri
   // Default truncation
   return truncated + '...';
 }
+
+// Rate limiting utilities for comments
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
+}
+
+interface RateLimitConfig {
+  maxRequests: number;
+  windowMs: number; // Time window in milliseconds
+}
+
+class RateLimiter {
+  private limits: Map<string, RateLimitEntry> = new Map();
+  private config: RateLimitConfig;
+
+  constructor(config: RateLimitConfig) {
+    this.config = config;
+  }
+
+  isRateLimited(key: string): boolean {
+    const now = Date.now();
+    const entry = this.limits.get(key);
+
+    if (!entry) {
+      // First request
+      this.limits.set(key, { count: 1, resetTime: now + this.config.windowMs });
+      return false;
+    }
+
+    if (now > entry.resetTime) {
+      // Reset window
+      this.limits.set(key, { count: 1, resetTime: now + this.config.windowMs });
+      return false;
+    }
+
+    if (entry.count >= this.config.maxRequests) {
+      return true;
+    }
+
+    // Increment counter
+    entry.count += 1;
+    this.limits.set(key, entry);
+    return false;
+  }
+
+  getRemainingTime(key: string): number {
+    const entry = this.limits.get(key);
+    if (!entry) return 0;
+
+    const now = Date.now();
+    return Math.max(0, entry.resetTime - now);
+  }
+
+  getRemainingRequests(key: string): number {
+    const entry = this.limits.get(key);
+    if (!entry) return this.config.maxRequests;
+
+    const now = Date.now();
+    if (now > entry.resetTime) return this.config.maxRequests;
+
+    return Math.max(0, this.config.maxRequests - entry.count);
+  }
+}
+
+// Comment rate limiter - 5 comments per minute per user
+export const commentRateLimiter = new RateLimiter({
+  maxRequests: 5,
+  windowMs: 60 * 1000, // 1 minute
+});
+
+// Reply rate limiter - 10 replies per minute per user
+export const replyRateLimiter = new RateLimiter({
+  maxRequests: 10,
+  windowMs: 60 * 1000, // 1 minute
+});
+
+export function checkCommentRateLimit(userId: string): { allowed: boolean; remainingTime?: number; remainingRequests?: number } {
+  const key = `comment_${userId}`;
+  const isLimited = commentRateLimiter.isRateLimited(key);
+
+  return {
+    allowed: !isLimited,
+    remainingTime: isLimited ? commentRateLimiter.getRemainingTime(key) : undefined,
+    remainingRequests: commentRateLimiter.getRemainingRequests(key)
+  };
+}
+
+export function checkReplyRateLimit(userId: string): { allowed: boolean; remainingTime?: number; remainingRequests?: number } {
+  const key = `reply_${userId}`;
+  const isLimited = replyRateLimiter.isRateLimited(key);
+
+  return {
+    allowed: !isLimited,
+    remainingTime: isLimited ? replyRateLimiter.getRemainingTime(key) : undefined,
+    remainingRequests: replyRateLimiter.getRemainingRequests(key)
+  };
+}
+
+export function formatRateLimitMessage(remainingTime: number): string {
+  const seconds = Math.ceil(remainingTime / 1000);
+  if (seconds < 60) {
+    return `Too many comments. Please wait ${seconds} second${seconds !== 1 ? 's' : ''} before trying again.`;
+  }
+  const minutes = Math.ceil(seconds / 60);
+  return `Too many comments. Please wait ${minutes} minute${minutes !== 1 ? 's' : ''} before trying again.`;
+}

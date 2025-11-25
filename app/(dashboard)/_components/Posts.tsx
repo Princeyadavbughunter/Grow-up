@@ -19,7 +19,7 @@ import {UploadIcon} from "@/components/ui/upload";
 import SharePopup from "../post/_components/SharePopup";
 import EmptyState from "@/components/ui/empty-state";
 import { CommentModal } from "@/components/ui/comment-modal";
-import { formatTimeAgo } from "@/lib/utils";
+import { formatTimeAgo, checkCommentRateLimit, checkReplyRateLimit, formatRateLimitMessage } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -483,6 +483,16 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
   const handleAddComment = async (content: string) => {
     if (!content.trim()) return;
 
+    // Check rate limit
+    if (currentUserId) {
+      const rateLimitCheck = checkCommentRateLimit(currentUserId);
+      if (!rateLimitCheck.allowed) {
+        const message = formatRateLimitMessage(rateLimitCheck.remainingTime!);
+        toast.error(message);
+        return;
+      }
+    }
+
     setIsSubmittingComment(true);
     try {
       // Check if this is a page post
@@ -499,8 +509,10 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
 
       setShowCommentModal(false);
       fetchComments();
+      toast.success("Comment added successfully");
     } catch (error) {
       console.error("Error adding comment:", error);
+      toast.error("Failed to add comment");
     } finally {
       setIsSubmittingComment(false);
     }
@@ -756,7 +768,7 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
           <div className="space-y-4 mb-4">
             {comments.length > 0 ? (
               comments.map((comment) => (
-                <CommentItem key={comment.id} comment={comment} api={api} />
+                <CommentItem key={comment.id} comment={comment} api={api} currentUserId={currentUserId} />
               ))
             ) : (
               <EmptyState
@@ -802,9 +814,10 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
 interface CommentItemProps {
   comment: Comment;
   api: any;
+  currentUserId: string | null;
 }
 
-const CommentItem = ({ comment, api }: CommentItemProps) => {
+const CommentItem = ({ comment, api, currentUserId }: CommentItemProps) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replies, setReplies] = useState<CommentReply[]>([]);
   const [showReplies, setShowReplies] = useState(false);
@@ -833,6 +846,16 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
   const handleAddReply = async (content: string) => {
     if (!content.trim()) return;
 
+    // Check rate limit
+    if (currentUserId) {
+      const rateLimitCheck = checkReplyRateLimit(currentUserId);
+      if (!rateLimitCheck.allowed) {
+        const message = formatRateLimitMessage(rateLimitCheck.remainingTime!);
+        toast.error(message);
+        return;
+      }
+    }
+
     setIsSubmittingReply(true);
     try {
       await api.post("/post/app/comments-replies/", {
@@ -845,8 +868,10 @@ const CommentItem = ({ comment, api }: CommentItemProps) => {
       fetchReplies();
       setShowReplies(true);
       setShowReplyForm(false);
+      toast.success("Reply added successfully");
     } catch (error) {
       console.error("Error adding reply:", error);
+      toast.error("Failed to add reply");
     } finally {
       setIsSubmittingReply(false);
     }

@@ -1,7 +1,10 @@
 // @ts-nocheck
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Building2, MapPin, Clock, Badge } from 'lucide-react'
+import { Building2, MapPin, Clock, Badge, Share2, ExternalLink } from 'lucide-react'
+import ShareGigPopup from './ShareGigPopup'
 
 interface DescriptionProps {
     selectedGig: Gig | null;
@@ -9,6 +12,9 @@ interface DescriptionProps {
 }
 
 const Description = ({ selectedGig, showSmaller }: DescriptionProps) => {
+    const router = useRouter();
+    const [showSharePopup, setShowSharePopup] = useState(false);
+
     if (!selectedGig) {
         return (
             <div className={`w-full ${showSmaller ? 'h-[calc(100vh-19rem)]' : 'h-[calc(100vh-12rem)]'} p-2 sm:p-4`}>
@@ -21,9 +27,20 @@ const Description = ({ selectedGig, showSmaller }: DescriptionProps) => {
 
     return (
         <div className={`w-full ${showSmaller ? 'h-[calc(100vh-19rem)]' : 'h-[calc(100vh-12rem)]'} overflow-y-scroll rounded-xl p-2 sm:p-4`}>
-            <Card className="h-full border-none p-2 sm:p-4 rounded-xl flex flex-col">
+            <Card className="h-full border-none p-2 sm:p-4 rounded-xl flex flex-col cursor-pointer"     onClick={() => router.push(`/gigs/${selectedGig.id}`)} >
                 <CardHeader className="sticky top-0 z-10 bg-white pb-4">
-                    <CardTitle>{selectedGig.job_title}</CardTitle>
+                    <div className="flex justify-between items-start">
+                        <CardTitle>{selectedGig.job_title}</CardTitle>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowSharePopup(true)}
+                            className="flex items-center gap-2"
+                        >
+                            <Share2 className="h-4 w-4" />
+                            Share
+                        </Button>
+                    </div>
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mt-2">
                         <div className="flex items-center">
                             <Building2 className="h-4 w-4 mr-1" />
@@ -81,6 +98,14 @@ const Description = ({ selectedGig, showSmaller }: DescriptionProps) => {
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Share Popup */}
+            <ShareGigPopup
+                isOpen={showSharePopup}
+                onClose={() => setShowSharePopup(false)}
+                gigId={selectedGig.id}
+                gigTitle={selectedGig.job_title}
+            />
         </div>
     );
 };

@@ -56,6 +56,19 @@ const CreatePage = () => {
   const handleProfileImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      
+      // Explicitly block SVG files for security
+      if (file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')) {
+        toast.error('SVG files are not allowed for security reasons');
+        return;
+      }
+      
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Only JPEG, PNG, and WebP images are allowed');
+        return;
+      }
+      
       setProfileImage(file);
       const reader = new FileReader();
       reader.onload = () => {
@@ -68,6 +81,19 @@ const CreatePage = () => {
   const handleCoverPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      
+      // Explicitly block SVG files for security
+      if (file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')) {
+        toast.error('SVG files are not allowed for security reasons');
+        return;
+      }
+      
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Only JPEG, PNG, and WebP images are allowed');
+        return;
+      }
+      
       setCoverPhoto(file);
       const reader = new FileReader();
       reader.onload = () => {

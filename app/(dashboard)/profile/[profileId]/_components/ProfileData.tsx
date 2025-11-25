@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useState, useEffect } from "react";
 import { IoLocationSharp } from "react-icons/io5";
-import { FaLinkedin, FaInstagramSquare, FaUserPlus, FaUserCheck, FaClock } from "react-icons/fa";
+import { FaLinkedin, FaInstagramSquare, FaUserPlus, FaUserCheck, FaClock, FaShareAlt } from "react-icons/fa";
 import { TiSocialFacebook, TiSocialTwitter } from "react-icons/ti";
 import { FiUser } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [followerCount, setFollowerCount] = useState(profileData?.follower_count || 0);
   const [connectionCount, setConnectionCount] = useState(profileData?.connection_count || 0);
+  const [shareSuccess, setShareSuccess] = useState(false);
   const { profileData: userProfileData, isAuthenticated, authToken } = useAuth();
 
   // Fetch follow statistics for the profile
@@ -153,6 +154,53 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     router.push(`/chat/${profileData.user}`);
   };
 
+  const createProfileSlug = (firstName: string, lastName: string, id: string) => {
+    // Create a URL-friendly slug from the name
+    const namePart = `${firstName}-${lastName}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric chars with hyphens
+      .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+    
+    // Include full ID for backend compatibility
+    return `${namePart}-${id}`;
+  };
+
+  const handleShareProfile = async () => {
+    if (!profileData) return;
+
+    const fullName = `${profileData.first_name} ${profileData.last_name}`;
+    const profileSlug = createProfileSlug(profileData.first_name, profileData.last_name, profileData.id);
+    const profileUrl = `${window.location.origin}/profile/${profileSlug}`;
+    const shareData = {
+      title: `${fullName}'s Profile - GrowupBuddy`,
+      text: `Check out ${fullName}'s profile on GrowupBuddy!`,
+      url: profileUrl,
+    };
+
+    try {
+      // Check if Web Share API is available (mainly for mobile devices)
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback to clipboard copy
+        await navigator.clipboard.writeText(profileUrl);
+        setShareSuccess(true);
+        setTimeout(() => setShareSuccess(false), 3000);
+      }
+    } catch (error) {
+      // If user cancels share or clipboard fails, try clipboard as fallback
+      if (error instanceof Error && error.name !== "AbortError") {
+        try {
+          await navigator.clipboard.writeText(profileUrl);
+          setShareSuccess(true);
+          setTimeout(() => setShareSuccess(false), 3000);
+        } catch (clipboardError) {
+          console.error("Failed to share profile:", clipboardError);
+        }
+      }
+    }
+  };
+
   return (
     <div className="py-4">
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 py-6">
@@ -169,8 +217,22 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
         </div>
         <div className="flex-1 text-center sm:text-left">
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
-            <h3 className="font-medium text-xl sm:text-2xl">{fullName}</h3>
+            <div className="flex items-center justify-center sm:justify-start gap-2">
+              <h3 className="font-medium text-xl sm:text-2xl">{fullName}</h3>
+              <button
+                onClick={handleShareProfile}
+                className="text-[#7052FF] hover:text-[#5a42cc] transition-colors"
+                aria-label="Share profile"
+              >
+                <FaShareAlt size={16} />
+              </button>
+            </div>
           </div>
+          {shareSuccess && (
+            <div className="text-green-600 text-sm mb-2 animate-fade-in">
+              ✓ Profile link copied to clipboard!
+            </div>
+          )}
           {bio && (
             <p className="text-gray-600 text-sm sm:text-base mb-2">
               {bio}
@@ -244,7 +306,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <div className="flex gap-3">
+              <div className="flex gap-3 flex-wrap">
                 <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
                   <ImUsers /> {followerCount || 0} Followers
                 </Button>
@@ -253,6 +315,12 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                     <ImUsers /> {connectionCount} Connections
                   </Button>
                 )}
+                <Button
+                  onClick={handleShareProfile}
+                  className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto"
+                >
+                  <FaShareAlt /> Share
+                </Button>
               </div>
               <Button
                 onClick={handleFollowAction}
@@ -266,7 +334,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
           )
         )}
         {userProfileData?.id === profileData.id && (
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
               <ImUsers /> {followerCount || 0} Followers
             </Button>
@@ -275,6 +343,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                 <ImUsers /> {connectionCount} Connections
               </Button>
             )}
+           
           </div>
         )}
       </div>

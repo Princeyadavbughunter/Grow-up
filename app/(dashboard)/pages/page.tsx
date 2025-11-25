@@ -361,7 +361,7 @@ const ChatInterface = () => {
               )}
             </div>
             
-            <div className="flex-1 overflow-y-auto scrollbar-hide p-4 min-h-0">
+            <div className="flex-1 overflow-y-auto scrollbar-hide px-4 pt-4 pb-24  min-h-0">
               {activeTab === 'buddies' ? (
                 <div className="space-y-2">
                   <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
@@ -495,7 +495,7 @@ const ChatInterface = () => {
           )}
         </div>
         
-        <div className="flex-1 overflow-y-auto scrollbar-hide p-4 min-h-0">
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-4 pt-4 pb-24 min-h-0">
           {activeTab === 'buddies' ? (
             <div className="space-y-2">
               <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
@@ -684,7 +684,7 @@ const ChatInterface = () => {
                     <div className="font-medium text-gray-900 mb-1 text-sm">
                       {selectedPage?.name || 'Unknown Page'}
                     </div>
-                    <div className="p-3 rounded-lg bg-white shadow-sm border border-gray-200 text-sm">
+                    <div className="p-3 rounded-lg bg-white shadow-sm border border-gray-200 text-sm break-words">
                       {linkifyText(message.message)}
                     </div>
                     <div className="text-xs text-gray-500 mt-1.5">

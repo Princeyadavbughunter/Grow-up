@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 
-const filters = ["Tech", "Product", "Design", "Web & Mobile Dev"];
+const filters = ["Web3 Club", "Coders Club", "Designers Club","Growth Club", "Memes Club"];
 
 export function EventFilters() {
   return (
