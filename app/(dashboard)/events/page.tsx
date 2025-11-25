@@ -9,10 +9,12 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SearchIcon, MapPin, Calendar, Clock, User, CalendarDays, MessageSquare, Users } from "lucide-react";
 import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
+import { checkCommentRateLimit, checkReplyRateLimit, formatRateLimitMessage } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EventComments } from './_components/EventComments';
 import { useRouter } from "next/navigation";
 import EmptyState from "@/components/ui/empty-state";
+import { toast } from "sonner";
 
 interface Attendee {
   id: string;
@@ -72,7 +74,7 @@ interface EventsData {
   todays_events: Event[];
 }
 
-const filters: string[] = ["Tech", "Product", "Design", "Web & Mobile Dev"];
+const filters: string[] = ["Web3 Club", "Coders Club", "Designers Club","Growth Club", "Memes Club"];
 
 export default function EventsPage() {
   const { api } = useAuthenticatedApi();
@@ -165,7 +167,7 @@ export default function EventsPage() {
   );
 
   const EventFilters = () => (
-    <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-6">
+    <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-6 max-w-sm">
       {filters.map((filter) => (
         <Button
           key={filter}
@@ -173,7 +175,7 @@ export default function EventsPage() {
           onClick={() => setSelectedFilter(filter)}
           className={`rounded-full text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2 h-auto ${
             selectedFilter === filter
- ? "bg-[#7052FF] text-white hover:bg-[#7052FF]"
+              ? "bg-[#7052FF] text-white hover:bg-[#7052FF]"
               : "bg-gray-100 hover:bg-gray-200 text-gray-700"
           }`}
         >
@@ -182,7 +184,7 @@ export default function EventsPage() {
       ))}
     </div>
   );
-
+  
   const formatEventTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US', { 
@@ -339,12 +341,23 @@ export default function EventsPage() {
     e.preventDefault();
     if (!selectedEvent || !newComment?.trim()) return;
 
+    // Check rate limit
+    const { userId } = useAuth();
+    if (userId) {
+      const rateLimitCheck = checkCommentRateLimit(userId);
+      if (!rateLimitCheck.allowed) {
+        const message = formatRateLimitMessage(rateLimitCheck.remainingTime!);
+        toast.error(message);
+        return;
+      }
+    }
+
     try {
       await api.post(`/company/app/event-comments/`, {
         comment_text: newComment,
         event: selectedEvent.id,
       });
-      
+
       // Refresh comments data and update the selected event
       const response = await api.get(`/company/app/event-comments/?event_id=${selectedEvent.id}`);
       setSelectedEvent({
@@ -352,29 +365,44 @@ export default function EventsPage() {
         comments: response.data
       });
       setNewComment("");
+      toast.success("Comment added successfully");
     } catch (error) {
       console.error('Error adding comment:', error);
+      toast.error("Failed to add comment");
     }
   };
 
   const handleAddReply = async (parentId: string, replyText: string) => {
     if (!selectedEvent || !replyText.trim()) return;
-    
+
+    // Check rate limit
+    const { userId } = useAuth();
+    if (userId) {
+      const rateLimitCheck = checkReplyRateLimit(userId);
+      if (!rateLimitCheck.allowed) {
+        const message = formatRateLimitMessage(rateLimitCheck.remainingTime!);
+        toast.error(message);
+        return;
+      }
+    }
+
     try {
       await api.post('/company/app/event-comments/', {
         comment_text: replyText,
         event: selectedEvent.id,
         parent: parentId,  // Include the parent comment ID for replies
       });
-      
+
       // Refresh comments after adding the reply
       const response = await api.get(`/company/app/event-comments/?event_id=${selectedEvent.id}`);
       setSelectedEvent({
         ...selectedEvent,
         comments: response.data  // Assuming response.data includes the updated comments with replies
       });
+      toast.success("Reply added successfully");
     } catch (error) {
       console.error('Error adding reply:', error);
+      toast.error("Failed to add reply");
     }
   };
 

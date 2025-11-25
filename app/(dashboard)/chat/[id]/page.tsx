@@ -72,6 +72,19 @@ interface Note {
     updated_at: string;
 }
 
+const MAX_USERNAME_LENGTH = 14;
+
+const formatUserName = (name?: string | null, maxLength = MAX_USERNAME_LENGTH): string => {
+    if (!name || typeof name !== 'string') {
+        return 'Unknown User';
+    }
+    if (name.length <= maxLength) {
+        return name;
+    }
+    const visibleChars = Math.max(0, maxLength - 3);
+    return `${name.slice(0, visibleChars)}...`;
+};
+
 const ChatInterface: React.FC = () => {
     const [searchInput, setSearchInput] = useState<string>('');
     const [messageInput, setMessageInput] = useState<string>('');
@@ -611,7 +624,7 @@ const ChatInterface: React.FC = () => {
                                         )}
                                         <div className="flex-1 min-w-0">
                                             <h3 className="font-medium text-sm md:text-base truncate">
-                                                {chatroom.chatting_with_current_user ? chatroom.chatting_with_current_user.name : 'Unknown User'}
+                                                {formatUserName(chatroom.chatting_with_current_user?.name)}
                                             </h3>
                                             <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                                         </div>
@@ -657,7 +670,7 @@ const ChatInterface: React.FC = () => {
                                             onClick={() => chatroom.chatting_with_current_user && (window.location.href = `/profile/${chatroom.chatting_with_current_user.id}`)}
                                         >
                                             <h3 className="font-medium text-sm md:text-base truncate">
-                                                {chatroom.chatting_with_current_user ? chatroom.chatting_with_current_user.name : 'Unknown User'}
+                                                {formatUserName(chatroom.chatting_with_current_user?.name)}
                                             </h3>
                                             <p className="text-xs md:text-sm text-gray-500 truncate">{chatroom.name}</p>
                                             <div className="text-xs text-gray-400 flex items-center">
@@ -723,7 +736,7 @@ const ChatInterface: React.FC = () => {
                             )}
                             <div className="min-w-0 flex-1">
                                 <h2 className="font-medium text-sm md:text-base truncate">
-                                    {selectedChatroom.chatting_with_current_user ? selectedChatroom.chatting_with_current_user.name : 'Unknown User'}
+                                    {formatUserName(selectedChatroom.chatting_with_current_user?.name)}
                                 </h2>
                                 <p className="text-xs md:text-sm text-gray-500 flex items-center">
                                     {wsConnected ? 
@@ -736,7 +749,7 @@ const ChatInterface: React.FC = () => {
                                 {chatroomNote && (
                                     <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-md border border-yellow-200">
                                         <FileText className="h-3 w-3 text-yellow-600" />
-                                        <span className="text-xs text-yellow-700 truncate max-w-32">{chatroomNote}</span>
+                                        <span className="text-xs text-yellow-700 truncate max-w-[60px]">{chatroomNote}</span>
                                         {chatroomNotes.length > 1 && (
                                             <span className="text-xs text-yellow-600 ml-1">
                                                 ({chatroomNotes.length})
@@ -755,27 +768,27 @@ const ChatInterface: React.FC = () => {
                         </div>
 
                         {/* Messages Area */}
-                        <div className=" h-[calc(100vh-20rem)] p-3 md:p-4 overflow-y-auto bg-gray-50 flex flex-col">
+                        <div className="flex-1 p-3 md:p-4 overflow-y-auto bg-gray-50 flex flex-col min-h-0">
                             {wsError && (
                                 <div className="bg-red-100 border border-red-400 text-red-700 px-3 md:px-4 py-2 md:py-3 rounded mb-4 text-sm">
                                     <p>{wsError}</p>
                                 </div>
                             )}
-                            
+
                             {messages.length === 0 ? (
                                 <div className="flex-1 flex  items-center justify-center text-gray-500">
                                     <p className="text-sm md:text-base">No messages yet. Start the conversation!</p>
                                 </div>
                             ) : (
-                                <div className="flex flex-col h-96 space-y-1 md:space-y-2">
+                                <div className="flex flex-col space-y-1 md:space-y-2 pb-4">
                                     {messages.map((message) => {
                                         const isCurrentUser = message.is_sender;
                                         return (
-                                            <div 
-                                                key={message.message_id} 
+                                            <div
+                                                key={message.message_id}
                                                 className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} group`}
                                             >
-                                                <div 
+                                                <div
                                                     className={`max-w-[85%] md:max-w-[70%] rounded-lg mb-2 p-2 md:p-3 ${
                                                         isCurrentUser ? 'bg-blue-500 text-white' : 'bg-white border'
                                                     } relative group`}
@@ -822,18 +835,24 @@ const ChatInterface: React.FC = () => {
                         </div>
 
                         {/* Message Input */}
-                        <div className="absolute bottom-40 left-0 right-0 p-3 md:p-4 border-t bg-white">
+                        <div className="sticky bottom-0 left-0 right-0 p-3 md:p-4 border-t bg-white z-10 safe-area-inset-bottom">
                             <div className="flex gap-2">
                                 <input
                                     type="text"
                                     value={messageInput}
                                     onChange={(e) => setMessageInput(e.target.value)}
                                     placeholder="Type a message..."
-                                    className="flex-1 rounded-lg border p-2 md:p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
+                                    className="flex-1 rounded-lg border p-2 md:p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base resize-none"
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             sendMessage();
                                         }
+                                    }}
+                                    onFocus={() => {
+                                        // Scroll to bottom when input is focused on mobile
+                                        setTimeout(() => {
+                                            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+                                        }, 100);
                                     }}
                                 />
                                 <button
@@ -843,7 +862,7 @@ const ChatInterface: React.FC = () => {
                                         sendMessage();
                                     }}
                                     type="button"
-                                    className="bg-blue-500 text-white rounded-lg px-3 md:px-4 py-2 md:py-3 hover:bg-blue-600 active:bg-blue-700 flex-shrink-0"
+                                    className="bg-blue-500 text-white rounded-lg px-3 md:px-4 py-2 md:py-3 hover:bg-blue-600 active:bg-blue-700 flex-shrink-0 disabled:opacity-50"
                                     disabled={!wsConnected}
                                 >
                                     <Send className="h-4 w-4 md:h-5 md:w-5" />

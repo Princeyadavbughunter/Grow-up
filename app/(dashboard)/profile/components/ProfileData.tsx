@@ -2,13 +2,29 @@
 import React, { useState, useRef } from "react";
 import { HiDotsVertical } from "react-icons/hi";
 import { IoLocationSharp } from "react-icons/io5";
-import { FaLinkedin, FaInstagramSquare, FaPencilAlt, FaCamera, FaDownload, FaUpload, FaUserPlus, FaSignOutAlt } from "react-icons/fa";
+import {
+  FaLinkedin,
+  FaInstagramSquare,
+  FaPencilAlt,
+  FaCamera,
+  FaDownload,
+  FaUpload,
+  FaUserPlus,
+  FaSignOutAlt,
+  FaShareAlt,
+} from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
 import { TiSocialFacebook, TiSocialTwitter } from "react-icons/ti";
 import { Button } from "@/components/ui/button";
 import { ImUsers } from "react-icons/im";
 import { FaMessage } from "react-icons/fa6";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -99,19 +115,27 @@ interface ValidationErrors {
 }
 
 const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
-  const { apiCaller, refreshProfile, logout, isAuthenticated, authToken } = useAuth();
-  
+  const { apiCaller, refreshProfile, logout, isAuthenticated, authToken } =
+    useAuth();
+
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
-  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
+    null
+  );
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [followerCount, setFollowerCount] = useState(profileData?.follower_count || 0);
-  const [connectionCount, setConnectionCount] = useState(profileData?.connection_count || 0);
+  const [followerCount, setFollowerCount] = useState(
+    profileData?.follower_count || 0
+  );
+  const [connectionCount, setConnectionCount] = useState(
+    profileData?.connection_count || 0
+  );
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  
+  const [shareSuccess, setShareSuccess] = useState<boolean>(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resumeInputRef = useRef<HTMLInputElement>(null);
 
@@ -119,22 +143,26 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   React.useEffect(() => {
     const fetchFollowStats = async () => {
       if (!profileData?.id || !isAuthenticated || !authToken) return;
-      
+
       try {
-        const response = await apiCaller.get('/freelancer/follow-request/');
+        const response = await apiCaller.get("/freelancer/follow-request/");
         if (response.data) {
           const { approved_followers, following_approved } = response.data;
-          
+
           const followersList = approved_followers || [];
           setFollowerCount(followersList.length);
-          
+
           const followingList = following_approved || [];
-          const followerIds = new Set(followersList.map((f: any) => f.profile_id));
-          const connections = followingList.filter((f: any) => followerIds.has(f.freelancer_id));
+          const followerIds = new Set(
+            followersList.map((f: any) => f.profile_id)
+          );
+          const connections = followingList.filter((f: any) =>
+            followerIds.has(f.freelancer_id)
+          );
           setConnectionCount(connections.length);
         }
       } catch (error) {
-        console.error('Error fetching follow stats:', error);
+        console.error("Error fetching follow stats:", error);
         setFollowerCount(profileData?.follower_count || 0);
         setConnectionCount(profileData?.connection_count || 0);
       }
@@ -163,15 +191,15 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
   // Validation helper functions
   const ensureHttps = (url: string): string => {
-    if (!url) return '';
+    if (!url) return "";
     const trimmedUrl = url.trim();
-    if (!trimmedUrl) return '';
-    
+    if (!trimmedUrl) return "";
+
     // If URL already has a protocol, return as is
     if (trimmedUrl.match(/^https?:\/\//i)) {
       return trimmedUrl;
     }
-    
+
     // Add https:// if missing
     return `https://${trimmedUrl}`;
   };
@@ -180,17 +208,20 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     if (!url) return true; // Empty URLs are valid (optional field)
     try {
       const urlObj = new URL(ensureHttps(url));
-      return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+      return urlObj.protocol === "http:" || urlObj.protocol === "https:";
     } catch {
       return false;
     }
   };
 
-  const isValidSocialUrl = (url: string, platform: string): { valid: boolean; message?: string } => {
+  const isValidSocialUrl = (
+    url: string,
+    platform: string
+  ): { valid: boolean; message?: string } => {
     if (!url) return { valid: true }; // Empty is valid
-    
+
     const formattedUrl = ensureHttps(url);
-    
+
     // Check if it's a valid URL format
     if (!isValidUrl(formattedUrl)) {
       return { valid: false, message: `Please enter a valid ${platform} URL` };
@@ -206,9 +237,9 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
     const pattern = platformPatterns[platform.toLowerCase()];
     if (pattern && !pattern.test(formattedUrl)) {
-      return { 
-        valid: false, 
-        message: `Please enter a valid ${platform} profile URL (e.g., https://${platform.toLowerCase()}.com/username)` 
+      return {
+        valid: false,
+        message: `Please enter a valid ${platform} profile URL (e.g., https://${platform.toLowerCase()}.com/username)`,
       };
     }
 
@@ -217,60 +248,74 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
   const validateField = (name: string, value: any): string | undefined => {
     switch (name) {
-      case 'first_name':
-        if (!value.trim()) return 'First name is required';
-        if (value.trim().length < 2) return 'First name must be at least 2 characters';
-        if (!/^[a-zA-Z\s'-]+$/.test(value)) return 'First name can only contain letters, spaces, hyphens, and apostrophes';
+      case "first_name":
+        if (!value.trim()) return "First name is required";
+        if (value.trim().length < 2)
+          return "First name must be at least 2 characters";
+        if (!/^[a-zA-Z\s'-]+$/.test(value))
+          return "First name can only contain letters, spaces, hyphens, and apostrophes";
         return undefined;
 
-      case 'last_name':
-        if (!value.trim()) return 'Last name is required';
-        if (value.trim().length < 2) return 'Last name must be at least 2 characters';
-        if (!/^[a-zA-Z\s'-]+$/.test(value)) return 'Last name can only contain letters, spaces, hyphens, and apostrophes';
+      case "last_name":
+        if (!value.trim()) return "Last name is required";
+        if (value.trim().length < 2)
+          return "Last name must be at least 2 characters";
+        if (!/^[a-zA-Z\s'-]+$/.test(value))
+          return "Last name can only contain letters, spaces, hyphens, and apostrophes";
         return undefined;
 
-      case 'bio':
-        if (value && value.length > 500) return 'Bio must be less than 500 characters';
+      case "bio":
+        if (value && value.length > 500)
+          return "Bio must be less than 500 characters";
         return undefined;
 
-      case 'address':
-        if (value && value.length > 200) return 'Address must be less than 200 characters';
+      case "address":
+        if (value && value.length > 200)
+          return "Address must be less than 200 characters";
         return undefined;
 
-      case 'city':
-        if (value && !/^[a-zA-Z\s'-]+$/.test(value)) return 'City name can only contain letters, spaces, hyphens, and apostrophes';
+      case "city":
+        if (value && !/^[a-zA-Z\s'-]+$/.test(value))
+          return "City name can only contain letters, spaces, hyphens, and apostrophes";
         return undefined;
 
-      case 'state':
-        if (value && !/^[a-zA-Z\s'-]+$/.test(value)) return 'State name can only contain letters, spaces, hyphens, and apostrophes';
+      case "state":
+        if (value && !/^[a-zA-Z\s'-]+$/.test(value))
+          return "State name can only contain letters, spaces, hyphens, and apostrophes";
         return undefined;
 
-      case 'skills':
+      case "skills":
         if (value) {
-          const skillsArray = value.split(',').map((s: string) => s.trim()).filter((s: string) => s);
-          if (skillsArray.length > 20) return 'Maximum 20 skills allowed';
-          const invalidSkills = skillsArray.filter((s: string) => s.length > 50);
-          if (invalidSkills.length > 0) return 'Each skill must be less than 50 characters';
+          const skillsArray = value
+            .split(",")
+            .map((s: string) => s.trim())
+            .filter((s: string) => s);
+          if (skillsArray.length > 20) return "Maximum 20 skills allowed";
+          const invalidSkills = skillsArray.filter(
+            (s: string) => s.length > 50
+          );
+          if (invalidSkills.length > 0)
+            return "Each skill must be less than 50 characters";
         }
         return undefined;
 
-      case 'linkedin_account': {
-        const result = isValidSocialUrl(value, 'LinkedIn');
+      case "linkedin_account": {
+        const result = isValidSocialUrl(value, "LinkedIn");
         return result.valid ? undefined : result.message;
       }
 
-      case 'twitter_account': {
-        const result = isValidSocialUrl(value, 'Twitter');
+      case "twitter_account": {
+        const result = isValidSocialUrl(value, "Twitter");
         return result.valid ? undefined : result.message;
       }
 
-      case 'instagram_account': {
-        const result = isValidSocialUrl(value, 'Instagram');
+      case "instagram_account": {
+        const result = isValidSocialUrl(value, "Instagram");
         return result.valid ? undefined : result.message;
       }
 
-      case 'facebook_account': {
-        const result = isValidSocialUrl(value, 'Facebook');
+      case "facebook_account": {
+        const result = isValidSocialUrl(value, "Facebook");
         return result.valid ? undefined : result.message;
       }
 
@@ -281,7 +326,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
-    
+
     // Validate all fields
     Object.keys(formData).forEach((key) => {
       const error = validateField(key, formData[key as keyof ProfileFormData]);
@@ -293,21 +338,27 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     // Validate files
     if (profileImageFile) {
       const maxSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      
       if (profileImageFile.size > maxSize) {
-        newErrors.profile_picture = 'Profile picture must be less than 5MB';
+        newErrors.profile_picture = "Profile picture must be less than 5MB";
       }
-      if (!profileImageFile.type.startsWith('image/')) {
-        newErrors.profile_picture = 'Only image files are allowed';
+      if (!allowedTypes.includes(profileImageFile.type)) {
+        newErrors.profile_picture = "Only JPEG, PNG, and WebP images are allowed";
+      }
+      // Explicitly block SVG files for security
+      if (profileImageFile.type === 'image/svg+xml' || profileImageFile.name.toLowerCase().endsWith('.svg')) {
+        newErrors.profile_picture = "SVG files are not allowed for security reasons";
       }
     }
 
     if (resumeFile) {
       const maxSize = 10 * 1024 * 1024; // 10MB
       if (resumeFile.size > maxSize) {
-        newErrors.resume = 'Resume must be less than 10MB';
+        newErrors.resume = "Resume must be less than 10MB";
       }
-      if (resumeFile.type !== 'application/pdf') {
-        newErrors.resume = 'Only PDF files are allowed for resume';
+      if (resumeFile.type !== "application/pdf") {
+        newErrors.resume = "Only PDF files are allowed for resume";
       }
     }
 
@@ -315,55 +366,66 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Mark field as touched
-    setTouched(prev => ({ ...prev, [name]: true }));
+    setTouched((prev) => ({ ...prev, [name]: true }));
 
     // Validate field on change (real-time validation)
     if (touched[name]) {
       const error = validateField(name, value);
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: error
+        [name]: error,
       }));
     }
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    
+
     // Mark field as touched
-    setTouched(prev => ({ ...prev, [name]: true }));
+    setTouched((prev) => ({ ...prev, [name]: true }));
 
     // Auto-format social media URLs on blur
-    if (['linkedin_account', 'twitter_account', 'instagram_account', 'facebook_account'].includes(name)) {
+    if (
+      [
+        "linkedin_account",
+        "twitter_account",
+        "instagram_account",
+        "facebook_account",
+      ].includes(name)
+    ) {
       if (value && value.trim()) {
         const formattedUrl = ensureHttps(value);
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          [name]: formattedUrl
+          [name]: formattedUrl,
         }));
-        
+
         // Validate the formatted URL
         const error = validateField(name, formattedUrl);
-        setErrors(prev => ({
+        setErrors((prev) => ({
           ...prev,
-          [name]: error
+          [name]: error,
         }));
       }
     } else {
       // Validate other fields
       const error = validateField(name, value);
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: error
+        [name]: error,
       }));
     }
   };
@@ -373,23 +435,35 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     if (file) {
       // Validate file
       const maxSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      
       if (file.size > maxSize) {
-        setErrors(prev => ({
+        setErrors((prev) => ({
           ...prev,
-          profile_picture: 'Profile picture must be less than 5MB'
+          profile_picture: "Profile picture must be less than 5MB",
         }));
         return;
       }
-      if (!file.type.startsWith('image/')) {
-        setErrors(prev => ({
+      
+      // Explicitly block SVG files for security
+      if (file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')) {
+        setErrors((prev) => ({
           ...prev,
-          profile_picture: 'Only image files are allowed'
+          profile_picture: "SVG files are not allowed for security reasons",
+        }));
+        return;
+      }
+      
+      if (!allowedTypes.includes(file.type)) {
+        setErrors((prev) => ({
+          ...prev,
+          profile_picture: "Only JPEG, PNG, and WebP images are allowed",
         }));
         return;
       }
 
       // Clear previous error
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors.profile_picture;
         return newErrors;
@@ -410,22 +484,22 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
       // Validate file
       const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {
-        setErrors(prev => ({
+        setErrors((prev) => ({
           ...prev,
-          resume: 'Resume must be less than 10MB'
+          resume: "Resume must be less than 10MB",
         }));
         return;
       }
-      if (file.type !== 'application/pdf') {
-        setErrors(prev => ({
+      if (file.type !== "application/pdf") {
+        setErrors((prev) => ({
           ...prev,
-          resume: 'Only PDF files are allowed for resume'
+          resume: "Only PDF files are allowed for resume",
         }));
         return;
       }
 
       // Clear previous error
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors.resume;
         return newErrors;
@@ -437,7 +511,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Mark all fields as touched
     const allFields = Object.keys(formData).reduce((acc, key) => {
       acc[key] = true;
@@ -449,15 +523,23 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     if (!validateForm()) {
       return;
     }
-    
+
     setIsSubmitting(true);
 
     try {
       const formDataToSend = new FormData();
-      
+
       // Add text fields with formatted URLs
       Object.entries(formData).forEach(([key, value]) => {
-        if (['linkedin_account', 'twitter_account', 'instagram_account', 'facebook_account'].includes(key) && value) {
+        if (
+          [
+            "linkedin_account",
+            "twitter_account",
+            "instagram_account",
+            "facebook_account",
+          ].includes(key) &&
+          value
+        ) {
           formDataToSend.append(key, ensureHttps(value as string));
         } else {
           formDataToSend.append(key, value as string);
@@ -466,28 +548,36 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
       // Add profile picture if selected
       if (profileImageFile) {
-        formDataToSend.append('profile_picture', profileImageFile);
+        formDataToSend.append("profile_picture", profileImageFile);
       }
 
       // Add resume if selected
       if (resumeFile) {
-        formDataToSend.append('resume', resumeFile);
+        formDataToSend.append("resume", resumeFile);
       }
 
       if (profileData) {
-        await apiCaller.patch(`/freelancer/freelancer-profile/?id=${profileData.id}`, formDataToSend, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        await apiCaller.patch(
+          `/freelancer/freelancer-profile/?id=${profileData.id}`,
+          formDataToSend,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
       } else {
-        await apiCaller.post('/freelancer/freelancer-profile/', formDataToSend, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        await apiCaller.post(
+          "/freelancer/freelancer-profile/",
+          formDataToSend,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
       }
-      
+
       await refreshProfile();
       setIsEditing(false);
       setProfileImageFile(null);
@@ -519,7 +609,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
       instagram_account: profileData?.instagram_account || "",
       twitter_account: profileData?.twitter_account || "",
     };
-    
+
     setFormData(resetFormData);
     setProfileImagePreview(null);
     setProfileImageFile(null);
@@ -531,7 +621,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
   const downloadResume = () => {
     if (profileData?.resume) {
-      window.open(profileData.resume, '_blank');
+      window.open(profileData.resume, "_blank");
     }
   };
 
@@ -542,6 +632,53 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     } catch (error) {
       console.error("Logout error:", error);
       setIsLoggingOut(false);
+    }
+  };
+
+  const createProfileSlug = (firstName: string, lastName: string, id: string) => {
+    // Create a URL-friendly slug from the name
+    const namePart = `${firstName}-${lastName}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric chars with hyphens
+      .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+    
+    // Include full ID for backend compatibility
+    return `${namePart}-${id}`;
+  };
+
+  const handleShareProfile = async () => {
+    if (!profileData) return;
+
+    const fullName = `${profileData.first_name} ${profileData.last_name}`;
+    const profileSlug = createProfileSlug(profileData.first_name, profileData.last_name, profileData.id);
+    const profileUrl = `${window.location.origin}/profile/${profileSlug}`;
+    const shareData = {
+      title: `${fullName}'s Profile - GrowupBuddy`,
+      text: `Check out ${fullName}'s profile on GrowupBuddy!`,
+      url: profileUrl,
+    };
+
+    try {
+      // Check if Web Share API is available (mainly for mobile devices)
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback to clipboard copy
+        await navigator.clipboard.writeText(profileUrl);
+        setShareSuccess(true);
+        setTimeout(() => setShareSuccess(false), 3000);
+      }
+    } catch (error) {
+      // If user cancels share or clipboard fails, try clipboard as fallback
+      if (error instanceof Error && error.name !== "AbortError") {
+        try {
+          await navigator.clipboard.writeText(profileUrl);
+          setShareSuccess(true);
+          setTimeout(() => setShareSuccess(false), 3000);
+        } catch (clipboardError) {
+          console.error("Failed to share profile:", clipboardError);
+        }
+      }
     }
   };
 
@@ -560,18 +697,21 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
               <FaUserPlus className="text-gray-400 text-3xl" />
             </div>
-            
+
             <h2 className="text-2xl font-semibold text-gray-800 mb-3">
               Complete Your Profile
             </h2>
-            
+
             <p className="text-gray-600 mb-6 max-w-md">
-              Your profile is the first impression potential clients will see. 
-              Let's get it set up with your professional information, skills, and experience.
+              Your profile is the first impression potential clients will see.
+              Let's get it set up with your professional information, skills,
+              and experience.
             </p>
-            
+
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 mb-6 max-w-lg">
-              <h3 className="font-medium text-gray-800 mb-3">Why complete your profile?</h3>
+              <h3 className="font-medium text-gray-800 mb-3">
+                Why complete your profile?
+              </h3>
               <ul className="text-sm text-gray-600 space-y-2 text-left">
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-[#7052FF] rounded-full"></div>
@@ -591,15 +731,15 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                 </li>
               </ul>
             </div>
-            
-            <Button 
+
+            <Button
               onClick={openEditModal}
               className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium px-8 py-3 rounded-lg flex items-center gap-2 text-lg"
             >
               <FaPencilAlt size={16} />
               Create My Profile
             </Button>
-            
+
             <p className="text-sm text-gray-500 mt-4">
               It only takes a few minutes to get started
             </p>
@@ -620,64 +760,88 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                     <Label htmlFor="first_name">
                       First Name <span className="text-red-500">*</span>
                     </Label>
-                    <Input 
-                      id="first_name" 
-                      name="first_name" 
-                      value={formData?.first_name || ""} 
+                    <Input
+                      id="first_name"
+                      name="first_name"
+                      value={formData?.first_name || ""}
                       onChange={handleInputChange}
                       onBlur={handleBlur}
-                      className={errors.first_name && touched.first_name ? 'border-red-500' : ''}
+                      className={
+                        errors.first_name && touched.first_name
+                          ? "border-red-500"
+                          : ""
+                      }
                       required
                     />
-                    <ErrorMessage message={touched.first_name ? errors.first_name : undefined} />
+                    <ErrorMessage
+                      message={
+                        touched.first_name ? errors.first_name : undefined
+                      }
+                    />
                   </div>
                   <div className="flex flex-col space-y-1.5">
                     <Label htmlFor="last_name">
                       Last Name <span className="text-red-500">*</span>
                     </Label>
-                    <Input 
-                      id="last_name" 
-                      name="last_name" 
-                      value={formData?.last_name || ""} 
+                    <Input
+                      id="last_name"
+                      name="last_name"
+                      value={formData?.last_name || ""}
                       onChange={handleInputChange}
                       onBlur={handleBlur}
-                      className={errors.last_name && touched.last_name ? 'border-red-500' : ''}
+                      className={
+                        errors.last_name && touched.last_name
+                          ? "border-red-500"
+                          : ""
+                      }
                       required
                     />
-                    <ErrorMessage message={touched.last_name ? errors.last_name : undefined} />
+                    <ErrorMessage
+                      message={touched.last_name ? errors.last_name : undefined}
+                    />
                   </div>
                 </div>
-                
+
                 <div className="flex flex-col space-y-1.5">
                   <Label htmlFor="bio">Bio</Label>
-                  <Textarea 
-                    id="bio" 
-                    name="bio" 
-                    value={formData?.bio || ""} 
+                  <Textarea
+                    id="bio"
+                    name="bio"
+                    value={formData?.bio || ""}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
                     rows={3}
                     placeholder="Tell us about yourself..."
-                    className={errors.bio && touched.bio ? 'border-red-500' : ''}
+                    className={
+                      errors.bio && touched.bio ? "border-red-500" : ""
+                    }
                   />
-                  <ErrorMessage message={touched.bio ? errors.bio : undefined} />
+                  <ErrorMessage
+                    message={touched.bio ? errors.bio : undefined}
+                  />
                   {formData?.bio && (
-                    <p className="text-xs text-gray-500">{formData.bio.length}/500 characters</p>
+                    <p className="text-xs text-gray-500">
+                      {formData.bio.length}/500 characters
+                    </p>
                   )}
                 </div>
-                
+
                 {/* Profile Picture Upload */}
                 <div className="flex flex-col space-y-3">
                   <Label>Profile Picture</Label>
                   <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <div 
-                      className={`w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed ${errors.profile_picture ? 'border-red-500' : 'border-gray-300'} flex items-center justify-center cursor-pointer hover:border-[#7052FF] transition-colors overflow-hidden`}
+                    <div
+                      className={`w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed ${
+                        errors.profile_picture
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } flex items-center justify-center cursor-pointer hover:border-[#7052FF] transition-colors overflow-hidden`}
                       onClick={() => fileInputRef.current?.click()}
                     >
                       {profileImagePreview ? (
-                        <img 
-                          src={profileImagePreview} 
-                          alt="Preview" 
+                        <img
+                          src={profileImagePreview}
+                          alt="Preview"
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -697,7 +861,8 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                       </p>
                       {profileImageFile && (
                         <p className="text-sm text-green-600 mt-1">
-                          Selected: {sanitizeFileName(profileImageFile.name, 30)}
+                          Selected:{" "}
+                          {sanitizeFileName(profileImageFile.name, 30)}
                         </p>
                       )}
                     </div>
@@ -707,7 +872,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileUpload}
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp"
                     className="hidden"
                   />
                 </div>
@@ -750,134 +915,208 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                 {/* Address */}
                 <div className="flex flex-col space-y-1.5">
                   <Label htmlFor="address">Address</Label>
-                  <Input 
-                    id="address" 
-                    name="address" 
-                    value={formData?.address || ""} 
+                  <Input
+                    id="address"
+                    name="address"
+                    value={formData?.address || ""}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
-                    className={errors.address && touched.address ? 'border-red-500' : ''}
+                    className={
+                      errors.address && touched.address ? "border-red-500" : ""
+                    }
                   />
-                  <ErrorMessage message={touched.address ? errors.address : undefined} />
+                  <ErrorMessage
+                    message={touched.address ? errors.address : undefined}
+                  />
                 </div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col space-y-1.5">
                     <Label htmlFor="city">City</Label>
-                    <Input 
-                      id="city" 
-                      name="city" 
-                      value={formData?.city || ""} 
+                    <Input
+                      id="city"
+                      name="city"
+                      value={formData?.city || ""}
                       onChange={handleInputChange}
                       onBlur={handleBlur}
-                      className={errors.city && touched.city ? 'border-red-500' : ''}
+                      className={
+                        errors.city && touched.city ? "border-red-500" : ""
+                      }
                     />
-                    <ErrorMessage message={touched.city ? errors.city : undefined} />
+                    <ErrorMessage
+                      message={touched.city ? errors.city : undefined}
+                    />
                   </div>
                   <div className="flex flex-col space-y-1.5">
                     <Label htmlFor="state">State</Label>
-                    <Input 
-                      id="state" 
-                      name="state" 
-                      value={formData?.state || ""} 
+                    <Input
+                      id="state"
+                      name="state"
+                      value={formData?.state || ""}
                       onChange={handleInputChange}
                       onBlur={handleBlur}
-                      className={errors.state && touched.state ? 'border-red-500' : ''}
+                      className={
+                        errors.state && touched.state ? "border-red-500" : ""
+                      }
                     />
-                    <ErrorMessage message={touched.state ? errors.state : undefined} />
+                    <ErrorMessage
+                      message={touched.state ? errors.state : undefined}
+                    />
                   </div>
                 </div>
-                
+
                 <div className="flex flex-col space-y-1.5">
                   <Label htmlFor="skills">Skills (comma-separated)</Label>
-                  <Input 
-                    id="skills" 
-                    name="skills" 
-                    value={formData?.skills || ""} 
+                  <Input
+                    id="skills"
+                    name="skills"
+                    value={formData?.skills || ""}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
                     placeholder="React, Node.js, JavaScript, Python..."
-                    className={errors.skills && touched.skills ? 'border-red-500' : ''}
+                    className={
+                      errors.skills && touched.skills ? "border-red-500" : ""
+                    }
                   />
-                  <ErrorMessage message={touched.skills ? errors.skills : undefined} />
+                  <ErrorMessage
+                    message={touched.skills ? errors.skills : undefined}
+                  />
                 </div>
 
                 {/* Social Links */}
                 <div className="flex flex-col space-y-3">
                   <Label>Social Links</Label>
-                  <p className="text-xs text-gray-500">URLs will be automatically formatted with https:// if missing</p>
+                  <p className="text-xs text-gray-500">
+                    URLs will be automatically formatted with https:// if
+                    missing
+                  </p>
                   <div className="grid gap-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex flex-col space-y-1.5">
-                        <Label htmlFor="linkedin_account" className="flex items-center gap-2">
+                        <Label
+                          htmlFor="linkedin_account"
+                          className="flex items-center gap-2"
+                        >
                           <FaLinkedin className="text-blue-600" /> LinkedIn
                         </Label>
-                        <Input 
-                          id="linkedin_account" 
-                          name="linkedin_account" 
-                          placeholder="https://linkedin.com/in/username" 
-                          value={formData?.linkedin_account || ""} 
+                        <Input
+                          id="linkedin_account"
+                          name="linkedin_account"
+                          placeholder="https://linkedin.com/in/username"
+                          value={formData?.linkedin_account || ""}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          className={errors.linkedin_account && touched.linkedin_account ? 'border-red-500' : ''}
+                          className={
+                            errors.linkedin_account && touched.linkedin_account
+                              ? "border-red-500"
+                              : ""
+                          }
                         />
-                        <ErrorMessage message={touched.linkedin_account ? errors.linkedin_account : undefined} />
+                        <ErrorMessage
+                          message={
+                            touched.linkedin_account
+                              ? errors.linkedin_account
+                              : undefined
+                          }
+                        />
                       </div>
                       <div className="flex flex-col space-y-1.5">
-                        <Label htmlFor="twitter_account" className="flex items-center gap-2">
+                        <Label
+                          htmlFor="twitter_account"
+                          className="flex items-center gap-2"
+                        >
                           <TiSocialTwitter className="text-blue-400" /> Twitter
                         </Label>
-                        <Input 
-                          id="twitter_account" 
-                          name="twitter_account" 
-                          placeholder="https://twitter.com/username" 
-                          value={formData?.twitter_account || ""} 
+                        <Input
+                          id="twitter_account"
+                          name="twitter_account"
+                          placeholder="https://twitter.com/username"
+                          value={formData?.twitter_account || ""}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          className={errors.twitter_account && touched.twitter_account ? 'border-red-500' : ''}
+                          className={
+                            errors.twitter_account && touched.twitter_account
+                              ? "border-red-500"
+                              : ""
+                          }
                         />
-                        <ErrorMessage message={touched.twitter_account ? errors.twitter_account : undefined} />
+                        <ErrorMessage
+                          message={
+                            touched.twitter_account
+                              ? errors.twitter_account
+                              : undefined
+                          }
+                        />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex flex-col space-y-1.5">
-                        <Label htmlFor="instagram_account" className="flex items-center gap-2">
-                          <FaInstagramSquare className="text-pink-600" /> Instagram
+                        <Label
+                          htmlFor="instagram_account"
+                          className="flex items-center gap-2"
+                        >
+                          <FaInstagramSquare className="text-pink-600" />{" "}
+                          Instagram
                         </Label>
-                        <Input 
-                          id="instagram_account" 
-                          name="instagram_account" 
-                          placeholder="https://instagram.com/username" 
-                          value={formData?.instagram_account || ""} 
+                        <Input
+                          id="instagram_account"
+                          name="instagram_account"
+                          placeholder="https://instagram.com/username"
+                          value={formData?.instagram_account || ""}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          className={errors.instagram_account && touched.instagram_account ? 'border-red-500' : ''}
+                          className={
+                            errors.instagram_account &&
+                            touched.instagram_account
+                              ? "border-red-500"
+                              : ""
+                          }
                         />
-                        <ErrorMessage message={touched.instagram_account ? errors.instagram_account : undefined} />
+                        <ErrorMessage
+                          message={
+                            touched.instagram_account
+                              ? errors.instagram_account
+                              : undefined
+                          }
+                        />
                       </div>
                       <div className="flex flex-col space-y-1.5">
-                        <Label htmlFor="facebook_account" className="flex items-center gap-2">
-                          <TiSocialFacebook className="text-blue-800" /> Facebook
+                        <Label
+                          htmlFor="facebook_account"
+                          className="flex items-center gap-2"
+                        >
+                          <TiSocialFacebook className="text-blue-800" />{" "}
+                          Facebook
                         </Label>
-                        <Input 
-                          id="facebook_account" 
-                          name="facebook_account" 
-                          placeholder="https://facebook.com/username" 
-                          value={formData?.facebook_account || ""} 
+                        <Input
+                          id="facebook_account"
+                          name="facebook_account"
+                          placeholder="https://facebook.com/username"
+                          value={formData?.facebook_account || ""}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          className={errors.facebook_account && touched.facebook_account ? 'border-red-500' : ''}
+                          className={
+                            errors.facebook_account && touched.facebook_account
+                              ? "border-red-500"
+                              : ""
+                          }
                         />
-                        <ErrorMessage message={touched.facebook_account ? errors.facebook_account : undefined} />
+                        <ErrorMessage
+                          message={
+                            touched.facebook_account
+                              ? errors.facebook_account
+                              : undefined
+                          }
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
               <DialogFooter className="flex flex-col sm:flex-row gap-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => {
                     setIsEditing(false);
                     setErrors({});
@@ -887,12 +1126,12 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                 >
                   Cancel
                 </Button>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={isSubmitting}
                   className="bg-[#7052FF] hover:bg-[#5a42cc] w-full sm:w-auto"
                 >
-                  {isSubmitting ? 'Creating...' : 'Create Profile'}
+                  {isSubmitting ? "Creating..." : "Create Profile"}
                 </Button>
               </DialogFooter>
             </form>
@@ -902,10 +1141,22 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     );
   }
 
-  const { first_name, last_name, bio, profile_picture, address, city, state, skills, resume } = profileData;
-  const skillsArray = skills ? skills.split(',') : [];
+  const {
+    first_name,
+    last_name,
+    bio,
+    profile_picture,
+    address,
+    city,
+    state,
+    skills,
+    resume,
+  } = profileData;
+  const skillsArray = skills ? skills.split(",") : [];
   const fullName = `${first_name} ${last_name}`;
-  const location = `${address ? address + ', ' : ''}${city ? city + ', ' : ''}${state || ''}`;
+  const location = `${address ? address + ", " : ""}${city ? city + ", " : ""}${
+    state || ""
+  }`;
   const profileImageUrl = profileImagePreview || profile_picture;
 
   return (
@@ -924,19 +1175,33 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
           )}
         </div>
         <div className="flex-1 text-center sm:text-left">
-          <div className="flex flex-row sm:items-center gap-2 sm:gap-4 mb-2">
+          <div className="flex flex-row justify-center sm:justify-start sm:items-center gap-2 sm:gap-4 mb-2">
             <h3 className="font-medium text-xl sm:text-2xl">{fullName}</h3>
-            <button 
-              onClick={openEditModal}
-              className="text-gray-500 hover:text-gray-700 transition-colors self-center sm:self-auto"
-              aria-label="Edit profile"
-            >
-              <FaPencilAlt size={16} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={openEditModal}
+                className="text-gray-500 hover:text-gray-700 transition-colors self-center sm:self-auto"
+                aria-label="Edit profile"
+              >
+                <FaPencilAlt size={16} />
+              </button>
+              <button
+                onClick={handleShareProfile}
+                className="text-[#7052FF] hover:text-[#5a42cc] transition-colors self-center sm:self-auto relative"
+                aria-label="Share profile"
+              >
+                <FaShareAlt size={16} />
+              </button>
+            </div>
           </div>
-          <p className="text-gray-600 text-sm sm:text-base mb-2">
-            {bio}
-          </p>
+          {shareSuccess && (
+            <div className="text-green-600 text-sm mb-2 animate-fade-in">
+              ✓ Profile link copied to clipboard!
+            </div>
+          )}
+
+          <p className="text-gray-600 text-sm sm:text-base mb-2">{bio}</p>
+
           <p className="text-gray-500 text-sm sm:text-base flex items-center justify-center sm:justify-start gap-1">
             <IoLocationSharp /> {location}
           </p>
@@ -948,7 +1213,10 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
         <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-4">
           {skillsArray.length > 0 ? (
             skillsArray.map((skill, index) => (
-              <span key={index} className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border bg-gray-50">
+              <span
+                key={index}
+                className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border bg-gray-50"
+              >
                 {skill.trim()}
               </span>
             ))
@@ -962,23 +1230,51 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
       <div className="mb-6">
         <div className="flex justify-center sm:justify-start gap-4">
           {profileData.linkedin_account && (
-            <a href={profileData.linkedin_account} target="_blank" rel="noopener noreferrer">
-              <FaLinkedin size={28} className="text-blue-600 hover:text-blue-800 transition-colors" />
+            <a
+              href={profileData.linkedin_account}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaLinkedin
+                size={28}
+                className="text-blue-600 hover:text-blue-800 transition-colors"
+              />
             </a>
           )}
           {profileData.twitter_account && (
-            <a href={profileData.twitter_account} target="_blank" rel="noopener noreferrer">
-              <TiSocialTwitter size={32} className="text-blue-400 hover:text-blue-600 transition-colors" />
+            <a
+              href={profileData.twitter_account}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <TiSocialTwitter
+                size={32}
+                className="text-blue-400 hover:text-blue-600 transition-colors"
+              />
             </a>
           )}
           {profileData.instagram_account && (
-            <a href={profileData.instagram_account} target="_blank" rel="noopener noreferrer">
-              <FaInstagramSquare size={28} className="text-pink-600 hover:text-pink-800 transition-colors" />
+            <a
+              href={profileData.instagram_account}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaInstagramSquare
+                size={28}
+                className="text-pink-600 hover:text-pink-800 transition-colors"
+              />
             </a>
           )}
           {profileData.facebook_account && (
-            <a href={profileData.facebook_account} target="_blank" rel="noopener noreferrer">
-              <TiSocialFacebook size={28} className="text-blue-800 hover:text-blue-900 transition-colors" />
+            <a
+              href={profileData.facebook_account}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <TiSocialFacebook
+                size={28}
+                className="text-blue-800 hover:text-blue-900 transition-colors"
+              />
             </a>
           )}
         </div>
@@ -986,7 +1282,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
       {/* Action Buttons - Responsive */}
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start">
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap justify-center sm:justify-start">
           <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
             <ImUsers /> {followerCount || 0} Followers
           </Button>
@@ -995,10 +1291,11 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
               <ImUsers /> {connectionCount} Connections
             </Button>
           )}
+         
         </div>
         {resume && (
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3">
-            <Button 
+            <Button
               onClick={downloadResume}
               className="bg-[#7052FF] hover:bg-[#5a42cc] text-white flex items-center gap-2"
             >
@@ -1008,13 +1305,13 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
           </div>
         )}
         {/* Logout Button */}
-        <Button 
+        <Button
           onClick={handleLogout}
           disabled={isLoggingOut}
           className="bg-[#7052FF] hover:bg-[#5a42d4] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto"
         >
           <FaSignOutAlt size={14} />
-          {isLoggingOut ? 'Signing Out...' : 'Sign Out'}
+          {isLoggingOut ? "Signing Out..." : "Sign Out"}
         </Button>
       </div>
 
@@ -1022,7 +1319,9 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{profileData ? 'Edit Profile' : 'Create Your Profile'}</DialogTitle>
+            <DialogTitle>
+              {profileData ? "Edit Profile" : "Create Your Profile"}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} noValidate>
             <div className="grid gap-4 py-4">
@@ -1032,70 +1331,88 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                   <Label htmlFor="first_name">
                     First Name <span className="text-red-500">*</span>
                   </Label>
-                  <Input 
-                    id="first_name" 
-                    name="first_name" 
-                    value={formData.first_name} 
+                  <Input
+                    id="first_name"
+                    name="first_name"
+                    value={formData.first_name}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
-                    className={errors.first_name && touched.first_name ? 'border-red-500' : ''}
+                    className={
+                      errors.first_name && touched.first_name
+                        ? "border-red-500"
+                        : ""
+                    }
                     required
                   />
-                  <ErrorMessage message={touched.first_name ? errors.first_name : undefined} />
+                  <ErrorMessage
+                    message={touched.first_name ? errors.first_name : undefined}
+                  />
                 </div>
                 <div className="flex flex-col space-y-1.5">
                   <Label htmlFor="last_name">
                     Last Name <span className="text-red-500">*</span>
                   </Label>
-                  <Input 
-                    id="last_name" 
-                    name="last_name" 
-                    value={formData.last_name} 
+                  <Input
+                    id="last_name"
+                    name="last_name"
+                    value={formData.last_name}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
-                    className={errors.last_name && touched.last_name ? 'border-red-500' : ''}
+                    className={
+                      errors.last_name && touched.last_name
+                        ? "border-red-500"
+                        : ""
+                    }
                     required
                   />
-                  <ErrorMessage message={touched.last_name ? errors.last_name : undefined} />
+                  <ErrorMessage
+                    message={touched.last_name ? errors.last_name : undefined}
+                  />
                 </div>
               </div>
-              
+
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="bio">Bio</Label>
-                <Textarea 
-                  id="bio" 
-                  name="bio" 
-                  value={formData.bio} 
+                <Textarea
+                  id="bio"
+                  name="bio"
+                  value={formData.bio}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
                   rows={3}
                   placeholder="Tell us about yourself..."
-                  className={errors.bio && touched.bio ? 'border-red-500' : ''}
+                  className={errors.bio && touched.bio ? "border-red-500" : ""}
                 />
                 <ErrorMessage message={touched.bio ? errors.bio : undefined} />
                 {formData.bio && (
-                  <p className="text-xs text-gray-500">{formData.bio.length}/500 characters</p>
+                  <p className="text-xs text-gray-500">
+                    {formData.bio.length}/500 characters
+                  </p>
                 )}
               </div>
-              
+
               {/* Profile Picture Upload */}
               <div className="flex flex-col space-y-3">
                 <Label>Profile Picture</Label>
                 <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <div 
-                    className={`w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed ${errors.profile_picture ? 'border-red-500' : 'border-gray-300'} flex items-center justify-center cursor-pointer hover:border-[#7052FF] transition-colors overflow-hidden`}
+                  <div
+                    className={`w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed ${
+                      errors.profile_picture
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    } flex items-center justify-center cursor-pointer hover:border-[#7052FF] transition-colors overflow-hidden`}
                     onClick={() => fileInputRef.current?.click()}
                   >
                     {profileImagePreview ? (
-                      <img 
-                        src={profileImagePreview} 
-                        alt="Preview" 
+                      <img
+                        src={profileImagePreview}
+                        alt="Preview"
                         className="w-full h-full object-cover"
                       />
                     ) : profileData.profile_picture ? (
-                      <img 
-                        src={profileData.profile_picture} 
-                        alt="Current Profile" 
+                      <img
+                        src={profileData.profile_picture}
+                        alt="Current Profile"
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -1141,7 +1458,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                       className="bg-[#7052FF] hover:bg-[#5a42cc] text-white flex items-center gap-2"
                     >
                       <FaUpload size={14} />
-                      {resume ? 'Update Resume' : 'Upload Resume'}
+                      {resume ? "Update Resume" : "Upload Resume"}
                     </Button>
                     {resume && (
                       <Button
@@ -1179,134 +1496,205 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
               {/* Address */}
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="address">Address</Label>
-                <Input 
-                  id="address" 
-                  name="address" 
-                  value={formData.address} 
+                <Input
+                  id="address"
+                  name="address"
+                  value={formData.address}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
-                  className={errors.address && touched.address ? 'border-red-500' : ''}
+                  className={
+                    errors.address && touched.address ? "border-red-500" : ""
+                  }
                 />
-                <ErrorMessage message={touched.address ? errors.address : undefined} />
+                <ErrorMessage
+                  message={touched.address ? errors.address : undefined}
+                />
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col space-y-1.5">
                   <Label htmlFor="city">City</Label>
-                  <Input 
-                    id="city" 
-                    name="city" 
-                    value={formData.city} 
+                  <Input
+                    id="city"
+                    name="city"
+                    value={formData.city}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
-                    className={errors.city && touched.city ? 'border-red-500' : ''}
+                    className={
+                      errors.city && touched.city ? "border-red-500" : ""
+                    }
                   />
-                  <ErrorMessage message={touched.city ? errors.city : undefined} />
+                  <ErrorMessage
+                    message={touched.city ? errors.city : undefined}
+                  />
                 </div>
                 <div className="flex flex-col space-y-1.5">
                   <Label htmlFor="state">State</Label>
-                  <Input 
-                    id="state" 
-                    name="state" 
-                    value={formData.state} 
+                  <Input
+                    id="state"
+                    name="state"
+                    value={formData.state}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
-                    className={errors.state && touched.state ? 'border-red-500' : ''}
+                    className={
+                      errors.state && touched.state ? "border-red-500" : ""
+                    }
                   />
-                  <ErrorMessage message={touched.state ? errors.state : undefined} />
+                  <ErrorMessage
+                    message={touched.state ? errors.state : undefined}
+                  />
                 </div>
               </div>
-              
+
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="skills">Skills (comma-separated)</Label>
-                <Input 
-                  id="skills" 
-                  name="skills" 
-                  value={formData.skills} 
+                <Input
+                  id="skills"
+                  name="skills"
+                  value={formData.skills}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
                   placeholder="React, Node.js, JavaScript, Python..."
-                  className={errors.skills && touched.skills ? 'border-red-500' : ''}
+                  className={
+                    errors.skills && touched.skills ? "border-red-500" : ""
+                  }
                 />
-                <ErrorMessage message={touched.skills ? errors.skills : undefined} />
+                <ErrorMessage
+                  message={touched.skills ? errors.skills : undefined}
+                />
               </div>
 
               {/* Social Links */}
               <div className="flex flex-col space-y-3">
                 <Label>Social Links</Label>
-                <p className="text-xs text-gray-500">URLs will be automatically formatted with https:// if missing</p>
+                <p className="text-xs text-gray-500">
+                  URLs will be automatically formatted with https:// if missing
+                </p>
                 <div className="grid gap-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col space-y-1.5">
-                      <Label htmlFor="linkedin_account" className="flex items-center gap-2">
+                      <Label
+                        htmlFor="linkedin_account"
+                        className="flex items-center gap-2"
+                      >
                         <FaLinkedin className="text-blue-600" /> LinkedIn
                       </Label>
-                      <Input 
-                        id="linkedin_account" 
-                        name="linkedin_account" 
-                        placeholder="https://linkedin.com/in/username" 
-                        value={formData.linkedin_account} 
+                      <Input
+                        id="linkedin_account"
+                        name="linkedin_account"
+                        placeholder="https://linkedin.com/in/username"
+                        value={formData.linkedin_account}
                         onChange={handleInputChange}
                         onBlur={handleBlur}
-                        className={errors.linkedin_account && touched.linkedin_account ? 'border-red-500' : ''}
+                        className={
+                          errors.linkedin_account && touched.linkedin_account
+                            ? "border-red-500"
+                            : ""
+                        }
                       />
-                      <ErrorMessage message={touched.linkedin_account ? errors.linkedin_account : undefined} />
+                      <ErrorMessage
+                        message={
+                          touched.linkedin_account
+                            ? errors.linkedin_account
+                            : undefined
+                        }
+                      />
                     </div>
                     <div className="flex flex-col space-y-1.5">
-                      <Label htmlFor="twitter_account" className="flex items-center gap-2">
+                      <Label
+                        htmlFor="twitter_account"
+                        className="flex items-center gap-2"
+                      >
                         <TiSocialTwitter className="text-blue-400" /> Twitter
                       </Label>
-                      <Input 
-                        id="twitter_account" 
-                        name="twitter_account" 
-                        placeholder="https://twitter.com/username" 
-                        value={formData.twitter_account} 
+                      <Input
+                        id="twitter_account"
+                        name="twitter_account"
+                        placeholder="https://twitter.com/username"
+                        value={formData.twitter_account}
                         onChange={handleInputChange}
                         onBlur={handleBlur}
-                        className={errors.twitter_account && touched.twitter_account ? 'border-red-500' : ''}
+                        className={
+                          errors.twitter_account && touched.twitter_account
+                            ? "border-red-500"
+                            : ""
+                        }
                       />
-                      <ErrorMessage message={touched.twitter_account ? errors.twitter_account : undefined} />
+                      <ErrorMessage
+                        message={
+                          touched.twitter_account
+                            ? errors.twitter_account
+                            : undefined
+                        }
+                      />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col space-y-1.5">
-                      <Label htmlFor="instagram_account" className="flex items-center gap-2">
-                        <FaInstagramSquare className="text-pink-600" /> Instagram
+                      <Label
+                        htmlFor="instagram_account"
+                        className="flex items-center gap-2"
+                      >
+                        <FaInstagramSquare className="text-pink-600" />{" "}
+                        Instagram
                       </Label>
-                      <Input 
-                        id="instagram_account" 
-                        name="instagram_account" 
-                        placeholder="https://instagram.com/username" 
-                        value={formData.instagram_account} 
+                      <Input
+                        id="instagram_account"
+                        name="instagram_account"
+                        placeholder="https://instagram.com/username"
+                        value={formData.instagram_account}
                         onChange={handleInputChange}
                         onBlur={handleBlur}
-                        className={errors.instagram_account && touched.instagram_account ? 'border-red-500' : ''}
+                        className={
+                          errors.instagram_account && touched.instagram_account
+                            ? "border-red-500"
+                            : ""
+                        }
                       />
-                      <ErrorMessage message={touched.instagram_account ? errors.instagram_account : undefined} />
+                      <ErrorMessage
+                        message={
+                          touched.instagram_account
+                            ? errors.instagram_account
+                            : undefined
+                        }
+                      />
                     </div>
                     <div className="flex flex-col space-y-1.5">
-                      <Label htmlFor="facebook_account" className="flex items-center gap-2">
+                      <Label
+                        htmlFor="facebook_account"
+                        className="flex items-center gap-2"
+                      >
                         <TiSocialFacebook className="text-blue-800" /> Facebook
                       </Label>
-                      <Input 
-                        id="facebook_account" 
-                        name="facebook_account" 
-                        placeholder="https://facebook.com/username" 
-                        value={formData.facebook_account} 
+                      <Input
+                        id="facebook_account"
+                        name="facebook_account"
+                        placeholder="https://facebook.com/username"
+                        value={formData.facebook_account}
                         onChange={handleInputChange}
                         onBlur={handleBlur}
-                        className={errors.facebook_account && touched.facebook_account ? 'border-red-500' : ''}
+                        className={
+                          errors.facebook_account && touched.facebook_account
+                            ? "border-red-500"
+                            : ""
+                        }
                       />
-                      <ErrorMessage message={touched.facebook_account ? errors.facebook_account : undefined} />
+                      <ErrorMessage
+                        message={
+                          touched.facebook_account
+                            ? errors.facebook_account
+                            : undefined
+                        }
+                      />
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <DialogFooter className="flex flex-col sm:flex-row gap-2">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => {
                   setIsEditing(false);
                   setErrors({});
@@ -1316,12 +1704,16 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isSubmitting}
                 className="bg-[#7052FF] hover:bg-[#5a42cc] w-full sm:w-auto"
               >
-                {isSubmitting ? 'Saving...' : (profileData ? 'Save Changes' : 'Create Profile')}
+                {isSubmitting
+                  ? "Saving..."
+                  : profileData
+                  ? "Save Changes"
+                  : "Create Profile"}
               </Button>
             </DialogFooter>
           </form>

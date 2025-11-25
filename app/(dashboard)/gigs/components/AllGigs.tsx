@@ -1,12 +1,14 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import { Search, Building2, Bookmark, BookmarkCheck } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, Building2, Bookmark, BookmarkCheck, Share2 } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuthenticatedApi } from "@/context/AuthContext";
 import { toast } from "sonner";
+import ShareGigPopup from './ShareGigPopup';
 
 interface Gig {
   id: string;
@@ -34,9 +36,12 @@ const AllGigs = ({
   activeJobType, 
   onFilterChange 
 }: AllGigsProps) => {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedGigId, setSelectedGigId] = useState<string | null>(null);
   const [localGigs, setLocalGigs] = useState<Gig[]>(gigs || []);
+  const [showSharePopup, setShowSharePopup] = useState(false);
+  const [gigToShare, setGigToShare] = useState<Gig | null>(null);
   const { api } = useAuthenticatedApi();
 
   useEffect(() => {
@@ -87,6 +92,12 @@ const AllGigs = ({
 
   const handleJobTypeChange = (tab: string) => {
     onFilterChange('job', tab);
+  };
+
+  const handleShare = (e: React.MouseEvent, gig: Gig) => {
+    e.stopPropagation();
+    setGigToShare(gig);
+    setShowSharePopup(true);
   };
 
   return (
@@ -158,16 +169,26 @@ const AllGigs = ({
                     <div className="flex-1">
                       <div className="flex justify-between items-start">
                         <h3 className="font-medium">{gig.job_title}</h3>
-                        <button 
-                          onClick={(e) => handleBookmark(e, gig)}
-                          className="text-violet-600 hover:text-violet-800"
-                        >
-                          {gig.is_bookmark ? (
-                            <BookmarkCheck className="h-5 w-5" />
-                          ) : (
-                            <Bookmark className="h-5 w-5" />
-                          )}
-                        </button>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={(e) => handleShare(e, gig)}
+                            className="text-violet-600 hover:text-violet-800"
+                            title="Share this gig"
+                          >
+                            <Share2 className="h-5 w-5" />
+                          </button>
+                          <button 
+                            onClick={(e) => handleBookmark(e, gig)}
+                            className="text-violet-600 hover:text-violet-800"
+                            title={gig.is_bookmark ? "Remove bookmark" : "Bookmark this gig"}
+                          >
+                            {gig.is_bookmark ? (
+                              <BookmarkCheck className="h-5 w-5" />
+                            ) : (
+                              <Bookmark className="h-5 w-5" />
+                            )}
+                          </button>
+                        </div>
                       </div>
                       <p className="text-xs text-gray-500">
                         {gig.about_role} | {gig.location}
@@ -196,6 +217,16 @@ const AllGigs = ({
           )}
         </div>
       </div>
+
+      {/* Share Popup */}
+      {gigToShare && (
+        <ShareGigPopup
+          isOpen={showSharePopup}
+          onClose={() => setShowSharePopup(false)}
+          gigId={gigToShare.id}
+          gigTitle={gigToShare.job_title}
+        />
+      )}
     </div>
   );
 };

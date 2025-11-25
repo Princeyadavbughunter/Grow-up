@@ -61,11 +61,30 @@ export default function ApplicationForm({ jobId, isApplied }: { jobId?: string, 
         <div className="p-4 sm:p-6 md:p-8 mb-20 h-[calc(100vh-12rem)] rounded-lg w-full max-w-full sm:max-w-lg mx-auto bg-white">
             {profileData && (
                 <div className="flex flex-col sm:flex-row items-center space-x-0 sm:space-x-4 space-y-2 sm:space-y-0 mb-6">
-                    <img
-                        src={profileData.profile_picture || "https://via.placeholder.com/80"}
-                        alt={`${profileData.first_name} ${profileData.last_name}`}
-                        className="w-20 h-20 rounded-full border border-gray-300"
-                    />
+                    {profileData.profile_picture ? (
+                        <img
+                            src={profileData.profile_picture}
+                            alt={`${profileData.first_name} ${profileData.last_name}`}
+                            className="w-20 h-20 rounded-full border border-gray-300"
+                        />
+                    ) : (
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center border border-gray-300 bg-[#ffe7e0]">
+                            {/* the icon below closely resembles the provided image */}
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="30"
+                                height="30"
+                                viewBox="0 0 40 40"
+                                fill="none"
+                            >
+                                <circle cx="20" cy="20" r="20" fill="#ffe7e0"/>
+                                <g>
+                                    <circle cx="20" cy="15" r="5" fill="#C84A1F"/>
+                                    <rect x="10" y="25" width="20" height="7" rx="3.5" fill="#C84A1F"/>
+                                </g>
+                            </svg>
+                        </div>
+                    )}
                     <div className="text-center sm:text-left">
                         <h3 className="font-medium text-lg">{`${profileData.first_name} ${profileData.last_name}`}</h3>
                         <p className="text-gray-500 text-sm">{profileData.position}</p>
