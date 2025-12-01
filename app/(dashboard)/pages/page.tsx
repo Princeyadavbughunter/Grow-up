@@ -255,7 +255,7 @@ const ChatInterface = () => {
 
     try {
       const response = await api.get(`/chats/app/club-chatrooms-messages/?room_id=${roomId}`);
-      setMessages(response.data?.results || []);
+      setMessages((response.data?.results || []).reverse());
       connectWebSocket(roomId);
     } catch (error) {
       console.error('Error fetching broadcast messages:', error);
@@ -289,6 +289,11 @@ const ChatInterface = () => {
 
   const filteredFollowedPages = followedPages.filter(page =>
     page.name.toLowerCase().includes(searchInput.toLowerCase())
+  );
+
+  const filteredPages = pages.filter(page =>
+    page.name.toLowerCase().includes(searchInput.toLowerCase()) ||
+    (page.description && page.description.toLowerCase().includes(searchInput.toLowerCase()))
   );
 
   if (loading) {
@@ -359,6 +364,19 @@ const ChatInterface = () => {
                   />
                 </div>
               )}
+              
+              {activeTab === 'discover' && (
+                <div className="relative">
+                  <BiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    placeholder="Search pages..."
+                    className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+                  />
+                </div>
+              )}
             </div>
             
             <div className="flex-1 overflow-y-auto scrollbar-hide px-4 pt-4 pb-24  min-h-0">
@@ -412,39 +430,46 @@ const ChatInterface = () => {
               ) : (
                 <div className="space-y-3">
                   <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
-                    Recommended for you
+                    {filteredPages.length} {filteredPages.length === 1 ? 'Page' : 'Pages'} {searchInput ? 'found' : 'Recommended for you'}
                   </p>
-                  {pages.map((page) => (
-                    <div
-                      key={page.id}
-                      className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm cursor-pointer transition-all duration-200 bg-white"
-                      onClick={() => handlePageSelect(page)}
-                    >
-                      {page.profile_picture ? (
-                        <img
-                          src={page.profile_picture}
-                          alt={page.name}
-                          className="h-12 w-12 rounded-full object-cover flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                          <FaUser className="h-6 w-6 text-gray-500" />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-gray-900 mb-1">{page.name}</h3>
-                        <p className="text-xs text-gray-500 mb-2 line-clamp-2">{page.description || 'No description available'}</p>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                          <span>{page.followers_count} followers</span>
-                          {page.is_owner_of_page && (
-                            <span className="text-blue-500 flex items-center">
-                              <RiBroadcastFill className="mr-1" /> Your Page
-                            </span>
-                          )}
+                  {filteredPages.length > 0 ? (
+                    filteredPages.map((page) => (
+                      <div
+                        key={page.id}
+                        className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm cursor-pointer transition-all duration-200 bg-white"
+                        onClick={() => handlePageSelect(page)}
+                      >
+                        {page.profile_picture ? (
+                          <img
+                            src={page.profile_picture}
+                            alt={page.name}
+                            className="h-12 w-12 rounded-full object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                            <FaUser className="h-6 w-6 text-gray-500" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-gray-900 mb-1">{page.name}</h3>
+                          <p className="text-xs text-gray-500 mb-2 line-clamp-2">{page.description || 'No description available'}</p>
+                          <div className="flex items-center gap-3 text-xs text-gray-500">
+                            <span>{page.followers_count} followers</span>
+                            {page.is_owner_of_page && (
+                              <span className="text-blue-500 flex items-center">
+                                <RiBroadcastFill className="mr-1" /> Your Page
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-12 text-gray-500">
+                      <BiSearch className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                      <p className="text-sm">No pages found</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
             </div>
@@ -482,6 +507,19 @@ const ChatInterface = () => {
           </div>
           
           {activeTab === 'buddies' && (
+            <div className="relative">
+              <BiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Search pages..."
+                className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors text-sm"
+              />
+            </div>
+          )}
+          
+          {activeTab === 'discover' && (
             <div className="relative">
               <BiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
@@ -546,39 +584,46 @@ const ChatInterface = () => {
           ) : (
             <div className="space-y-3">
               <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
-                Recommended for you
+                {filteredPages.length} {filteredPages.length === 1 ? 'Page' : 'Pages'} {searchInput ? 'found' : 'Recommended for you'}
               </p>
-              {pages.map((page) => (
-                <div
-                  key={page.id}
-                  className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-400 hover:shadow-md cursor-pointer transition-all duration-200 bg-white"
-                  onClick={() => handlePageSelect(page)}
-                >
-                  {page.profile_picture ? (
-                    <img
-                      src={page.profile_picture}
-                      alt={page.name}
-                      className="h-12 w-12 rounded-full object-cover flex-shrink-0"
-                    />
-                  ) : (
-                    <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                      <FaUser className="h-6 w-6 text-gray-500" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 mb-1 text-sm">{page.name}</h3>
-                    <p className="text-xs text-gray-500 mb-2 line-clamp-2">{page.description || 'Join this page to receive updates and broadcasts'}</p>
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
-                      <span>{page.followers_count} followers</span>
-                      {page.is_owner_of_page && (
-                        <span className="text-blue-500 flex items-center">
-                          <RiBroadcastFill className="mr-1 h-3 w-3" /> Your Page
-                        </span>
-                      )}
+              {filteredPages.length > 0 ? (
+                filteredPages.map((page) => (
+                  <div
+                    key={page.id}
+                    className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-400 hover:shadow-md cursor-pointer transition-all duration-200 bg-white"
+                    onClick={() => handlePageSelect(page)}
+                  >
+                    {page.profile_picture ? (
+                      <img
+                        src={page.profile_picture}
+                        alt={page.name}
+                        className="h-12 w-12 rounded-full object-cover flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                        <FaUser className="h-6 w-6 text-gray-500" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 mb-1 text-sm">{page.name}</h3>
+                      <p className="text-xs text-gray-500 mb-2 line-clamp-2">{page.description || 'Join this page to receive updates and broadcasts'}</p>
+                      <div className="flex items-center gap-3 text-xs text-gray-500">
+                        <span>{page.followers_count} followers</span>
+                        {page.is_owner_of_page && (
+                          <span className="text-blue-500 flex items-center">
+                            <RiBroadcastFill className="mr-1 h-3 w-3" /> Your Page
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <BiSearch className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">No pages found</p>
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>

@@ -94,52 +94,57 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ pageId, creatorId }) => {
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-bold">Page Members</h2>
-      {pageMembers.length === 0 ? (
-        <p className="text-gray-500">No members found</p>
-      ) : (
-        pageMembers.map((member) => {
-          const isCreator = (pageCreatorId && member.id === pageCreatorId) || (creatorId && member.id === creatorId);
-          return (
-            <div 
-              key={member.id} 
-              className={`flex items-center justify-between space-x-4 p-3 border rounded-lg ${isCreator ? 'border-purple-500 bg-purple-50' : ''}`}
-            >
-              <div className="flex items-center space-x-4">
-                {member.profile_picture ? (
-                  <img 
-                    src={member.profile_picture} 
-                    alt={`${member.first_name} ${member.last_name}`} 
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-purple-200 flex items-center justify-center">
-                    <span className="text-purple-600 font-bold text-lg">
-                      {member.first_name?.charAt(0) || '?'}
-                    </span>
+    <div className="h-full overflow-y-auto pb-20">
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold">Page Members</h2>
+  
+        {pageMembers.length === 0 ? (
+          <p className="text-gray-500">No members found</p>
+        ) : (
+          pageMembers.map((member) => {
+            const isCreator = (pageCreatorId && member.id === pageCreatorId) || (creatorId && member.id === creatorId);
+            return (
+              <div
+                key={member.id}
+                className={`flex items-center justify-between space-x-4 p-3 border rounded-lg ${isCreator ? 'border-purple-500 bg-purple-50' : ''}`}
+              >
+                <div className="flex items-center space-x-4">
+                  {member.profile_picture ? (
+                    <img
+                      src={member.profile_picture}
+                      alt={`${member.first_name} ${member.last_name}`}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-purple-200 flex items-center justify-center">
+                      <span className="text-purple-600 font-bold text-lg">
+                        {member.first_name?.charAt(0) || '?'}
+                      </span>
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-semibold text-base md:text-lg">{`${member.first_name} ${member.last_name}`}</p>
+                    <div className="space-y-1">
+                      {member.role && <p className="text-gray-500 text-sm">{member.role}</p>}
+                      {member.location && <p className="text-gray-400 text-xs">📍 {member.location}</p>}
+                    </div>
+                  </div>
+                </div>
+  
+                {isCreator && (
+                  <div className="flex items-center gap-1 bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    <span>👑</span>
+                    <span>Admin</span>
                   </div>
                 )}
-                <div>
-                  <p className="font-semibold text-base md:text-lg">{`${member.first_name} ${member.last_name}`}</p>
-                  <div className="space-y-1">
-                    {member.role && <p className="text-gray-500 text-sm">{member.role}</p>}
-                    {member.location && <p className="text-gray-400 text-xs">📍 {member.location}</p>}
-                  </div>
-                </div>
               </div>
-              {isCreator && (
-                <div className="flex items-center gap-1 bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                  <span>👑</span>
-                  <span>Admin</span>
-                </div>
-              )}
-            </div>
-          );
-        })
-      )}
+            );
+          })
+        )}
+      </div>
     </div>
-  )
+  );
+  
 }
 
 export default PeopleTab

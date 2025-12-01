@@ -196,7 +196,8 @@ const MyExperience: React.FC = () => {
 
     try {
       setIsSubmitting(true);
-      await apiCaller.delete(`/freelancer/work-experience/${id}/`);
+      // Use same pattern as PATCH: delete via query param on the list endpoint
+      await apiCaller.delete(`/freelancer/work-experience/?id=${id}`);
       await fetchExperiences();
       setIsEditing(false);
     } catch (error) {

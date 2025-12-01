@@ -409,12 +409,12 @@ export default function EventsPage() {
   const currentEvents = events?.[`${activeTab}_events` as keyof EventsData] || [];
 
   return (
-    <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-8 pb-40 h-full md:h-[calc(100vh-10rem)] overflow-y-scroll md:overflow-y-hidden">
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-8 pb-20 md:pb-40 h-full md:h-[calc(100vh-10rem)] overflow-y-scroll md:overflow-y-hidden">
       <EventTabs />
       <EventFilters />
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="w-full lg:w-1/3">
+      <div className="flex flex-col lg:flex-row gap-0 lg:gap-8">
+        <div className="w-full lg:w-1/3 mb-0">
           <ScrollArea className="h-[calc(100vh-20rem)]" ref={scrollContainerRef}>
             <div className="pr-4 space-y-4">
               {eventsLoading ? (
@@ -562,4 +562,3 @@ export default function EventsPage() {
     </div>
   );
 }
-
