@@ -232,7 +232,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
             <div className="text-green-600 text-sm mb-2 animate-fade-in">
               ✓ Profile link copied to clipboard!
             </div>
-          )}
+            )}
           {bio && (
             <p className="text-gray-600 text-sm sm:text-base mb-2">
               {bio}

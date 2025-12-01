@@ -29,6 +29,8 @@ const StepForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [formData, setFormData] = useState<FormData>({
     job_description: "",
     job_title: "",
@@ -48,28 +50,67 @@ const StepForm = () => {
   const { profileData } = useAuth()
 
   const validateStep = (step: number) => {
+    const newErrors: Record<string, string> = {};
+    
     switch (step) {
       case 1:
-        return formData.job_title.trim() !== "" && formData.work_type !== "" && formData.job_type !== "";
+        if (!formData.job_title.trim()) {
+          newErrors.job_title = "Job title is required";
+        }
+        if (!formData.work_type) {
+          newErrors.work_type = "Work type is required";
+        }
+        if (!formData.job_type) {
+          newErrors.job_type = "Job type is required";
+        }
+        break;
       case 2:
-        return formData.required_skills.trim() !== "";
+        if (!formData.required_skills.trim()) {
+          newErrors.required_skills = "Required skills are required";
+        }
+        break;
       case 3:
-        return formData.job_description.trim() !== "";
+        if (!formData.job_description.trim()) {
+          newErrors.job_description = "Job description is required";
+        }
+        break;
       default:
-        return true;
+        break;
     }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
       setCurrentStep((prev) => Math.min(prev + 1, 3));
+      // Clear errors when moving to next step
+      setErrors({});
+    } else {
+      // Mark all fields in current step as touched to show errors
+      const fieldsToTouch: Record<string, boolean> = {};
+      if (currentStep === 1) {
+        fieldsToTouch.job_title = true;
+        fieldsToTouch.work_type = true;
+        fieldsToTouch.job_type = true;
+      } else if (currentStep === 2) {
+        fieldsToTouch.required_skills = true;
+      } else if (currentStep === 3) {
+        fieldsToTouch.job_description = true;
+      }
+      setTouched((prev) => ({ ...prev, ...fieldsToTouch }));
     }
   };
 
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
   const handleSubmit = async () => {
-    if (!validateStep(3)) return;
+    if (!validateStep(3)) {
+      // Mark job_description as touched if validation fails
+      setTouched((prev) => ({ ...prev, job_description: true }));
+      return;
+    }
     
     try {
       setIsSubmitting(true);
@@ -105,6 +146,30 @@ const StepForm = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+    
+    // Mark field as touched
+    setTouched((prev) => ({ ...prev, [name]: true }));
+  };
+
+  const handleBlur = (fieldName: string) => {
+    setTouched((prev) => ({ ...prev, [fieldName]: true }));
+    // Validate the field on blur
+    if (currentStep === 1 && (fieldName === 'job_title' || fieldName === 'work_type' || fieldName === 'job_type')) {
+      validateStep(1);
+    } else if (currentStep === 2 && fieldName === 'required_skills') {
+      validateStep(2);
+    } else if (currentStep === 3 && fieldName === 'job_description') {
+      validateStep(3);
+    }
   };
 
 
@@ -200,14 +265,27 @@ const StepForm = () => {
                   <textarea
                     id="job_title"
                     name="job_title"
-                    className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm sm:text-base"
+                    className={`w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 resize-none text-sm sm:text-base ${
+                      errors.job_title && touched.job_title
+                        ? "border-red-500 focus:ring-red-500"
+                        : "focus:ring-purple-500"
+                    }`}
                     placeholder="e.g., Web Designer, Software Engineer"
                     maxLength={120}
                     value={formData.job_title}
                     onChange={handleInputChange}
+                    onBlur={() => handleBlur('job_title')}
                     rows={2}
                     autoFocus
                   ></textarea>
+                  {errors.job_title && touched.job_title && (
+                    <p className="mt-1 text-xs text-red-600 flex items-center">
+                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.job_title}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-4 sm:mt-6">
@@ -219,6 +297,8 @@ const StepForm = () => {
                         className={`flex items-center p-2 sm:p-3 border rounded-lg sm:rounded-xl cursor-pointer ${
                           formData.work_type === type 
                             ? "border-purple-500 bg-purple-50" 
+                            : errors.work_type && touched.work_type
+                            ? "border-red-500"
                             : "border-gray-200 hover:bg-gray-50"
                         }`}
                       >
@@ -227,14 +307,31 @@ const StepForm = () => {
                           name="work_type"
                           className="form-radio text-purple-500 mr-1 sm:mr-2 w-3 h-3 sm:w-4 sm:h-4"
                           checked={formData.work_type === type}
-                          onChange={() =>
-                            setFormData({ ...formData, work_type: type })
-                          }
+                          onChange={() => {
+                            setFormData({ ...formData, work_type: type });
+                            if (errors.work_type) {
+                              setErrors((prev) => {
+                                const newErrors = { ...prev };
+                                delete newErrors.work_type;
+                                return newErrors;
+                              });
+                            }
+                            setTouched((prev) => ({ ...prev, work_type: true }));
+                          }}
+                          onBlur={() => handleBlur('work_type')}
                         />
                         <span className="text-xs sm:text-sm text-gray-700">{type}</span>
                       </label>
                     ))}
                   </div>
+                  {errors.work_type && touched.work_type && (
+                    <p className="mt-1 text-xs text-red-600 flex items-center">
+                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.work_type}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-4 sm:mt-6">
@@ -246,6 +343,8 @@ const StepForm = () => {
                         className={`flex items-center p-2 sm:p-3 border rounded-lg sm:rounded-xl cursor-pointer ${
                           formData.job_type === type 
                             ? "border-purple-500 bg-purple-50" 
+                            : errors.job_type && touched.job_type
+                            ? "border-red-500"
                             : "border-gray-200 hover:bg-gray-50"
                         }`}
                       >
@@ -254,14 +353,31 @@ const StepForm = () => {
                           name="job_type"
                           className="form-radio text-purple-500 mr-1 sm:mr-2 w-3 h-3 sm:w-4 sm:h-4"
                           checked={formData.job_type === type}
-                          onChange={() =>
-                            setFormData({ ...formData, job_type: type })
-                          }
+                          onChange={() => {
+                            setFormData({ ...formData, job_type: type });
+                            if (errors.job_type) {
+                              setErrors((prev) => {
+                                const newErrors = { ...prev };
+                                delete newErrors.job_type;
+                                return newErrors;
+                              });
+                            }
+                            setTouched((prev) => ({ ...prev, job_type: true }));
+                          }}
+                          onBlur={() => handleBlur('job_type')}
                         />
                         <span className="text-xs sm:text-sm text-gray-700">{type}</span>
                       </label>
                     ))}
                   </div>
+                  {errors.job_type && touched.job_type && (
+                    <p className="mt-1 text-xs text-red-600 flex items-center">
+                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.job_type}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-4 sm:mt-6">
@@ -322,12 +438,25 @@ const StepForm = () => {
                   <p className="text-xs sm:text-sm text-gray-600 mb-1">Skills you are looking for</p>
                   <textarea
                     name="required_skills"
-                    className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm sm:text-base"
+                    className={`w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 resize-none text-sm sm:text-base ${
+                      errors.required_skills && touched.required_skills
+                        ? "border-red-500 focus:ring-red-500"
+                        : "focus:ring-purple-500"
+                    }`}
                     placeholder="e.g., Python, React, UI/UX Design (separate with commas)"
                     value={formData.required_skills}
                     onChange={handleInputChange}
+                    onBlur={() => handleBlur('required_skills')}
                     rows={3}
                   ></textarea>
+                  {errors.required_skills && touched.required_skills && (
+                    <p className="mt-1 text-xs text-red-600 flex items-center">
+                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.required_skills}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-4 sm:mt-6">
@@ -391,13 +520,26 @@ const StepForm = () => {
                   </p>
                   <textarea
                     name="job_description"
-                    className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm sm:text-base"
+                    className={`w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 resize-none text-sm sm:text-base ${
+                      errors.job_description && touched.job_description
+                        ? "border-red-500 focus:ring-red-500"
+                        : "focus:ring-purple-500"
+                    }`}
                     placeholder="Describe the job position, responsibilities, and requirements"
                     maxLength={1200}
                     rows={5}
                     value={formData.job_description}
                     onChange={handleInputChange}
+                    onBlur={() => handleBlur('job_description')}
                   ></textarea>
+                  {errors.job_description && touched.job_description && (
+                    <p className="mt-1 text-xs text-red-600 flex items-center">
+                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.job_description}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-4 sm:mt-6">
