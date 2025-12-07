@@ -34,7 +34,10 @@ const Description = ({ selectedGig, showSmaller }: DescriptionProps) => {
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setShowSharePopup(true)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setShowSharePopup(true);
+                            }}
                             className="flex items-center gap-2"
                         >
                             <Share2 className="h-4 w-4" />

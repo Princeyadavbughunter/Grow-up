@@ -49,6 +49,25 @@ const StepForm = () => {
 
   const { profileData } = useAuth()
 
+  // Pure validation function (no side effects) - for use in render
+  const isValidStep = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        return (
+          formData.job_title.trim() !== "" &&
+          formData.work_type !== "" &&
+          formData.job_type !== ""
+        );
+      case 2:
+        return formData.required_skills.trim() !== "";
+      case 3:
+        return formData.job_description.trim() !== "";
+      default:
+        return true;
+    }
+  };
+
+  // Validation function with side effects - for use in handlers
   const validateStep = (step: number) => {
     const newErrors: Record<string, string> = {};
     
@@ -186,7 +205,7 @@ const StepForm = () => {
         <nav aria-label="Progress">
           <ol className="flex items-center justify-center">
             {steps.map((step, stepIdx) => (
-              <li key={step.name} className={`relative ${stepIdx !== steps.length - 1 ? 'pr-4 sm:pr-6 md:pr-8' : ''}`}>
+              <li key={step.id} className={`relative ${stepIdx !== steps.length - 1 ? 'pr-4 sm:pr-6 md:pr-8' : ''}`}>
                 {stepIdx !== steps.length - 1 && (
                   <div className="absolute top-1/2 left-full w-4 sm:w-6 md:w-8 h-0.5 -translate-y-1/2" aria-hidden="true">
                     <div 
@@ -418,12 +437,12 @@ const StepForm = () => {
 
                 <button
                   className={`w-full mt-4 sm:mt-6 py-2 sm:py-3 px-4 rounded-lg transition-colors text-sm sm:text-base ${
-                    validateStep(1)
+                    isValidStep(1)
                       ? "bg-purple-600 text-white hover:bg-purple-700"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                   onClick={nextStep}
-                  disabled={!validateStep(1)}
+                  disabled={!isValidStep(1)}
                 >
                   Next
                 </button>
@@ -496,12 +515,12 @@ const StepForm = () => {
                   </button>
                   <button
                     className={`flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg transition-colors flex items-center justify-center text-sm sm:text-base ${
-                      validateStep(2)
+                      isValidStep(2)
                         ? "bg-purple-600 text-white hover:bg-purple-700"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }`}
                     onClick={nextStep}
-                    disabled={!validateStep(2)}
+                    disabled={!isValidStep(2)}
                   >
                     Next <HiArrowNarrowRight className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4" />
                   </button>
@@ -567,12 +586,12 @@ const StepForm = () => {
                   </button>
                   <button
                     className={`flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg transition-colors flex items-center justify-center text-sm sm:text-base ${
-                      validateStep(3) && !isSubmitting
+                      isValidStep(3) && !isSubmitting
                         ? "bg-purple-600 text-white hover:bg-purple-700"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }`}
                     onClick={handleSubmit}
-                    disabled={!validateStep(3) || isSubmitting}
+                    disabled={!isValidStep(3) || isSubmitting}
                   >
                     {isSubmitting ? "Posting..." : (
                       <>
