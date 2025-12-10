@@ -85,10 +85,10 @@ const NavBar: React.FC = () => {
                     alt="Profile"
                     width={40}
                     height={40}
-                    className="rounded-full md:w-10 md:h-10 w-8 h-8 cursor-pointer"
+                    className="rounded-full md:w-10 md:h-10 w-8 h-8 cursor-pointer aspect-square object-cover"
                   />
                 ) : (
-                  <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8 cursor-pointer">
+                  <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8 cursor-pointer aspect-square">
                     <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
                   </div>
                 )}

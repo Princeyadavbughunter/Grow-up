@@ -4,6 +4,7 @@ import LandingNav from '@/components/LandingNav'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
+import { COOKIE_KEYS } from '@/lib/cookieConfig'
 import Community from './landing/Community'
 import Future from './landing/Future'
 import Download from './landing/Download'
@@ -29,8 +30,8 @@ const Home = () => {
 
   useEffect(() => {
     // Check if user is authenticated by checking for access token
-    const accessToken = Cookies.get('access_token')
-    const refreshToken = Cookies.get('refresh_token')
+    const accessToken = Cookies.get(COOKIE_KEYS.ACCESS_TOKEN)
+    const refreshToken = Cookies.get(COOKIE_KEYS.REFRESH_TOKEN)
     
     if (accessToken && refreshToken) {
       // User is authenticated, redirect to explore page

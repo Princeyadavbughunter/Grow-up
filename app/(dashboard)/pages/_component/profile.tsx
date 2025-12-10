@@ -90,7 +90,7 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
       case 'About':
         return <AboutTab pageDetails={pageDetails} />;
       case 'Post':
-        return <PostTab pageId={pageDetails.id} pageName={pageDetails.name} pageProfilePicture={pageDetails.profile_picture} />; 
+        return <PostTab pageId={pageDetails.id} pageName={pageDetails.name} pageProfilePicture={pageDetails.profile_picture} isAdmin={pageDetails.is_admin} />; 
       case 'People':
         return <PeopleTab pageId={pageDetails.id} creatorId={pageDetails.creator} />;
       default:
@@ -132,10 +132,10 @@ const ProfileView = ({ onBack, pageId }: { onBack: () => void, pageId?: string }
                 <img
                   src={pageDetails.profile_picture}
                   alt={pageDetails.name}
-                  className="h-12 w-12 rounded-full flex-shrink-0"
+                  className="h-12 w-12 rounded-full flex-shrink-0 aspect-square object-cover"
                 />
               ) : (
-                <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 aspect-square">
                   <FaUser className="h-6 w-6 text-gray-500" />
                 </div>
               )}

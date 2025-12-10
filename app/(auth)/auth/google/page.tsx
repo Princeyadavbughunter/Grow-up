@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { useAuth } from '@/context/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
+import { COOKIE_OPTIONS, COOKIE_KEYS } from '@/lib/cookieConfig'
 
 interface GoogleAuthResponse {
     authorization_url?: string;
@@ -29,13 +30,6 @@ const AccountCreationContent = () => {
         '/images/login_page2.svg',
         '/images/login_page3.svg'
     ]
-
-    const COOKIE_OPTIONS = {
-        expires: 7,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict' as const,
-        path: '/'
-    };
 
     // Auto-rotate images every 4 seconds
     useEffect(() => {
@@ -123,11 +117,12 @@ const AccountCreationContent = () => {
             if (response.data.access && response.data.refresh) {
                 console.log(response.data);
                 
-                Cookies.set('access_token', response.data.access, COOKIE_OPTIONS);
-                Cookies.set('refresh_token', response.data.refresh, COOKIE_OPTIONS);
+                // Use centralized cookie configuration for consistency
+                Cookies.set(COOKIE_KEYS.ACCESS_TOKEN, response.data.access, COOKIE_OPTIONS);
+                Cookies.set(COOKIE_KEYS.REFRESH_TOKEN, response.data.refresh, COOKIE_OPTIONS);
 
                 if (response.data.user) {
-                    Cookies.set('user_id', response.data.user, COOKIE_OPTIONS);
+                    Cookies.set(COOKIE_KEYS.USER_ID, response.data.user, COOKIE_OPTIONS);
 
                     const emailMatch = response.data.user.match(/email - ([^\s]+)/) || [];
                     const userEmail = emailMatch[1];
@@ -138,7 +133,7 @@ const AccountCreationContent = () => {
 
                     const idMatch = response.data.user.match(/id - ([0-9a-f-]+)/);
                     if (idMatch && idMatch[1]) {
-                        Cookies.set('user_id_value', idMatch[1], COOKIE_OPTIONS);
+                        Cookies.set(COOKIE_KEYS.USER_ID_VALUE, idMatch[1], COOKIE_OPTIONS);
                     }
                 }
 
