@@ -3,6 +3,7 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
 import axios, { AxiosInstance } from 'axios';
 import Cookies from 'js-cookie';
+import { COOKIE_OPTIONS, COOKIE_KEYS } from '@/lib/cookieConfig';
 
 // Define interfaces for the profile data
 interface WorkExperience {
@@ -38,9 +39,6 @@ interface FreelancerProfile {
   created_at: string;
   degree_name: string;
   is_degree: boolean;
-  is_diploma: boolean;
-  diploma_name: string;
-  is_disabled: boolean;
   resume: string | null;
   skills: string;
   gender: string;
@@ -83,12 +81,6 @@ interface AuthTokens {
 }
 
 const baseURL = process.env.NEXT_PUBLIC_URL as string;
-const COOKIE_OPTIONS = {
-  expires: 7, 
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict' as const,
-  path: '/'
-};
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
@@ -107,9 +99,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const loadAuthState = () => {
       try {
-        const accessToken = Cookies.get('access_token');
-        const refreshToken = Cookies.get('refresh_token');
-        const userInfo = Cookies.get('user_id');
+        const accessToken = Cookies.get(COOKIE_KEYS.ACCESS_TOKEN);
+        const refreshToken = Cookies.get(COOKIE_KEYS.REFRESH_TOKEN);
+        const userInfo = Cookies.get(COOKIE_KEYS.USER_ID);
 
         if (accessToken && refreshToken) {
           setAuthToken(accessToken);
@@ -217,10 +209,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated(false);
       setProfileData(null);
       
-      // Remove cookies
-      Cookies.remove('access_token', { path: '/' });
-      Cookies.remove('refresh_token', { path: '/' });
-      Cookies.remove('user_id', { path: '/' });
+      // Remove cookies with same options used to set them
+      Cookies.remove(COOKIE_KEYS.ACCESS_TOKEN, { path: COOKIE_OPTIONS.path });
+      Cookies.remove(COOKIE_KEYS.REFRESH_TOKEN, { path: COOKIE_OPTIONS.path });
+      Cookies.remove(COOKIE_KEYS.USER_ID, { path: COOKIE_OPTIONS.path });
+      Cookies.remove(COOKIE_KEYS.USER_ID_VALUE, { path: COOKIE_OPTIONS.path });
       
       window.location.href = '/';
     }

@@ -27,8 +27,6 @@ const MyEducation: React.FC<MyEducationProps> = ({ profileData }) => {
         highest_qualification: profileData?.highest_qualification || "",
         degree_name: profileData?.degree_name || "",
         is_degree: profileData?.is_degree || false,
-        is_diploma: profileData?.is_diploma || false,
-        diploma_name: profileData?.diploma_name || "",
     };
 
     // @ts-ignore
@@ -49,9 +47,6 @@ const MyEducation: React.FC<MyEducationProps> = ({ profileData }) => {
             if (name === 'is_degree') {
                 // @ts-ignore
                 setFormData(prev => ({ ...prev, degree_name: '' }));
-            } else if (name === 'is_diploma') {
-                // @ts-ignore
-                setFormData(prev => ({ ...prev, diploma_name: '' }));
             }
         }
     };
@@ -75,10 +70,6 @@ const MyEducation: React.FC<MyEducationProps> = ({ profileData }) => {
                 degree_name: formData.degree_name,
                 // @ts-ignore
                 is_degree: formData.is_degree,
-                // @ts-ignore
-                is_diploma: formData.is_diploma,
-                // @ts-ignore
-                diploma_name: formData.diploma_name,
             };
 
             if (profileData?.id) {
@@ -134,11 +125,9 @@ const MyEducation: React.FC<MyEducationProps> = ({ profileData }) => {
                 {hasEducationData ? (
                     <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4">
                         <h3 className="font-semibold">
-                            {profileData.is_degree ? 
-                                `${profileData.degree_name || profileData.highest_qualification}` : 
-                                profileData.is_diploma ? 
-                                    `${profileData.diploma_name || profileData.highest_qualification}` : 
-                                    profileData.highest_qualification}
+                            {profileData.is_degree ?
+                                `${profileData.degree_name || profileData.highest_qualification}` :
+                                profileData.highest_qualification}
                         </h3>
                         <p className="text-sm text-gray-500">{profileData.university_name || 'N/A'}</p>
                         <p className="text-sm text-gray-400">
@@ -236,30 +225,6 @@ const MyEducation: React.FC<MyEducationProps> = ({ profileData }) => {
                                 </div>
                             )}
                             
-                            <div className="flex items-center space-x-2">
-                                <Checkbox 
-                                    id="is_diploma" 
-                                    // @ts-ignore
-                                    checked={formData.is_diploma}
-                                    onCheckedChange={(checked) => handleCheckboxChange("is_diploma", checked as boolean)}
-                                />
-                                <Label htmlFor="is_diploma">This is a Diploma</Label>
-                            </div>
-                            
-                            {/* @ts-ignore */}
-                            {formData.is_diploma && (
-                                <div className="flex flex-col space-y-1.5">
-                                    <Label htmlFor="diploma_name">Diploma Name</Label>
-                                    <Input 
-                                        id="diploma_name" 
-                                        name="diploma_name" 
-                                        // @ts-ignore
-                                        value={formData.diploma_name} 
-                                        onChange={handleInputChange}
-                                        placeholder="e.g., Diploma in Web Development"
-                                    />
-                                </div>
-                            )}
                         </div>
                         
                         <DialogFooter>

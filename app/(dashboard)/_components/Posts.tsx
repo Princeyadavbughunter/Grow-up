@@ -13,6 +13,7 @@ import {
   Users,
   MoreVertical,
   Trash2,
+  User,
 } from "lucide-react";
 import { HeartIcon } from "@/components/ui/heart";
 import {UploadIcon} from "@/components/ui/upload";
@@ -105,9 +106,10 @@ interface CommentReply {
 
 interface PostsProps {
   posts?: Post[];
+  isPageAdmin?: boolean;
 }
 
-const Posts = ({ posts: propPosts }: PostsProps = {}) => {
+const Posts = ({ posts: propPosts, isPageAdmin }: PostsProps = {}) => {
   const [posts, setPosts] = useState<Post[]>(propPosts || []);
   const [loading, setLoading] = useState<boolean>(!propPosts);
   const [error, setError] = useState<string | null>(null);
@@ -379,12 +381,14 @@ const Posts = ({ posts: propPosts }: PostsProps = {}) => {
           title="No posts yet"
           description="Be the first to share something with your community! Create a post to start the conversation."
           action={
-            <Link
-              href="/create-post"
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              Create First Post
-            </Link>
+            isPageAdmin ? (
+              <Link
+                href="/create-post"
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                Create First Post
+              </Link>
+            ) : null
           }
         />
       </div>
@@ -880,16 +884,19 @@ const CommentItem = ({ comment, api, currentUserId }: CommentItemProps) => {
   return (
     <div className="border-l-2 sm:border-l-4 border-gray-200 pl-3 sm:pl-4">
       <div className="flex items-start gap-3">
-        <Image
-          src={
-            comment.profile_picture ||
-            "https://randomuser.me/portraits/men/2.jpg"
-          }
-          alt="User"
-          width={32}
-          height={32}
-          className="rounded-full w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0"
-        />
+        {comment.profile_picture ? (
+          <Image
+            src={comment.profile_picture}
+            alt="User"
+            width={32}
+            height={32}
+            className="rounded-full w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 aspect-square object-cover"
+          />
+        ) : (
+          <div className="rounded-full bg-gray-200 flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 aspect-square">
+            <User className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
+          </div>
+        )}
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h4 className="font-medium">
@@ -928,16 +935,19 @@ const CommentItem = ({ comment, api, currentUserId }: CommentItemProps) => {
                     key={reply.id}
                     className="flex items-start gap-2 ml-4 sm:ml-6 pl-3 sm:pl-4 border-l-2 border-gray-100"
                   >
-                    <Image
-                      src={
-                        reply.profile_picture ||
-                        "https://randomuser.me/portraits/men/2.jpg"
-                      }
-                      alt="User"
-                      width={24}
-                      height={24}
-                      className="rounded-full w-6 h-6 flex-shrink-0"
-                    />
+                    {reply.profile_picture ? (
+                      <Image
+                        src={reply.profile_picture}
+                        alt="User"
+                        width={24}
+                        height={24}
+                        className="rounded-full w-6 h-6 flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="rounded-full bg-gray-200 flex items-center justify-center w-6 h-6 flex-shrink-0">
+                        <User className="w-3 h-3 text-gray-500" />
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h5 className="font-medium text-xs">

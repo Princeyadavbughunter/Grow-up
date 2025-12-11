@@ -64,9 +64,6 @@ interface Job {
     created_at: string;
     degree_name: string;
     is_degree: boolean;
-    is_diploma: boolean;
-    diploma_name: string | null;
-    is_disabled: boolean;
     resume: string | null;
     skills: string;
     gender: string;
@@ -107,9 +104,6 @@ interface Job {
     created_at: string;
     degree_name: string;
     is_degree: boolean;
-    is_diploma: boolean;
-    diploma_name: string;
-    is_disabled: boolean;
     resume: string | null;
     skills: string;
     gender: string;

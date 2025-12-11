@@ -46,7 +46,9 @@ const LandingFaqs = () => {
           FAQs Insights
         </h1>
       </div>
-        <p className="text-[#696C78] text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">
+        <p className="text-[#696C78] text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl justify-center md:mx-0 
+          text-justify hyphens-auto 
+          lg:text-left lg:not-italic lg:hyphens-none lg:text-nowrap">
           Find answers to commonly asked questions about GrowUp Buddy and how our platform can help accelerate your professional growth.
         </p>
       </div>

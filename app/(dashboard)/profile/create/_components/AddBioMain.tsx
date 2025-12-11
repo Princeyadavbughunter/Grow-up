@@ -39,9 +39,6 @@ interface ProfileData {
   passing_year: string;
   degree_name: string;
   is_degree: string;
-  is_diploma: string;
-  diploma_name: string;
-  is_disabled: string;
   date_of_birth: string;
   first_name: string;
   last_name: string;
@@ -98,9 +95,6 @@ const AddBioMain = () => {
     passing_year: "",
     degree_name: "",
     is_degree: "True",
-    is_diploma: "",
-    diploma_name: "",
-    is_disabled: "",
     date_of_birth: "",
     first_name: "",
     last_name: "",
@@ -139,9 +133,6 @@ const AddBioMain = () => {
           passing_year: response.data[0].passing_year || "",
           degree_name: response.data[0].degree_name || "",
           is_degree: response.data[0].is_degree || "True",
-          is_diploma: response.data[0].is_diploma || "",
-          diploma_name: response.data[0].diploma_name || "",
-          is_disabled: response.data[0].is_disabled || "",
           date_of_birth: response.data[0].date_of_birth || "",
           first_name: response.data[0].first_name || "",
           last_name: response.data[0].last_name || "",
@@ -769,25 +760,6 @@ const AddBioMain = () => {
                     id="degree_name" 
                     name="degree_name" 
                     value={profileForm.degree_name} 
-                    onChange={handleProfileInputChange}
-                  />
-                </div>
-              )}
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="is_diploma" 
-                  checked={profileForm.is_diploma === "True"}
-                  onCheckedChange={(checked) => handleCheckboxChange("is_diploma", checked as boolean)}
-                />
-                <Label htmlFor="is_diploma">Diploma</Label>
-              </div>
-              {profileForm.is_diploma === "True" && (
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="diploma_name">Diploma Name</Label>
-                  <Input 
-                    id="diploma_name" 
-                    name="diploma_name" 
-                    value={profileForm.diploma_name} 
                     onChange={handleProfileInputChange}
                   />
                 </div>

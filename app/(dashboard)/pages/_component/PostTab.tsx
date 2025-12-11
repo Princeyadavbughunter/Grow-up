@@ -7,9 +7,10 @@ interface PostTabProps {
   pageId: string;
   pageName?: string;
   pageProfilePicture?: string;
+  isAdmin?: boolean;
 }
 
-const PostTab: React.FC<PostTabProps> = ({ pageId, pageName, pageProfilePicture }) => {
+const PostTab: React.FC<PostTabProps> = ({ pageId, pageName, pageProfilePicture, isAdmin }) => {
   const [pagePosts, setPagePosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { api } = useAuthenticatedApi();
@@ -47,7 +48,7 @@ const PostTab: React.FC<PostTabProps> = ({ pageId, pageName, pageProfilePicture 
 
   return (
     <div className='flex flex-col justify-center w-full'>
-      <Posts posts={pagePosts} />
+      <Posts posts={pagePosts} isPageAdmin={isAdmin} />
     </div>
   )
 }

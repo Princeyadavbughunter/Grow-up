@@ -312,7 +312,7 @@ export default function EventsPage() {
         </div>
         {participants.length > 0 ? (
           participants.map((participant) => (
-            <div key={participant.id} className="flex flex-col md:flex-row items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+            <div key={participant.id} className="flex flex-col md:flex-row items-start md:items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
               <div className="flex items-center gap-3">
                 <Avatar>
                   <AvatarImage src={participant.profile_picture} />

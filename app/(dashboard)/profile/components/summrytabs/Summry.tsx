@@ -40,9 +40,6 @@ interface FreelancerProfile {
     created_at: string;
     degree_name: string;
     is_degree: boolean;
-    is_diploma: boolean;
-    diploma_name: string;
-    is_disabled: boolean;
     resume: string | null;
     skills: string;
     gender: string;
@@ -171,7 +168,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                                 />
                             </p>
                             <div className="bg-[#F6F8FF] shadow-sm rounded-lg p-4">
-                                <p>MY Journey</p>
+                                <p>My Journey</p>
 
                                 <div className='py-2'>
                                     <p className="flex flex-wrap gap-2 font-semibold">

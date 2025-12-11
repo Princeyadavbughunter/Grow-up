@@ -52,7 +52,7 @@ const AboutTab: React.FC<AboutTabProps> = ({ pageDetails }) => {
         <p className='font-semibold text-lg mb-3'>Additional Information</p>
         <div className="space-y-2">
           <div>
-            <span className="font-medium">Founded:</span>{' '}
+            <span className="font-medium">Created:</span>{' '}
             {pageDetails.created_at ? formatTimeAgo(pageDetails.created_at) : 'Not specified'}
           </div>
           <div>

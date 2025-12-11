@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, User } from "lucide-react";
 
 interface Participant {
   name: string;
@@ -15,13 +15,13 @@ export function EventParticipants() {
   const participants: Participant[] = [
     {
       name: "Priya Sharma",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+      image: "",
       role: "Product Designer",
       company: "Microsoft"
     },
     {
       name: "Alex Chen",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=48&h=48&fit=crop&crop=faces",
+      image: "",
       role: "Software Engineer",
       company: "Google"
     }
@@ -38,7 +38,9 @@ export function EventParticipants() {
           <div className="flex items-center gap-3">
             <Avatar>
               <AvatarImage src={participant.image} />
-              <AvatarFallback>{participant.name[0]}</AvatarFallback>
+              <AvatarFallback>
+                <User className="h-4 w-4" />
+              </AvatarFallback>
             </Avatar>
             <div>
               <div className="font-medium">{participant.name}</div>
