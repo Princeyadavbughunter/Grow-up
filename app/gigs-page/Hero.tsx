@@ -56,18 +56,10 @@ const Hero = () => {
                 onClick={() => router.push('/gigs')}
                 className="group relative inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#7052FF] to-blue-600 hover:from-[#5a42d4] hover:to-blue-700 text-white font-semibold text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#7052FF]/30 focus:ring-opacity-50 w-full sm:w-auto"
               >
-                <span>Explore Opportunities</span>
+                <span>Explore wide range of Gigs</span>
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                 </svg>
-              </button>
-              
-              {/* Secondary CTA */}
-              <button className="group inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white border border-white/30 hover:border-white/50 font-semibold text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/20 w-full sm:w-auto">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M19 10a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Learn More</span>
               </button>
             </div>
             
@@ -78,40 +70,24 @@ const Hero = () => {
               </p>
               
               {/* Stats Row */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 max-w-3xl mx-auto">
-                <div className="text-center">
-                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-[#7052FF] mb-1">
-                    50K+
+                <div className="flex justify-center gap-8 sm:gap-16 max-w-3xl mx-auto">
+                  <div className="text-center">
+                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-[#7052FF] mb-1">
+                      50K+
+                    </div>
+                    <div className="text-xs text-gray-300">
+                      Active Users
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-300">
-                    Active Users
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-400 mb-1">
-                    25K+
-                  </div>
-                  <div className="text-xs text-gray-300">
-                    Jobs Posted
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-400 mb-1">
-                    98%
-                  </div>
-                  <div className="text-xs text-gray-300">
-                    Success Rate
+                  <div className="text-center">
+                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-400 mb-1">
+                      500+
+                    </div>
+                    <div className="text-xs text-gray-300">
+                      Gigs Posted
+                    </div>
                   </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-yellow-400 mb-1">
-                    4.9★
-                  </div>
-                  <div className="text-xs text-gray-300">
-                    User Rating
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

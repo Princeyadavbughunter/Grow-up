@@ -22,7 +22,7 @@ const LandingTestimonials = () => {
       image: '/testimonials/sumati_grover.jpeg', 
       bgColor: 'bg-yellow-50',
       role: 'Digital Marketer & Content Writer',
-      testimonial: 'The community here is something else! Everyone\'s so supportive and willing to share knowledge. I picked up so many new skills just by being active here, and actually landed my dream job through a connection I made on the platform. Couldn\'t be happier!',
+      testimonial: 'The community here is something! Everyone\'s so supportive and willing to share knowledge. I picked up so many new skills just by being active here, and actually landed my dream job through a connection I made on the platform. Couldn\'t be happier!',
       linkedinUrl: 'https://www.linkedin.com/in/sumati-grover/'
     },
     { 
@@ -169,7 +169,7 @@ const LandingTestimonials = () => {
                         ))}
                       </div>
                     </div>
-                    <p className="text-[#696C78] text-xs sm:text-sm md:text-base text-center leading-relaxed line-clamp-5 px-0.5 sm:px-1">
+                    <p className="text-[#696C78] text-xs sm:text-sm md:text-base text-center leading-relaxed line-clamp-5 px-0.5 sm:px-1 text-justify hyphens-auto">
                       "{testimonial.testimonial}"
                     </p>
                   </div>
