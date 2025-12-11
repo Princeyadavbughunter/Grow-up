@@ -56,9 +56,6 @@ interface FreelancerProfile {
   created_at: string;
   degree_name: string;
   is_degree: boolean;
-  is_diploma: boolean;
-  diploma_name: string;
-  is_disabled: boolean;
   resume: string | null;
   skills: string;
   gender: string;
@@ -1203,7 +1200,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
           <p className="text-gray-600 text-sm sm:text-base mb-2">{bio}</p>
 
           <p className="text-gray-500 text-sm sm:text-base flex items-center justify-center sm:justify-start gap-1">
-            <IoLocationSharp /> {location}
+            <IoLocationSharp className="flex-shrink-0 text-base sm:text-lg" /> {location}
           </p>
         </div>
       </div>

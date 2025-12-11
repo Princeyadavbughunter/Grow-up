@@ -42,9 +42,6 @@ interface ProfileData {
   created_at: string;
   degree_name: string;
   is_degree: boolean;
-  is_diploma: boolean;
-  diploma_name: string;
-  is_disabled: boolean;
   resume: string | null;
   skills: string;
   gender: string;
@@ -122,10 +119,10 @@ const ProgressProfile: React.FC = () => {
       label: "Bio", 
       completed: !!profileData.bio 
     },
-    { 
-      label: "Education", 
-      completed: !!(profileData.university_name && profileData.graduation_year_from && 
-                  (profileData.is_degree || profileData.is_diploma)) 
+    {
+      label: "Education",
+      completed: !!(profileData.university_name && profileData.graduation_year_from &&
+                  profileData.is_degree)
     },
     { 
       label: "Work Experience", 

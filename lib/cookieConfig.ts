@@ -13,6 +13,6 @@ export const COOKIE_KEYS = {
   ACCESS_TOKEN: 'access_token',
   REFRESH_TOKEN: 'refresh_token',
   USER_ID: 'user_id',
-  USER_ID_VALUE: 'user_id_value',``
+  USER_ID_VALUE: 'user_id_value',
 } as const;
 

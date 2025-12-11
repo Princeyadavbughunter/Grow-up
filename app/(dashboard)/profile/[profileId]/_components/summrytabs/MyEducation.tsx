@@ -23,8 +23,6 @@ const MyEducation: React.FC<MyEducationProps> = ({ profileData }) => {
         highest_qualification: profileData?.highest_qualification || "",
         degree_name: profileData?.degree_name || "",
         is_degree: profileData?.is_degree || false,
-        is_diploma: profileData?.is_diploma || false,
-        diploma_name: profileData?.diploma_name || "",
     };
 
     const [formData, setFormData] = useState(defaultFormData);
