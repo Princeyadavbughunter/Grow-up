@@ -97,10 +97,9 @@ const MyEducation: React.FC<MyEducationProps> = ({ profileData }) => {
     };
 
     const hasEducationData = profileData && (
-        profileData.university_name || 
-        profileData.highest_qualification || 
-        profileData.degree_name || 
-        profileData.diploma_name
+        profileData.university_name ||
+        profileData.highest_qualification ||
+        profileData.degree_name
     );
 
     return (

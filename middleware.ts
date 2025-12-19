@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Import cookie keys for consistency (note: can't import COOKIE_OPTIONS in middleware as it's edge runtime)
-const ACCESS_TOKEN_KEY = 'access_token';
-
 const publicAuthPath = '/auth/google';
 const publicPaths = ['/', '/gigs-page', '/events-page', '/talent', '/community', '/clubs-page', '/support', '/privacy-policy', '/terms-and-conditions'];
 
@@ -20,7 +17,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   
-  const accessToken = request.cookies.get(ACCESS_TOKEN_KEY)?.value;
+  const accessToken = request.cookies.get('access_token')?.value;
   
   if (!accessToken) {
     const loginUrl = new URL(publicAuthPath, request.url);

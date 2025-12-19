@@ -194,80 +194,73 @@ interface ClubCardProps {
     onSelect: (clubId: string) => void;
 }
 
-const ClubCard = ({ club, isMyClub, isSelected, onJoinToggle, onSelect }: ClubCardProps) => {
-    const [showFullDescription, setShowFullDescription] = useState(false);
-
-    const truncatedDescription = club.description?.length > 60
-        ? club.description.substring(0, 60) + "..."
-        : club.description;
-
+const ClubCard = ({
+    club,
+    isMyClub,
+    isSelected,
+    onJoinToggle,
+    onSelect,
+  }: ClubCardProps) => {
     return (
-        <div 
-            className={`bg-white rounded-xl p-3 md:p-4 shadow-sm cursor-pointer transition-all hover:shadow-md ${
-                isSelected ? 'border-2 border-purple-500' : 'border border-gray-200'
-            }`}
-            onClick={() => onSelect(club.id)}
-        >
-            <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
-                    <div className="w-8 h-8 md:w-10 md:h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-purple-600 text-base md:text-lg font-semibold">
-                            {club.name?.[0]?.toUpperCase() || '?'}
-                        </span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-gray-800 text-sm md:text-base truncate">{club.name}</h3>
-                        <p className="text-xs md:text-sm text-gray-500">
-                            {club.participants_count || 0} member{(club.participants_count || 0) !== 1 ? 's' : ''}
-                        </p>
-                    </div>
-                </div>
-
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onJoinToggle(club.id, isMyClub);
-                    }}
-                    className={`px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-colors flex-shrink-0 ${
-                        isMyClub 
-                            ? "bg-purple-600 text-white hover:bg-purple-700" 
-                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-300"
-                    }`}
-                >
-                    {isMyClub ? "Joined" : "Join"}
-                </button>
+      <div
+        onClick={() => onSelect(club.id)}
+        className={`bg-white border rounded-2xl px-4 py-4 transition cursor-pointer
+          ${isSelected ? "border-purple-500" : "border-gray-200 hover:border-gray-300"}
+        `}
+      >
+        {/* Top Row */}
+        <div className="flex items-start justify-between gap-4">
+          {/* Left */}
+          <div className="flex gap-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+              <span className="text-purple-600 font-semibold text-lg">
+                {club.name?.[0]?.toUpperCase() || "C"}
+              </span>
             </div>
-
-            {club.description && (
-                <div className="text-[11px] md:text-xs text-gray-700 mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-100">
-                    <p className={`leading-relaxed ${showFullDescription ? 'whitespace-normal' : 'truncate'}`}>
-                        {showFullDescription 
-                            ? (() => {
-                                // Show first 35 words only when expanded
-                                const words = club.description.split(' ');
-                                if (words.length > 35) {
-                                    return words.slice(0, 35).join(' ') + '...';
-                                }
-                                return club.description;
-                            })()
-                            : club.description
-                        }
-                        {club.description.length > 60 && (
-                            <button
-                                className="text-purple-600 ml-1 hover:text-purple-800 font-medium"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowFullDescription(!showFullDescription);
-                                }}
-                            >
-                                {showFullDescription ? "Read Less" : "Read More"}
-                            </button>
-                        )}
-                    </p>
-                </div>
-            )}
+  
+            <div>
+              <h3 className="font-semibold text-gray-900 leading-tight">
+                {club.name}
+              </h3>
+              <p className="text-sm text-gray-500">
+                {club.participants_count || 0} members
+              </p>
+            </div>
+          </div>
+  
+          {/* Join Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onJoinToggle(club.id, isMyClub);
+            }}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition
+              ${
+                isMyClub
+                  ? "bg-purple-600 text-white hover:bg-purple-700"
+                  : "bg-purple-50 text-purple-600 hover:bg-purple-100"
+              }
+            `}
+          >
+            {isMyClub ? "Joined" : "Join"}
+          </button>
         </div>
+  
+        {/* Description */}
+        {club.description && (
+          <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+            {club.description.length > 90
+              ? club.description.slice(0, 90)
+              : club.description}
+            {club.description.length > 90 && (
+              <span className="text-purple-600 ml-1 font-medium">
+                Read More...
+              </span>
+            )}
+          </p>
+        )}
+      </div>
     );
-};
+  };
 
 export default ClubsList;

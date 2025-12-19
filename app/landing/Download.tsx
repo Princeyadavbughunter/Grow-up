@@ -21,7 +21,7 @@ const Download = () => {
       title: "Earn Money",
       description:
         "Get the right team, gigs, and partners to power your vision. Connect, collaborate, and bring it all to life—right here, in one place.",
-      image: "/gig1.png",
+      image: "/download-earn.png",
       imageAlt: "Earn Money feature screenshot",
     },
     {
@@ -29,7 +29,7 @@ const Download = () => {
       title: "Find Opportunities",
       description:
         "Discover projects and collaborations that match your skills. Build meaningful professional connections.",
-      image: "/gig1.png",
+      image: "/download-gig.png",
       imageAlt: "Find Opportunities feature screenshot",
     },
     {
@@ -37,7 +37,7 @@ const Download = () => {
       title: "Grow Your Network",
       description:
         "Connect through curated clubs and creator pages. Learn, share, and grow with purpose.",
-      image: "/gig1.png",
+      image: "/download-club.png",
       imageAlt: "Grow Your Network feature screenshot",
     },
   ];

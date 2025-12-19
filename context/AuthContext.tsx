@@ -1,9 +1,9 @@
+
 // @ts-nocheck
 'use client'
 import React, { createContext, useState, useContext, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
 import axios, { AxiosInstance } from 'axios';
 import Cookies from 'js-cookie';
-import { COOKIE_OPTIONS, COOKIE_KEYS } from '@/lib/cookieConfig';
 
 // Define interfaces for the profile data
 interface WorkExperience {
@@ -39,6 +39,9 @@ interface FreelancerProfile {
   created_at: string;
   degree_name: string;
   is_degree: boolean;
+  is_diploma: boolean;
+  diploma_name: string;
+  is_disabled: boolean;
   resume: string | null;
   skills: string;
   gender: string;
@@ -81,6 +84,12 @@ interface AuthTokens {
 }
 
 const baseURL = process.env.NEXT_PUBLIC_URL as string;
+const COOKIE_OPTIONS = {
+  expires: 7, 
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict' as const,
+  path: '/'
+};
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
@@ -96,16 +105,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [profileLoading, setProfileLoading] = useState<boolean>(false);
   const [profileError, setProfileError] = useState<string | null>(null);
 
-  // Track token refresh state across renders
-  const isRefreshingRef = React.useRef<boolean>(false);
-  const failedQueueRef = React.useRef<any[]>([]);
-
   useEffect(() => {
     const loadAuthState = () => {
       try {
-        const accessToken = Cookies.get(COOKIE_KEYS.ACCESS_TOKEN);
-        const refreshToken = Cookies.get(COOKIE_KEYS.REFRESH_TOKEN);
-        const userInfo = Cookies.get(COOKIE_KEYS.USER_ID);
+        const accessToken = Cookies.get('access_token');
+        const refreshToken = Cookies.get('refresh_token');
+        const userInfo = Cookies.get('user_id');
 
         if (accessToken && refreshToken) {
           setAuthToken(accessToken);
@@ -145,105 +150,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [authToken, apiCaller]);
 
-  const processQueue = React.useCallback((error: any, token: string | null = null) => {
-    failedQueueRef.current.forEach(prom => {
-      if (error) {
-        prom.reject(error);
-      } else {
-        prom.resolve(token);
-      }
-    });
-    
-    failedQueueRef.current = [];
-  }, []);
-
   apiCaller.interceptors.response.use(
     (response) => response,
     async (error) => {
-      const originalRequest = error.config;
-
-      // If error is 401 and we haven't tried to refresh yet
-      if (error.response?.status === 401 && !originalRequest._retry) {
-        if (isRefreshingRef.current) {
-          // If already refreshing, queue this request
-          return new Promise((resolve, reject) => {
-            failedQueueRef.current.push({ resolve, reject });
-          }).then(token => {
-            originalRequest.headers['Authorization'] = 'Bearer ' + token;
-            return apiCaller(originalRequest);
-          }).catch(err => {
-            return Promise.reject(err);
-          });
-        }
-
-        originalRequest._retry = true;
-        isRefreshingRef.current = true;
-
-        const storedRefreshToken = Cookies.get(COOKIE_KEYS.REFRESH_TOKEN);
-        
-        if (!storedRefreshToken) {
-          // No refresh token, clear everything and redirect to login
-          console.log('No refresh token available, redirecting to login');
-          setAuthToken(null);
-          setRefreshToken(null);
-          setUserId(null);
-          setIsAuthenticated(false);
-          setProfileData(null);
-          
-          Cookies.remove(COOKIE_KEYS.ACCESS_TOKEN, { path: COOKIE_OPTIONS.path });
-          Cookies.remove(COOKIE_KEYS.REFRESH_TOKEN, { path: COOKIE_OPTIONS.path });
-          Cookies.remove(COOKIE_KEYS.USER_ID, { path: COOKIE_OPTIONS.path });
-          Cookies.remove(COOKIE_KEYS.USER_ID_VALUE, { path: COOKIE_OPTIONS.path });
-          
-          window.location.href = '/auth/google';
-          return Promise.reject(error);
-        }
-
-        try {
-          // Try to refresh the token
-          const response = await axios.post(`${baseURL}/auth/token/refresh/`, {
-            refresh: storedRefreshToken
-          });
-
-          const newAccessToken = response.data.access;
-          
-          // Update the access token in cookies and state
-          Cookies.set(COOKIE_KEYS.ACCESS_TOKEN, newAccessToken, COOKIE_OPTIONS);
-          setAuthToken(newAccessToken);
-          
-          // Update the authorization header for future requests
-          apiCaller.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-          originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-          
-          // Process any queued requests with the new token
-          processQueue(null, newAccessToken);
-          isRefreshingRef.current = false;
-          
-          // Retry the original request with new token
-          return apiCaller(originalRequest);
-        } catch (refreshError: any) {
-          // Refresh token failed or expired, clear everything and redirect to login
-          console.error('Token refresh failed:', refreshError);
-          processQueue(refreshError, null);
-          isRefreshingRef.current = false;
-          
-          setAuthToken(null);
-          setRefreshToken(null);
-          setUserId(null);
-          setIsAuthenticated(false);
-          setProfileData(null);
-          
-          Cookies.remove(COOKIE_KEYS.ACCESS_TOKEN, { path: COOKIE_OPTIONS.path });
-          Cookies.remove(COOKIE_KEYS.REFRESH_TOKEN, { path: COOKIE_OPTIONS.path });
-          Cookies.remove(COOKIE_KEYS.USER_ID, { path: COOKIE_OPTIONS.path });
-          Cookies.remove(COOKIE_KEYS.USER_ID_VALUE, { path: COOKIE_OPTIONS.path });
-          
-          window.location.href = '/auth/google';
-          return Promise.reject(refreshError);
-        }
-      }
-
-      // For other errors or if refresh already failed, just reject
       return Promise.reject(error);
     }
   );
@@ -309,11 +218,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated(false);
       setProfileData(null);
       
-      // Remove cookies with same options used to set them
-      Cookies.remove(COOKIE_KEYS.ACCESS_TOKEN, { path: COOKIE_OPTIONS.path });
-      Cookies.remove(COOKIE_KEYS.REFRESH_TOKEN, { path: COOKIE_OPTIONS.path });
-      Cookies.remove(COOKIE_KEYS.USER_ID, { path: COOKIE_OPTIONS.path });
-      Cookies.remove(COOKIE_KEYS.USER_ID_VALUE, { path: COOKIE_OPTIONS.path });
+      // Remove cookies
+      Cookies.remove('access_token', { path: '/' });
+      Cookies.remove('refresh_token', { path: '/' });
+      Cookies.remove('user_id', { path: '/' });
       
       window.location.href = '/';
     }
@@ -367,89 +275,6 @@ export const useAuthenticatedApi = () => {
       return config;
     },
     (error) => {
-      return Promise.reject(error);
-    }
-  );
-
-  // Add response interceptor for token refresh (same as apiCaller)
-  let isRefreshing = false;
-  let failedQueue: any[] = [];
-
-  const processQueue = (error: any, token: string | null = null) => {
-    failedQueue.forEach(prom => {
-      if (error) {
-        prom.reject(error);
-      } else {
-        prom.resolve(token);
-      }
-    });
-    
-    failedQueue = [];
-  };
-
-  api.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-      const originalRequest = error.config;
-
-      if (error.response?.status === 401 && !originalRequest._retry) {
-        if (isRefreshing) {
-          return new Promise((resolve, reject) => {
-            failedQueue.push({ resolve, reject });
-          }).then(token => {
-            originalRequest.headers['Authorization'] = 'Bearer ' + token;
-            return api(originalRequest);
-          }).catch(err => {
-            return Promise.reject(err);
-          });
-        }
-
-        originalRequest._retry = true;
-        isRefreshing = true;
-
-        const storedRefreshToken = Cookies.get(COOKIE_KEYS.REFRESH_TOKEN);
-        
-        if (!storedRefreshToken) {
-          console.log('No refresh token available, redirecting to login');
-          Cookies.remove(COOKIE_KEYS.ACCESS_TOKEN, { path: COOKIE_OPTIONS.path });
-          Cookies.remove(COOKIE_KEYS.REFRESH_TOKEN, { path: COOKIE_OPTIONS.path });
-          Cookies.remove(COOKIE_KEYS.USER_ID, { path: COOKIE_OPTIONS.path });
-          Cookies.remove(COOKIE_KEYS.USER_ID_VALUE, { path: COOKIE_OPTIONS.path });
-          
-          window.location.href = '/auth/google';
-          return Promise.reject(error);
-        }
-
-        try {
-          const response = await axios.post(`${baseURL}/auth/token/refresh/`, {
-            refresh: storedRefreshToken
-          });
-
-          const newAccessToken = response.data.access;
-          
-          Cookies.set(COOKIE_KEYS.ACCESS_TOKEN, newAccessToken, COOKIE_OPTIONS);
-          api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-          originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-          
-          processQueue(null, newAccessToken);
-          isRefreshing = false;
-          
-          return api(originalRequest);
-        } catch (refreshError: any) {
-          console.error('Token refresh failed:', refreshError);
-          processQueue(refreshError, null);
-          isRefreshing = false;
-          
-          Cookies.remove(COOKIE_KEYS.ACCESS_TOKEN, { path: COOKIE_OPTIONS.path });
-          Cookies.remove(COOKIE_KEYS.REFRESH_TOKEN, { path: COOKIE_OPTIONS.path });
-          Cookies.remove(COOKIE_KEYS.USER_ID, { path: COOKIE_OPTIONS.path });
-          Cookies.remove(COOKIE_KEYS.USER_ID_VALUE, { path: COOKIE_OPTIONS.path });
-          
-          window.location.href = '/auth/google';
-          return Promise.reject(refreshError);
-        }
-      }
-
       return Promise.reject(error);
     }
   );
