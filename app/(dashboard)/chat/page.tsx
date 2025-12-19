@@ -490,8 +490,8 @@ const ChatInterface: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className={`${showSidebar ? 'block' : 'hidden'} w-full md:block md:w-1/4 border-r bg-white md:relative absolute inset-0 z-10 md:z-auto`}>
-        <div className="p-2 mt-16 md:mt-0 md:p-4 border-b">
+      <div className={`${showSidebar ? 'block' : 'hidden'} w-full md:block md:w-1/4 border-r bg-white md:relative absolute inset-0 z-10 md:z-auto flex flex-col`}>
+        <div className="p-2 mt-16 md:mt-0 md:p-4 border-b flex-shrink-0">
           <div className="relative mb-2 md:mb-4">
             <BiSearch className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
             <input
@@ -519,7 +519,7 @@ const ChatInterface: React.FC = () => {
           </div>
         </div>
 
-        <div className="overflow-y-auto h-full pb-16 md:pb-0">
+        <div className="overflow-y-auto flex-1 pb-16 md:pb-0 ">
           {tab === 'active' ? (
             <>
               {loading ? (

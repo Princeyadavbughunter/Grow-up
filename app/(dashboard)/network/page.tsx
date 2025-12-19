@@ -414,7 +414,7 @@ export default function NetworkPage() {
       <div className="w-full lg:w-1/3 bg-white border border-gray-200 shadow-sm p-5 lg:h-auto lg:overflow-y-auto rounded-xl">
         {/* Tab Navigation */}
 
-          <div className="mb-5 flex gap-2 md:gap-1 border-b border-gray-200 overflow-x-auto hide-scrollbar">
+        <div className="mb-5 flex gap-2 md:gap-1 border-b border-gray-200 overflow-x-auto hide-scrollbar">
           <button
             onClick={() => setActiveTab("followers")}
             className={`px-4 md:px-3 py-3 md:py-2.5 font-semibold text-sm md:text-xs transition-all relative flex items-center gap-2 md:gap-1.5 whitespace-nowrap flex-shrink-0 ${
@@ -518,37 +518,41 @@ export default function NetworkPage() {
 
       <div className="w-full lg:w-2/3 p-4 lg:min-h-screen scrollbar-[1px] rounded-lg">
         <NetworkSection title="Invites" showAll={invites.length > 4}>
-          {invites.length > 0 ? (
-            invites.map((invite) => (
-              <NetworkCard
-                key={invite.requestId}
-                {...invite}
-                showAccept
-                onAccept={() => handleAcceptRequest(invite.requestId)}
-                onReject={() => handleRejectRequest(invite.requestId)}
-              />
-            ))
-          ) : (
-            <p className="text-gray-500">No pending invites.</p>
-          )}
+          <div className="max-h-[240px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300">
+            {invites.length > 0 ? (
+              invites.map((invite) => (
+                <NetworkCard
+                  key={invite.requestId}
+                  {...invite}
+                  showAccept
+                  onAccept={() => handleAcceptRequest(invite.requestId)}
+                  onReject={() => handleRejectRequest(invite.requestId)}
+                />
+              ))
+            ) : (
+              <p className="text-gray-500">No pending invites.</p>
+            )}
+          </div>
         </NetworkSection>
 
         <NetworkSection title="Near My Network">
-          <div className="gap-4 space-y-6">
-            {nearNetwork.length > 0 ? (
-              nearNetwork.map((connection) => (
-                <div key={connection.id} className="p-4 border rounded-lg">
-                  <NetworkCard
-                    {...connection}
-                    showFollow={!connection.requestSent}
-                    onFollow={() => handleFollowUser(connection.id)}
-                    onCancelRequest={() => handleCancelRequest(connection.id)}
-                  />
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500">No freelancers found.</p>
-            )}
+          <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300">
+            <div className="space-y-6">
+              {nearNetwork.length > 0 ? (
+                nearNetwork.map((connection) => (
+                  <div key={connection.id} className="p-4 border rounded-lg">
+                    <NetworkCard
+                      {...connection}
+                      showFollow={!connection.requestSent}
+                      onFollow={() => handleFollowUser(connection.id)}
+                      onCancelRequest={() => handleCancelRequest(connection.id)}
+                    />
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500">No freelancers found.</p>
+              )}
+            </div>
           </div>
         </NetworkSection>
       </div>
