@@ -90,51 +90,51 @@ const LandingFooter = () => {
 
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 lg:gap-16 mb-12 sm:mb-16">
-          
           {/* Company Info */}
-          <div className="lg:col-span-1 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start mb-6">
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 mr-3">
-                <Image
-                  src="/logo_grow_up_buddy.png"
-                  alt="GrowUp Buddy Logo"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <h1 className="font-bold text-xl sm:text-2xl text-[#F4ECFF]">
-                GrowUp Buddy
-              </h1>
-            </div>
-            <p className="text-gray-400 text-sm sm:text-base leading-7 mb-6 max-w-sm mx-auto md:mx-0 text-justify hyphens-auto">
-              GrowUp Buddy is a community-based startup dedicated to empowering
-              individuals to achieve their professional and personal goals. Join
-              us and be part of a growing community that's changing the way
-              people connect and grow.
-            </p>
+            {/* Company Info */}
+  <div className="lg:col-span-1 text-center md:text-left">
+    <div className="flex items-center justify-center md:justify-start mb-6">
+      <div className="relative w-12 h-12 sm:w-14 sm:h-14 mr-3">
+        <Image
+          src="/logo_grow_up_buddy.png"
+          alt="GrowUp Buddy Logo"
+          fill
+          className="object-contain"
+        />
+      </div>
+      <h1 className="font-bold text-xl sm:text-2xl text-[#F4ECFF]">
+        GrowUp Buddy
+      </h1>
+    </div>
+    <p className="text-gray-400 text-sm sm:text-base leading-7 mb-6 max-w-sm mx-auto md:mx-0 text-justify hyphens-auto">
+      GrowUp Buddy is a community-based startup dedicated to empowering
+      individuals to achieve their professional and personal goals. Join
+      us and be part of a growing community that's changing the way
+      people connect and grow.
+    </p>
             
             {/* Newsletter Signup */}
             <div className="space-y-3">
-              <h4 className="text-[#7052FF] font-semibold text-sm sm:text-base">Stay Updated</h4>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input 
-                  type="email" 
-                  placeholder="Enter your email"
-                  className="flex-1 px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7052FF] text-white placeholder-gray-400"
-                />
-                <button className="px-4 py-2 bg-[#7052FF] hover:bg-[#5a42d4] text-white text-sm font-medium rounded-lg transition-colors duration-300">
-                  Subscribe
-                </button>
-              </div>
-            </div>
-          </div>
+      <h4 className="text-[#7052FF] font-semibold text-sm sm:text-base">Stay Updated</h4>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <input 
+          type="email" 
+          placeholder="Enter your email"
+          className="flex-1 px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7052FF] text-white placeholder-gray-400"
+        />
+        <button className="px-4 py-2 bg-[#7052FF] hover:bg-[#5a42d4] text-white text-sm font-medium rounded-lg transition-colors duration-300">
+          Subscribe
+        </button>
+      </div>
+    </div>
+  </div>
 
           {/* Footer Links */}
           {footerLinks.map((section, index) => (
             <div key={index} className="text-center md:text-left">
-              <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-[#7052FF]">
-                {section.title}
-              </h3>
+              <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-[#7052FF] flex items-center justify-center md:justify-start" style={{ minHeight: '56px' }}>
+        {section.title}
+      </h3>
               <ul className="space-y-2 sm:space-y-3">
                 {section.links.map((link, idx) => (
                   <li key={idx}>
@@ -205,7 +205,7 @@ const LandingFooter = () => {
         <div className="border-t border-gray-700 mt-8 sm:mt-12 pt-6 sm:pt-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-center sm:text-left">
             <p className="text-gray-500 text-xs sm:text-sm">
-              © 2025 GrowUp Buddy. All Rights Reserved. Made with ❤️ by the GrowUp Buddy Team
+              © 2025 GrowUp Buddy. All Rights Reserved.
             </p>
             <div className="flex justify-center sm:justify-end gap-4 sm:gap-6 text-xs sm:text-sm">
               <a href="/privacy-policy" className="text-gray-500 hover:text-white transition-colors duration-300">

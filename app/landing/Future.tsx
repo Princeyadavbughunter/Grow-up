@@ -50,7 +50,7 @@ const Future = () => {
        <div className="text-center mt-16 sm:mt-24 md:mt-32 lg:mt-40 xl:mt-52 mb-12 sm:mb-16 md:mb-20 lg:mb-24">
          <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-[#4A4A4A] leading-tight max-w-4xl mx-auto">
            Empower Your Future in{' '}
-             <span className="bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#7052FF] px-4 py-6">
+             <span className="bg-gradient-to-r from-[#FFFFFF] via-[#E9DAFF] to-[#FFFFFF] text-[#7052FF] px-1 py-6">
                3 Steps
              </span>
          </h1>

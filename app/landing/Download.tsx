@@ -28,7 +28,7 @@ const Download = () => {
       id: 2,
       title: "Find Opportunities",
       description:
-        "Discover exciting projects and collaborations that match your skills. Build meaningful connections with like-minded professionals.",
+        "Discover projects and collaborations that match your skills. Build meaningful professional connections.",
       image: "/gig1.png",
       imageAlt: "Find Opportunities feature screenshot",
     },
@@ -36,7 +36,7 @@ const Download = () => {
       id: 3,
       title: "Grow Your Network",
       description:
-        "Join a community of ambitious individuals. Share knowledge, learn from experts, and accelerate your professional growth.",
+        "Connect through curated clubs and creator pages. Learn, share, and grow with purpose.",
       image: "/gig1.png",
       imageAlt: "Grow Your Network feature screenshot",
     },

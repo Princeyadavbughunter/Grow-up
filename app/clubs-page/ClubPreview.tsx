@@ -132,14 +132,6 @@ const ClubPreview = () => {
       participants_count: 2,
       chat_room_id: "0d9f485b-4f8e-42ae-a586-e42e210780ef",
       is_user_member: true
-    },
-    {
-      id: "69694fd2-8f3d-4c10-95c9-d73d5306981b",
-      name: "JavaScript Club",
-      description: "The JavaScript Club is a community of passionate developers, learners, and innovators who love to build the web of tomorrow.",
-      participants_count: 1,
-      chat_room_id: "35111f62-bea7-497e-8834-5ec789b71fe7",
-      is_user_member: false
     }
   ]
 

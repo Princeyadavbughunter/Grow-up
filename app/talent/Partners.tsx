@@ -16,18 +16,18 @@ const Partners = () => {
       
       {/* Companies logos with animation */}
       <div className="relative overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-r from-gray-50 to-white p-4 sm:p-6 md:p-8 shadow-sm mb-6 sm:mb-8 md:mb-12 lg:mb-16 xl:mb-20">
-        <div className="animate-slideX flex items-center justify-center">
+        <div className="animate-slideX flex items-center">
           {/* First set of logos */}
           <img
             src="/companies.png"
             alt="Partner companies logos including major tech and startup companies"
-            className="w-full max-w-6xl h-12 sm:h-14 md:h-16 lg:h-18 xl:h-20 object-contain opacity-80 hover:opacity-100 transition-opacity duration-300 mr-8"
+            className="flex-shrink-0 w-full max-w-6xl h-12 sm:h-14 md:h-16 lg:h-18 xl:h-20 object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
           />
           {/* Second set of logos for seamless loop */}
           <img
             src="/companies.png"
             alt="Partner companies logos including major tech and startup companies"
-            className="w-full max-w-6xl h-12 sm:h-14 md:h-16 lg:h-18 xl:h-20 object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
+            className="flex-shrink-0 w-full max-w-6xl h-12 sm:h-14 md:h-16 lg:h-18 xl:h-20 object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
           />
         </div>
         
@@ -49,7 +49,8 @@ const Partners = () => {
 
         .animate-slideX {
           animation: slideX 30s linear infinite;
-          width: 200%; /* Double width to accommodate two sets of logos */
+          display: flex;
+          width: max-content;
         }
 
         .animate-slideX:hover {
