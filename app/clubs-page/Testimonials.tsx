@@ -25,24 +25,27 @@ const Testimonials = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`
   }
 
+  // Fixed waveform heights to avoid hydration mismatch (Math.random differs between server & client)
+  const WAVEFORM_HEIGHTS = [
+    20, 35, 15, 42, 28, 48, 12, 38, 25, 44, 18, 32, 47, 22, 41, 14, 36, 29,
+    50, 19, 43, 27, 16, 39, 24, 46, 13, 33, 48, 21, 37, 26, 49, 17, 40, 30,
+    15, 44, 23, 45, 11, 34, 28, 47, 20, 38, 25, 43, 18, 36, 29, 50, 14, 41,
+    22, 46, 16, 35, 27, 48,
+  ];
+
   // Create visual waveform bars (simplified representation)
   const createWaveformBars = () => {
-    const bars = []
-    for (let i = 0; i < 60; i++) {
-      const height = Math.random() * 40 + 10 // Random height between 10-50px
-      bars.push(
-        <div
-          key={i}
-          className="bg-[#7052FF] rounded-full transition-all duration-200"
-          style={{
-            width: '3px',
-            height: `${height}px`,
-            opacity: i < (currentTime / duration) * 60 ? 1 : 0.3,
-          }}
-        />
-      )
-    }
-    return bars
+    return WAVEFORM_HEIGHTS.map((height, i) => (
+      <div
+        key={i}
+        className="bg-[#7052FF] rounded-full transition-all duration-200"
+        style={{
+          width: '3px',
+          height: `${height}px`,
+          opacity: i < (currentTime / duration) * 60 ? 1 : 0.3,
+        }}
+      />
+    ));
   }
 
   return (

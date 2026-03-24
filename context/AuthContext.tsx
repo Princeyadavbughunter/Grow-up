@@ -134,21 +134,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loadAuthState();
   }, []);
 
-  const apiCaller = axios.create({
-    baseURL,
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  // Create a stable axios instance (useRef so it's not recreated on every render)
+  const apiCallerRef = React.useRef(
+    axios.create({
+      baseURL,
+      withCredentials: true,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  );
+  const apiCaller = apiCallerRef.current;
 
-  useEffect(() => {
-    if (authToken) {
-      apiCaller.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
-    } else {
-      delete apiCaller.defaults.headers.common['Authorization'];
-    }
-  }, [authToken, apiCaller]);
+  // Use an interceptor to always inject the latest token at request time
+  // This avoids stale-closure bugs where the token was set on an old instance
+  React.useEffect(() => {
+    const interceptorId = apiCaller.interceptors.request.use((config) => {
+      const token = Cookies.get('access_token');
+      if (token) {
+        config.headers = config.headers || {};
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+      return config;
+    });
+    return () => apiCaller.interceptors.request.eject(interceptorId);
+  }, [apiCaller]);
 
   apiCaller.interceptors.response.use(
     (response) => response,
@@ -258,26 +266,30 @@ export const useAuth = (): AuthContextType => {
 };
 
 export const useAuthenticatedApi = () => {
-  const { authToken } = useAuth();
-
-  const api = axios.create({
-    baseURL: baseURL,
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
-
-  api.interceptors.request.use(
-    (config) => {
-      if (authToken) {
-        config.headers.Authorization = `Bearer ${authToken}`;
+  // Use useMemo so the axios instance is NOT recreated on every render
+  const api = React.useMemo(() => {
+    const instance = axios.create({
+      baseURL: baseURL,
+      headers: {
+        'Content-Type': 'application/json'
       }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
+    });
+
+    // Read the token fresh from cookie on every request — avoids stale closure bugs
+    instance.interceptors.request.use(
+      (config) => {
+        const token = Cookies.get('access_token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    return instance;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // created once, token always read fresh from cookie
 
   return { api };
 };

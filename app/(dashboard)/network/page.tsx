@@ -127,7 +127,7 @@ export default function NetworkPage() {
           name: follower.follower_username || "User",
           location: follower.follower_address || "Unknown",
           imageUrl: follower.freelancer_image,
-          isOnline: Math.random() > 0.5,
+          isOnline: false,
           summary: follower.follower_bio,
         })
       );
@@ -140,7 +140,7 @@ export default function NetworkPage() {
         name: following.freelancer_username,
         location: following.freelancer_address,
         imageUrl: following.freelancer_image,
-        isOnline: Math.random() > 0.5,
+        isOnline: false,
         summary: following.freelancer_bio,
       }));
 
@@ -152,7 +152,7 @@ export default function NetworkPage() {
         name: following.freelancer_username,
         location: following.freelancer_address,
         imageUrl: following.freelancer_image,
-        isOnline: Math.random() > 0.5,
+        isOnline: false,
         summary: following.freelancer_bio,
       }));
 
@@ -209,7 +209,7 @@ export default function NetworkPage() {
         name: request.follower_username,
         location: request.follower_address,
         imageUrl: request.freelancer_image,
-        isOnline: Math.random() > 0.5,
+        isOnline: false,
         summary: request.follower_bio,
         requestId: request.request_id,
       }));
@@ -234,7 +234,7 @@ export default function NetworkPage() {
             [freelancer.city, freelancer.state].filter(Boolean).join(", ") ||
             "Unknown",
           imageUrl: freelancer.profile_picture,
-          isOnline: Math.random() > 0.5,
+          isOnline: false,
           followerCount: freelancer.follower_count || 0,
           summary: freelancer.bio || undefined,
           requestSent: false,
@@ -263,7 +263,7 @@ export default function NetworkPage() {
                 freelancer.address ||
                 "Unknown",
               imageUrl: freelancer.profile_picture || "",
-              isOnline: Math.random() > 0.5,
+              isOnline: false,
               followerCount: freelancer.follower_count || 0,
               summary: freelancer.bio || undefined,
               requestSent: freelancer.follow_request_sent || false,

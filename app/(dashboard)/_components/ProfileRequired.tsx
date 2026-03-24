@@ -32,17 +32,17 @@ const ProfileRequired: React.FC<ProfileRequiredProps> = ({ children }) => {
         return <>{children}</>
     }
 
-    // If profile data doesn't exist, show blurred overlay with profile creation
+    // If profile data doesn't exist, show overlay with profile creation
+    // NOTE: We render a plain gray background instead of actual children to prevent
+    // dashboard components from mounting and firing 404 API calls unnecessarily.
     if (!profileData) {
         return (
             <div className="relative h-screen w-screen overflow-hidden">
-                {/* Blurred background content */}
-                <div className="absolute inset-0 filter blur-md pointer-events-none">
-                    {children}
-                </div>
+                {/* Static gray background — no real components mount here */}
+                <div className="absolute inset-0 bg-gray-100 pointer-events-none" />
                 
                 {/* Overlay backdrop */}
-                <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
+                <div className="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
                 
                 {/* Profile creation modal */}
                 <div className="absolute inset-0 z-20 flex items-start justify-center p-2 sm:p-4 md:p-6 overflow-y-auto">

@@ -7,33 +7,36 @@ import PostButton from "../profile/create/_components/PostButton";
 
 const Home = () => {
   return (
-    <div className="max-w-7xl font-work-sans overflow-y-auto md:overflow-y-hidden mx-auto h-[calc(100vh-9rem)] grid grid-cols-1 lg:grid-cols-7 gap-4 p-4 md:p-6 lg:p-8">
-      {/* Left sidebar - hidden on mobile, shown on lg+ */}
-      <div className="hidden lg:block h-fit lg:sticky lg:top-4 lg:col-span-2">
+    <div className="w-full font-work-sans grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-5 px-28 py-4 h-[calc(100vh-4.5rem)] overflow-hidden bg-white">
+
+      {/* Left sidebar — 3/12 columns */}
+      <div className="hidden lg:flex flex-col lg:col-span-3 h-full overflow-y-auto scrollbar-hide pb-20">
         <UpcomingEvents />
         <ProgressProfile />
       </div>
-      
-      {/* Main content - full width on mobile, center column on lg+ */}
-      <div className="col-span-1 lg:col-span-3">
-        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm ">
+
+      {/* Center feed — 5/12 columns */}
+      <div className="col-span-1 lg:col-span-5 flex flex-col h-full overflow-hidden">
+        {/* Sticky create post */}
+        <div className="flex-shrink-0 pt-2">
           <PostButton />
         </div>
-        <div className="overflow-y-auto max-h-[calc(100vh-200px)] lg:max-h-[calc(100vh-136px)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        {/* Scrollable feed — no scrollbar */}
+        <div className="flex-1 overflow-y-auto scrollbar-hide pb-20 lg:pb-4">
           <Posts />
         </div>
       </div>
-      
-      {/* Right sidebar - shown below posts on mobile, right column on lg+ */}
-      <div className="lg:h-fit lg:sticky lg:top-4 lg:col-span-2 space-y-4">
-        <div className="h-[calc(30vh-20px)] pb-10 lg:h-[calc(100vh-136px)] overflow-y-auto" >
+
+      {/* Right sidebar — 4/12 columns */}
+      <div className="hidden lg:flex flex-col lg:col-span-4 h-full overflow-y-auto scrollbar-hide pb-20">
         <Clubs />
-        </div>
-        {/* Show profile components on mobile below clubs */}
-        <div className="lg:hidden space-y-4">
-          <UpcomingEvents />
-          <ProgressProfile />
-        </div>
+      </div>
+
+      {/* Mobile: stacked below feed */}
+      <div className="lg:hidden col-span-1 pb-24">
+        <Clubs />
+        <UpcomingEvents />
+        <ProgressProfile />
       </div>
     </div>
   );

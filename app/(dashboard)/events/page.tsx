@@ -189,7 +189,8 @@ export default function EventsPage() {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US', { 
       hour: '2-digit', 
-      minute: '2-digit' 
+      minute: '2-digit',
+      timeZone: 'UTC'
     });
   };
 
@@ -198,7 +199,8 @@ export default function EventsPage() {
     return date.toLocaleDateString('en-US', { 
       weekday: 'short', 
       month: 'short', 
-      day: 'numeric'
+      day: 'numeric',
+      timeZone: 'UTC'
     });
   };
 
@@ -478,7 +480,8 @@ export default function EventsPage() {
                       month: 'short',
                       day: 'numeric',
                       hour: 'numeric',
-                      minute: 'numeric'
+                      minute: 'numeric',
+                      timeZone: 'UTC'
                     })}
                   </Badge>
                   <Badge className="bg-purple-100 text-purple-800">

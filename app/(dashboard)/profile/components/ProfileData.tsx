@@ -560,6 +560,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
           {
             headers: {
               "Content-Type": "multipart/form-data",
+              "Authorization": `Bearer ${authToken}`,
             },
           }
         );
@@ -570,6 +571,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
           {
             headers: {
               "Content-Type": "multipart/form-data",
+              "Authorization": `Bearer ${authToken}`,
             },
           }
         );

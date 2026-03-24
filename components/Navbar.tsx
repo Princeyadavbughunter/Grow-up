@@ -32,12 +32,6 @@ const NavBar: React.FC = () => {
 
   const buttonInfo = buttonConfig[pathname];
 
-  const handleCreateClick = () => {
-    if (buttonInfo) {
-      router.push(buttonInfo.route);
-    }
-  };
-
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
@@ -50,49 +44,52 @@ const NavBar: React.FC = () => {
 
   return (
     <div className="relative">
-      <div className="flex items-center justify-between md:p-4 p-2 border-b">
-        <div onClick={() => router.push('/')} className="flex items-center gap-2 cursor-pointer">
-          <Image src="/logo.svg" alt="GrowUp Buddy" width={40} height={40} className="md:w-10 md:h-10 w-8 h-8" />
-          <span className=" md:text-xl text-lg font-semibold">GrowUp Buddy</span>
+      {/* No border-b — clean Figma style */}
+      <div className="flex items-center justify-between px-28 py-5 bg-white">
+        {/* Logo */}
+        <div onClick={() => router.push('/')} className="flex items-center gap-3 cursor-pointer select-none">
+          <Image src="/logo.svg" alt="GrowUp Buddy" width={48} height={48} className="w-12 h-12" />
+          <span className="text-2xl font-bold text-gray-900 tracking-tight">GrowUp Buddy</span>
         </div>
-        <div className="flex items-center md:gap-4 gap-2">
-          {/* Search Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsSearchOpen(true)}
-            className="p-2 hover:bg-gray-100"
-          >
-            <FiSearch className="w-5 h-5 text-gray-600" />
-          </Button>
 
+        {/* Right side actions */}
+        <div className="flex items-center gap-3">
           {buttonInfo && (
             <Button
-              onClick={handleCreateClick}
-              className="border bg-white hover:bg-[#7052FF] hover:text-white border-[#7052FF] text-[#7052FF] md:px-4 md:py-1 px-2 py-1 text-sm md:text-base"
+              onClick={() => router.push(buttonInfo.route)}
+              className="border bg-white hover:bg-[#7052FF] hover:text-white border-[#7052FF] text-[#7052FF] px-4 py-2 text-sm font-semibold"
             >
-              <LuPlus className="md:mr-2 mr-1" />
-              <span className="hidden md:inline">{buttonInfo.label}</span>
-              <span className="md:hidden">Create</span>
+              <LuPlus className="mr-2" />
+              {buttonInfo.label}
             </Button>
           )}
+
+          {/* Search — round gray button */}
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="w-11 h-11 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+          >
+            <FiSearch className="w-5 h-5 text-gray-600" />
+          </button>
+
+          {/* Profile Avatar */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
+              <button className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-gray-200 hover:ring-[#7052FF] transition-all flex-shrink-0 focus:outline-none">
                 {profileData?.profile_picture ? (
                   <Image
                     src={profileData.profile_picture}
                     alt="Profile"
-                    width={40}
-                    height={40}
-                    className="rounded-full md:w-10 md:h-10 w-8 h-8 cursor-pointer aspect-square object-cover"
+                    width={44}
+                    height={44}
+                    className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8 cursor-pointer aspect-square">
-                    <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <FiUser className="text-gray-600 w-5 h-5" />
                   </div>
                 )}
-              </Button>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem asChild>
@@ -102,7 +99,7 @@ const NavBar: React.FC = () => {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={handleLogout}
                 disabled={isLoggingOut}
                 className="flex items-center gap-2 cursor-pointer text-[#7052FF] focus:text-[#5a42d4] hover:text-[#5a42d4]"
@@ -115,7 +112,6 @@ const NavBar: React.FC = () => {
         </div>
       </div>
 
-      {/* Search Component */}
       <SearchComponent
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}

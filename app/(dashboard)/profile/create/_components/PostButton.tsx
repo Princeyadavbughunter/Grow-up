@@ -1,41 +1,40 @@
-import { useAuth } from "@/context/AuthContext";
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
-import { FiUser } from "react-icons/fi";
+// @ts-nocheck
+'use client';
+import Image from 'next/image';
+import Link from 'next/link';
+import { FiUser } from 'react-icons/fi';
+import { useAuth } from '@/context/AuthContext';
 
 const PostButton = () => {
   const { profileData } = useAuth();
   return (
-    <div className="bg-white rounded-xl p-2 md:p-4 md:mb-4">
-      <div className="flex items-center gap-3 w-full">
-        {" "}
-        {/* Added w-full for better flex behavior */}
-        <Link href="/profile">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm px-5 py-4 mb-4">
+      <Link href="/create-post" className="flex items-center gap-4 group">
+        {/* Avatar — large with purple ring */}
+        <div className="flex-shrink-0">
           {profileData?.profile_picture ? (
             <Image
               src={profileData.profile_picture}
               alt="Profile"
-              width={50}
-              height={50}
-              className="rounded-full h-10 object-cover"
+              width={52}
+              height={52}
+              className="rounded-full w-[52px] h-[52px] object-cover ring-2 ring-[#7052FF]/30"
             />
           ) : (
-            <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
-              <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
+            <div className="w-[52px] h-[52px] rounded-full bg-gray-100 flex items-center justify-center ring-2 ring-[#7052FF]/20">
+              <FiUser className="text-gray-400 w-6 h-6" />
             </div>
           )}
-        </Link>
-        <Link
-          href="/create-post"
-          className="w-full bg-gray-100 rounded-lg px-4 py-3 text-[#7052FF] text-center text-sm md:text-base flex-grow"
-        >
-          Create Post
-        </Link>{" "}
-        {/* Adjusted padding, added text-center and flex-grow */}
-      </div>
+        </div>
+
+        {/* "Create post...." in purple */}
+        <span className="text-[#7052FF] text-base font-medium group-hover:opacity-80 transition-opacity">
+          Create post....
+        </span>
+      </Link>
     </div>
   );
 };
 
 export default PostButton;
+

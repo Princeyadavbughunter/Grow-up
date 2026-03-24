@@ -1,66 +1,58 @@
 // @ts-nocheck
+'use client'
 import { useState, useEffect } from 'react';
-import { HiOutlineStar } from "react-icons/hi2";
-import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
+import { useAuth, useAuthenticatedApi } from '@/context/AuthContext';
 
 interface WorkExperience {
   id: string;
   company_name: string;
-  position: string;
-  start_date: string;
-  end_date: string | null;
-  description: string;
-  location: string;
-  created_at: string;
-  updated_at: string;
-  currently_working: boolean;
-  job_location: string;
-  job_title: string;
-  freelancer: string;
 }
 
 interface ProfileData {
   id: string;
   first_name: string;
   last_name: string;
-  date_of_birth: string;
   bio: string;
   university_name: string;
   graduation_year_from: string;
   profile_picture: string;
-  address: string;
-  lat: number | null;
-  long: number | null;
-  city: string;
-  district: string;
-  pincode: number;
-  state: string;
-  interest_in: string;
-  hobbies: string;
-  highest_qualification: string;
-  passing_year: string;
-  created_at: string;
-  degree_name: string;
-  is_degree: boolean;
-  resume: string | null;
   skills: string;
-  gender: string;
-  saved_jobs_count: number;
-  follower_count: number;
-  dribble_account: string | null;
-  github_account: string | null;
-  figma_account: string | null;
-  youtube_account: string | null;
-  medium_account: string | null;
   soft_skills: string;
-  position: string;
-  user: string;
+  is_degree: boolean;
 }
 
 interface Step {
   label: string;
   completed: boolean;
 }
+
+const StarBadgeIcon = ({ completed }: { completed: boolean }) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill={completed ? "#7052FF" : "none"}
+    stroke={completed ? "none" : "#6A737D"}
+    strokeWidth={completed ? "0" : "1.5"}
+    strokeLinejoin="round"
+    strokeLinecap="round"
+    className="flex-shrink-0"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* 8-pointed scalloped star path matching Figma closely */}
+    <path d="M12 2L14.46 4.36L17.82 4.04L18.84 7.27L22 8.7L21.36 12L22 15.3L18.84 16.73L17.82 19.96L14.46 19.64L12 22L9.54 19.64L6.18 19.96L5.16 16.73L2 15.3L2.64 12L2 8.7L5.16 7.27L6.18 4.04L9.54 4.36L12 2Z" />
+    {completed && (
+      <path
+        d="M8 12.5L10.5 15L16 9"
+        stroke="white"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    )}
+  </svg>
+);
 
 const ProgressProfile: React.FC = () => {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
@@ -69,97 +61,90 @@ const ProgressProfile: React.FC = () => {
   const { authToken } = useAuth();
   const { api } = useAuthenticatedApi();
 
-  const fetchProfileData = async (): Promise<void> => {
-    try {
-      const response = await api.get('/freelancer/freelancer-profile/');
-      if (response.data && response.data.length > 0) {
-        setProfileData(response.data[0]);
-      }
-    } catch (error) { 
-      console.error('Error fetching profile data:', error);
-    }
-  };
-
-  const fetchWorkExperiences = async (): Promise<void> => {
-    try {
-      const response = await api.get('/freelancer/work-experience/');
-      setWorkExperiences(response.data || []);
-    } catch (error) {
-      console.error('Error fetching work experiences:', error);
-      setWorkExperiences([]);
-    }
-  };
-
   useEffect(() => {
     if (authToken) {
       const fetchData = async () => {
         setLoading(true);
-        await Promise.all([fetchProfileData(), fetchWorkExperiences()]);
-        setLoading(false);
+        try {
+          const [profileRes, workRes] = await Promise.all([
+            api.get('/freelancer/freelancer-profile/'),
+            api.get('/freelancer/work-experience/'),
+          ]);
+          if (profileRes.data && profileRes.data.length > 0) {
+            setProfileData(profileRes.data[0]);
+          }
+          setWorkExperiences(workRes.data || []);
+        } catch {
+          // Errors expected if no profile yet
+        } finally {
+          setLoading(false);
+        }
       };
       fetchData();
     }
   }, [authToken]);
 
   if (loading) {
-    return <div className="px-4 py-5 border border-gray-200 rounded-xl text-center text-gray-500">Loading profile data...</div>;
+    return (
+      <div className="mt-4 p-5 bg-white border border-gray-100 rounded-[20px] shadow-sm animate-pulse">
+        <div className="h-4 bg-gray-200 rounded w-40 mb-2" />
+        <div className="h-3 bg-gray-200 rounded w-32 mb-4" />
+        <div className="h-1.5 bg-gray-200 rounded-full mb-6 w-full" />
+        <div className="space-y-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-6 h-6 bg-gray-200 rounded-lg" />
+              <div className="h-3 bg-gray-200 rounded w-24" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
-  if (!profileData) {
-    return <div className="px-4 py-5 border border-gray-200 rounded-xl text-center text-gray-500">No profile data found</div>;
-  }
+  if (!profileData) return null;
 
-  // Define steps and check completion based on profile data and work experiences
   const steps: Step[] = [
-    { 
-      label: "Personal Info", 
-      completed: !!(profileData.first_name && profileData.last_name) 
-    },
-    { 
-      label: "Bio", 
-      completed: !!profileData.bio 
-    },
-    {
-      label: "Education",
-      completed: !!(profileData.university_name && profileData.graduation_year_from &&
-                  profileData.is_degree)
-    },
-    { 
-      label: "Work Experience", 
-      completed: workExperiences.length > 0 
-    },
-    {
-      label: "Skills",
-      completed: !!(profileData.skills || profileData.soft_skills)
-    }
+    { label: 'Profile', completed: !!(profileData.first_name && profileData.last_name) },
+    { label: 'Bio', completed: !!profileData.bio },
+    { label: 'Education', completed: !!(profileData.university_name && profileData.graduation_year_from && profileData.is_degree) },
+    { label: 'Work experience', completed: workExperiences.length > 0 },
+    { label: 'Skills', completed: !!(profileData.skills || profileData.soft_skills) },
   ];
 
-  const completedSteps = steps.filter((step) => step.completed).length;
-  const totalSteps = steps.length;
-  const progressPercentage = Math.round((completedSteps / totalSteps) * 100);
+  const completedCount = steps.filter((s) => s.completed).length;
+  const pct = Math.round((completedCount / steps.length) * 100);
+  const leftPct = 100 - pct;
 
   return (
-    <div className="p-4 border border-gray-200 rounded-xl">
-      <p className="font-semibold text-base md:text-lg">Complete Your Profile</p>
-      <p className="text-xs text-gray-500">
-        {progressPercentage}% completed ({totalSteps - completedSteps} steps left)
+    <div className="mt-4 p-5 bg-white border border-gray-200 rounded-[20px] shadow-sm w-full mx-auto">
+      <h2 className="text-[17px] font-bold text-[#111827] tracking-tight mb-1">
+        Complete your profile
+      </h2>
+      <p className="text-[13px] text-[#6A737D] mb-4">
+        {leftPct === 0 ? 'Profile complete! 🎉' : `Just ${leftPct}% left to complete`}
       </p>
-      <div className="w-full bg-gray-200 h-2 rounded-full mt-2 mb-4">
+
+      {/* Progress bar */}
+      <div className="w-full h-1.5 bg-[#F3F4F6] rounded-full mb-6 overflow-hidden">
         <div
-          className="h-2 rounded-full bg-[#7052FF]"
-          style={{ width: `${progressPercentage}%` }}
-        ></div>
+          className="h-full rounded-full bg-[#7052FF] transition-all duration-500 ease-out"
+          style={{ width: `${pct}%` }}
+        />
       </div>
-      <div>
-        {steps.map((step, index) => (
-          <div key={index} className="flex items-center mb-2">
-            <HiOutlineStar
-              className={`mr-2 ${step.completed ? "text-purple-600" : "text-gray-400"}`}
-              size={18} // Adjust icon size for readability
-            />
-            <p className={`${step.completed ? "text-black" : "text-gray-400"}`}>
+
+      {/* Steps List */}
+      <div className="space-y-4 pl-1">
+        {steps.map((step, i) => (
+          <div key={i} className="flex items-center gap-3.5">
+            <StarBadgeIcon completed={step.completed} />
+            <span
+              className={`text-[15px] ${
+                step.completed ? 'text-[#7052FF]' : 'text-[#6A737D]'
+              }`}
+            >
               {step.label}
-            </p>
+            </span>
           </div>
         ))}
       </div>

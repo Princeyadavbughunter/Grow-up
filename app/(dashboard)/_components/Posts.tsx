@@ -332,7 +332,7 @@ const Posts = ({ posts: propPosts, isPageAdmin }: PostsProps = {}) => {
 
   if (loading) {
     return (
-      <div className="px-0 py-4 h-[calc(100vh-18rem)] overflow-y-scroll">
+      <div className="px-0 py-4 h-[calc(100vh-18rem)] overflow-y-auto scrollbar-hide">
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div
@@ -362,7 +362,7 @@ const Posts = ({ posts: propPosts, isPageAdmin }: PostsProps = {}) => {
 
   if (error) {
     return (
-      <div className="px-0 py-4 h-[calc(100vh-18rem)] overflow-y-scroll">
+      <div className="px-0 py-4 h-[calc(100vh-18rem)] overflow-y-auto scrollbar-hide">
         <EmptyState
           variant="error"
           title="Unable to load posts"
@@ -375,7 +375,7 @@ const Posts = ({ posts: propPosts, isPageAdmin }: PostsProps = {}) => {
 
   if (!posts || posts.length === 0) {
     return (
-      <div className="px-0 py-4 h-[calc(100vh-18rem)] overflow-y-scroll">
+      <div className="px-0 py-4 h-[calc(100vh-18rem)] overflow-y-auto scrollbar-hide">
         <EmptyState
           icon={<FileText className="w-6 h-6 text-gray-400" />}
           title="No posts yet"
@@ -396,7 +396,7 @@ const Posts = ({ posts: propPosts, isPageAdmin }: PostsProps = {}) => {
   }
 
   return (
-    <div className="px-0 py-4 h-[calc(100vh-18rem)] overflow-y-scroll">
+    <div className="px-0 py-4 h-[calc(100vh-18rem)] overflow-y-auto scrollbar-hide">
       {posts.map((post) => (
         <PostCard
           key={post.id}
@@ -559,84 +559,57 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
 
 
   return (
-    <div className="bg-white rounded-xl px-4 py-4 mb-4 border border-gray-200 mx-0">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3 flex-1">
-          {post.type === "page_post" || post.freelancer_profile ? (
-            <Link href={profileLink} className="flex items-center gap-3">
-              <div>
-                {profilePicture ? (
-                  <Image
-                    src={profilePicture}
-                    alt="Profile"
-                    width={40}
-                    height={40}
-                    className="rounded-full md:w-10 md:h-10 w-8 h-8"
-                  />
-                ) : (
-                  <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
-                    <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
-                  </div>
-                )}
+    <div className="bg-white rounded-2xl px-5 py-4 mb-3 border border-gray-100 shadow-sm">
+      {/* Header — Figma style */}
+      <div className="flex items-center justify-between mb-3">
+        {/* Left: avatar + name + time */}
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <Link href={profileLink} className="flex-shrink-0">
+            {profilePicture ? (
+              <Image
+                src={profilePicture}
+                alt="Profile"
+                width={44}
+                height={44}
+                className="w-11 h-11 rounded-full object-cover ring-1 ring-gray-100"
+              />
+            ) : (
+              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center ring-1 ring-gray-100">
+                <FiUser className="text-gray-500 w-5 h-5" />
               </div>
-              <div>
-                <h3 className="font-semibold">{displayName}</h3>
-                <p className="text-sm text-gray-500">{formattedDate}</p>
-              </div>
+            )}
+          </Link>
+          <div className="min-w-0">
+            <Link href={profileLink}>
+              <h3 className="font-semibold text-gray-900 text-sm leading-tight hover:text-[#7052FF] transition-colors truncate">{displayName}</h3>
             </Link>
-          ) : (
-            <div className="flex items-center gap-3">
-              <div>
-                {profilePicture ? (
-                  <Image
-                    src={profilePicture}
-                    alt="Profile"
-                    width={40}
-                    height={40}
-                    className="rounded-full md:w-10 md:h-10 w-8 h-8"
-                  />
-                ) : (
-                  <div className="rounded-full bg-gray-200 flex items-center justify-center md:w-10 md:h-10 w-8 h-8">
-                    <FiUser className="text-gray-600 md:w-5 md:h-5 w-4 h-4" />
-                  </div>
-                )}
-              </div>
-              <div>
-                <h3 className="font-semibold">{displayName}</h3>
-                <p className="text-sm text-gray-500">{formattedDate}</p>
-              </div>
-            </div>
-          )}
+            <p className="text-xs text-gray-400 mt-0.5">{formattedDate}</p>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          {/* Show club badge for user posts */}
+
+        {/* Right: club badge + owner menu */}
+        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
           {post.type === "user_post" && post.club_name && (
             <Link
               href={`/clubs/${post.club || post.club_id}`}
-              className="text-xs sm:text-sm bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 transition-colors cursor-pointer whitespace-nowrap"
+              className="text-xs bg-[#E8F5E9] text-[#2E7D32] px-3 py-1 rounded-full hover:bg-green-200 transition-colors whitespace-nowrap font-medium"
             >
               {post.club_name}
             </Link>
           )}
-          {/* Show club badges for page posts */}
-          {post.type === "page_post" && post.clubs_data && post.clubs_data.length > 0 && (
-            <>
-              {post.clubs_data.map((club) => (
-                <Link
-                  key={club.id}
-                  href={`/clubs/${club.id}`}
-                  className="text-xs sm:text-sm bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 transition-colors cursor-pointer whitespace-nowrap"
-                >
-                  {club.name}
-                </Link>
-              ))}
-            </>
+          {post.type === "page_post" && post.clubs_data?.length > 0 && (
+            <Link
+              href={`/clubs/${post.clubs_data[0].id}`}
+              className="text-xs bg-[#E8F5E9] text-[#2E7D32] px-3 py-1 rounded-full hover:bg-green-200 transition-colors whitespace-nowrap font-medium"
+            >
+              {post.clubs_data[0].name}
+            </Link>
           )}
           {isOwner && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                  <MoreVertical className="w-5 h-5 text-gray-600" />
+                <button className="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+                  <MoreVertical className="w-4 h-4 text-gray-400" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -738,33 +711,62 @@ const PostCard = ({ post, onLike, onDelete, currentUserId }: PostCardProps) => {
         )}
       </div>
 
-      <div className="flex items-center gap-4 text-gray-500">
-        <button
-          className={`flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors ${
-            post.is_liked ? "text-red-500 bg-red-50" : "text-gray-500"
-          }`}
-          onClick={() => onLike(post.id)}
-          title={`${post.is_liked ? "Unlike" : "Like"} this post`}
-        >
-          <HeartIcon
-            className="w-5 h-5"
-            filled={post.is_liked} // Add this prop
-          />
-          <span className="font-medium">{post.like_count}</span>
-        </button>
-        <button
-          className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors"
-          onClick={handleCommentToggle}
-        >
-          <MessageSquare className="w-5 h-5" />
-          <span className="font-medium">{post.comment_count}</span>
-        </button>
-        <button
-          onClick={() => setShowSharePopup(true)}
-          className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors"
-        >
-          <UploadIcon size={20} />
-        </button>
+      {/* Action Bar — Figma Style (latest light-stroke icons) */}
+      <div className="flex items-center justify-between text-[#6B7280] border-t border-gray-100 pt-3 mt-1 px-1">
+        {/* Left Side: Like and Comment */}
+        <div className="flex items-center gap-6">
+          <button
+            className={`flex items-center gap-2 transition-all text-[14px] font-medium ${
+              post.is_liked ? 'text-[#FF2D55]' : 'text-[#6B7280] hover:text-[#111827]'
+            }`}
+            onClick={() => onLike(post.id)}
+          >
+            {/* Outline Heart per Final Figma */}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill={post.is_liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span>{post.like_count}</span>
+          </button>
+
+          <button
+            className="flex items-center gap-2 transition-all text-[14px] font-medium text-[#6B7280] hover:text-[#111827]"
+            onClick={handleCommentToggle}
+          >
+            {/* Outline speech bubble with 3 horizontal dots per Final Figma */}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+              <path d="M8 12h.01" />
+              <path d="M12 12h.01" />
+              <path d="M16 12h.01" />
+            </svg>
+            <span>{post.comment_count}</span>
+          </button>
+        </div>
+
+        {/* Right Side: View count and Share */}
+        <div className="flex items-center gap-5">
+          <div className="flex items-center gap-2 text-[14px] font-medium text-[#6B7280]">
+            {/* Outline Eye with pupil per Final Figma */}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 12c3.5-6 16.5-6 20 0-3.5 6-16.5 6-20 0z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <span>{post.like_count + post.comment_count}</span>
+          </div>
+
+          <button
+            onClick={() => setShowSharePopup(true)}
+            className="flex items-center text-[#6B7280] hover:text-[#111827] transition-colors"
+          >
+            {/* Box pointing up-right arrow exact match Final Figma */}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 3v6" />
+              <path d="M21 3h-6" />
+              <path d="M10 14L21 3" />
+              <path d="M14 21H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h7" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {showComments && (

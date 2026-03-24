@@ -12,7 +12,7 @@ export default function RootLayout({ children }: LayoutProps) {
     return (
         <AuthProvider>
             <div className="min-h-screen flex flex-col">
-                <div className="sticky top-0 z-50 bg-white shadow">
+                <div className="sticky top-0 z-50 bg-white">
                     <Navbar />
                 </div>
                 <div className="h-[calc(100vh-5rem)] md:h-[calc(100vh-10rem)] overflow-y-hidden">
@@ -20,7 +20,7 @@ export default function RootLayout({ children }: LayoutProps) {
                         {children}
                     </ProfileRequired>
                 </div>
-                <div className="sticky bottom-0 z-50 bg-white shadow">
+                <div className="sticky bottom-0 z-50 bg-white">
                     <BottomNavbar />
                 </div>
             </div>
