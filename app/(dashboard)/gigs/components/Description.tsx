@@ -3,7 +3,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Building2, MapPin, Clock, Badge, Share2, ExternalLink } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Building2, MapPin, Clock, Share2, ExternalLink, Wallet, Compass } from 'lucide-react'
 import ShareGigPopup from './ShareGigPopup'
 
 interface DescriptionProps {
@@ -26,49 +27,76 @@ const Description = ({ selectedGig, showSmaller }: DescriptionProps) => {
     }
 
     return (
-        <div className={`w-full ${showSmaller ? 'h-[calc(100vh-19rem)]' : 'h-[calc(100vh-12rem)]'} overflow-y-scroll rounded-xl p-2 sm:p-4`}>
-            <Card className="h-full border-none p-2 sm:p-4 rounded-xl flex flex-col cursor-pointer"     onClick={() => router.push(`/gigs/${selectedGig.id}`)} >
-                <CardHeader className="sticky top-0 z-10 bg-white pb-4">
-                    <div className="flex justify-between items-start">
-                        <CardTitle>{selectedGig.job_title}</CardTitle>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setShowSharePopup(true);
-                            }}
-                            className="flex items-center gap-2"
-                        >
-                            <Share2 className="h-4 w-4" />
-                            Share
-                        </Button>
+        <div className={`w-full ${showSmaller ? 'h-[calc(100vh-19rem)]' : 'h-[calc(100vh-12rem)]'} overflow-y-scroll rounded-xl p-2 sm:p-4 bg-white`}>
+            <Card className="h-full border-none p-2 sm:p-4 rounded-xl flex flex-col cursor-pointer" onClick={() => router.push(`/gigs/${selectedGig.id}`)} >
+                <CardHeader className="sticky top-0 z-10 bg-white pb-6 pt-4 border-b border-gray-100 mb-6">
+                    <div className="flex justify-between items-start gap-4">
+                        <CardTitle className="text-2xl sm:text-[28px] font-bold text-gray-900 leading-tight">
+                            {selectedGig.job_title}
+                        </CardTitle>
+                        <div className="flex items-center gap-3 shrink-0 mt-1">
+                            <div className="text-right hidden sm:block">
+                                <p className="text-sm font-bold text-gray-900 leading-tight">{selectedGig.about_role || "Company Name"}</p>
+                                <p className="text-xs text-gray-500 font-medium">{selectedGig.location}</p>
+                            </div>
+                            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shrink-0 border border-gray-100 shadow-sm overflow-hidden p-1">
+                                <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="100" height="100" fill="#FFEACB" />
+                                    <path d="M20 80L50 20L80 80H20Z" fill="#202020" stroke="#FFEACB" strokeWidth="4" strokeLinejoin="round" />
+                                    <path d="M35 80L50 50L65 80H35Z" fill="#F0B52B" />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mt-2">
-                        <div className="flex items-center">
-                            <Building2 className="h-4 w-4 mr-1" />
-                            {selectedGig.about_role}
+
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-8">
+                        <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm font-medium text-gray-700">
+                            <div className="flex items-center gap-1.5">
+                                <Wallet className="w-4 h-4 text-gray-400" />
+                                <span>
+                                    {selectedGig.is_unpaid || !selectedGig.salary_range || selectedGig.salary_range.trim() === '' ? (
+                                        <span className="text-orange-600 font-medium">Unpaid</span>
+                                    ) : (
+                                        `${selectedGig.salary_range}/month`
+                                    )}
+                                </span>
+                            </div>
+                            <div className="w-px h-4 bg-gray-300"></div>
+                            <div className="flex items-center gap-1.5">
+                                <Clock className="w-4 h-4 text-gray-400" />
+                                <span>{selectedGig.experience || "Not specified"}</span>
+                            </div>
+                            <div className="w-px h-4 bg-gray-300"></div>
+                            <div className="flex items-center gap-1.5">
+                                <Compass className="w-4 h-4 text-gray-400" />
+                                <span>{selectedGig.work_type || "Remote"}</span>
+                            </div>
                         </div>
-                        <div className="flex items-center">
-                            <MapPin className="h-4 w-4 mr-1" />
-                            {selectedGig.location}
+
+                        <div className="flex items-center gap-2 self-start sm:self-auto">
+                            <Badge variant="outline" className="rounded-full px-3 py-0.5 text-xs font-medium text-gray-500 border-gray-300 bg-white">
+                                {selectedGig.employment_type}
+                            </Badge>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-6 w-6 rounded-full shrink-0 border-gray-200 hover:bg-gray-50 text-gray-400"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowSharePopup(true);
+                                }}
+                            >
+                                <Share2 className="h-3 w-3" />
+                            </Button>
                         </div>
-                        <div className="flex items-center">
-                            <Clock className="h-4 w-4 mr-1" />
-                            {selectedGig.is_unpaid || !selectedGig.salary_range || selectedGig.salary_range.trim() === '' ? (
-                                <span className="text-orange-600 font-medium">Unpaid</span>
-                            ) : (
-                                `${selectedGig.salary_range}/month`
-                            )}
-                        </div>
-                        <Badge>{selectedGig.employment_type}</Badge>
                     </div>
                 </CardHeader>
 
-                <CardContent className="overflow-y-auto space-y-6 md:space-y-8 lg:space-y-10 h-[500px] pb-4">
+                <CardContent className="overflow-y-auto space-y-8 md:space-y-10 h-[500px] pb-4 px-2 sm:px-6">
                     <div>
-                        <h3 className="font-medium mb-2">About Position</h3>
-                        <p className="text-gray-600">
+                        <h3 className="font-bold text-gray-900 text-[17px] mb-3">About Position</h3>
+                        <h4 className="font-semibold text-gray-800 text-sm mb-2">Description</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">
                             {selectedGig.job_description}
                         </p>
                     </div>

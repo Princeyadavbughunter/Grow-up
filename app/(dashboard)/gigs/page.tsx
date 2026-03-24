@@ -52,27 +52,39 @@ const GigsPage = () => {
                         job_type: jobType !== "All" ? jobType.toLowerCase() : ""
                     }
                 });
-                
+
                 // Merge with user's job postings to ensure they see their own gigs
                 const allGigs = response.data || [];
                 const userGigIds = new Set(userJobPostings.map(job => job.id));
-                
+
                 // Add user's job postings that might not be in the general list
                 const mergedGigs = [...allGigs];
                 for (const userJob of userJobPostings) {
                     const existsInGigs = allGigs.some(gig => gig.id === userJob.id);
                     if (!existsInGigs) {
-                        // Transform user job posting to match gig format
-                        const gigFormat = {
-                            ...userJob,
-                            employment_type: userJob.job_type || userJob.employment_type,
-                            is_bookmark: false,
-                            is_applied: false,
-                        };
-                        mergedGigs.push(gigFormat);
+                        // Ensure user job actually matches the current filters
+                        const actualWorkType = userJob.work_type || "";
+                        const actualJobType = userJob.job_type || userJob.employment_type || "";
+
+                        const matchesWorkType = workType === "Domain" ||
+                            actualWorkType.toLowerCase() === workType.toLowerCase();
+
+                        const matchesJobType = jobType === "All" ||
+                            actualJobType.toLowerCase() === jobType.toLowerCase();
+
+                        if (matchesWorkType && matchesJobType) {
+                            // Transform user job posting to match gig format
+                            const gigFormat = {
+                                ...userJob,
+                                employment_type: actualJobType,
+                                is_bookmark: false,
+                                is_applied: false,
+                            };
+                            mergedGigs.push(gigFormat);
+                        }
                     }
                 }
-                
+
                 setGigs(mergedGigs);
             } catch (error) {
                 console.error('Error fetching gigs:', error);
@@ -97,41 +109,41 @@ const GigsPage = () => {
     };
 
     return (
-        <div className='max-w-[1350px] font-work-sans bg-gray-50 md:py-3 sm:py-3 py-2 mx-auto px-2 sm:px-4 md:px-6 lg:px-10'>
+        <div className='w-full font-work-sans bg-white md:py-4 sm:py-3 py-2 px-4 md:px-10 lg:px-20 xl:px-28 min-h-[calc(100vh-4rem)]'>
             {/* Navigation to Saved Jobs */}
-            <div className="mb-2 sm:mb-3 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between">
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Browse Jobs</h1>
                 <Link href="/gigs/saved">
-                    <Button 
-                        variant="outline" 
-                        className="flex items-center gap-2 text-violet-600 hover:text-violet-700 hover:bg-violet-50 border-violet-300"
+                    <Button
+                        variant="outline"
+                        className="flex items-center gap-2 text-[#6A5DE2] hover:text-[#5849C9] hover:bg-[#F8F7FF] border-[#EBE8FF] rounded-xl px-4"
                     >
                         <Bookmark className="w-4 h-4" />
-                        <span className="hidden sm:inline">Saved Jobs</span>
-                        <span className="sm:hidden">Saved</span>
+                        <span className="hidden sm:inline font-medium">Saved Jobs</span>
+                        <span className="sm:hidden font-medium">Saved</span>
                     </Button>
                 </Link>
             </div>
 
-                {!checkingJobs && hasJobPostings && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 sm:p-3 md:p-4 mb-2 sm:mb-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-blue-800">
-                            <div className="flex items-center gap-1 sm:gap-2">
-                                <Users className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0" />
-                                <span className="font-medium text-xs sm:text-sm md:text-base">
-                                    You have {userJobPostings.length} job posting{userJobPostings.length !== 1 ? 's' : ''}
-                                </span>
-                            </div>
-                            <Link href="/gigs/jobs/manage" className="underline text-xs sm:text-sm md:text-base hover:text-blue-900 sm:ml-1">
-                                manage applications
-                            </Link>
+            {!checkingJobs && hasJobPostings && (
+                <div className="bg-[#F8F7FF] border border-[#EBE8FF] rounded-xl p-2 sm:p-3 md:p-4 mb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-[#6A5DE2]">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                            <Users className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0" />
+                            <span className="font-medium text-xs sm:text-sm md:text-base">
+                                You have {userJobPostings.length} job posting{userJobPostings.length !== 1 ? 's' : ''}
+                            </span>
                         </div>
+                        <Link href="/gigs/jobs/manage" className="underline text-xs sm:text-sm md:text-base hover:text-[#5849C9] font-medium sm:ml-1">
+                            manage applications
+                        </Link>
                     </div>
-                )}
-            
+                </div>
+            )}
+
 
             {/* Main Gigs Content */}
-            <div className=' overflow-y-auto md:overflow-y-hidden h-[calc(100vh-10rem)] gap-2 sm:gap-4 md:gap-6 lg:gap-8 grid lg:grid-cols-3'>
+            <div className='overflow-y-auto md:overflow-y-hidden h-[calc(100vh-10rem)] gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid lg:grid-cols-[420px_minmax(400px,_1fr)_380px] xl:grid-cols-[450px_minmax(450px,_1fr)_400px]'>
                 <AllGigs
                     gigs={gigs}
                     onSelectGig={handleGigSelect}

@@ -28,6 +28,7 @@ const StepForm = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -70,7 +71,7 @@ const StepForm = () => {
   // Validation function with side effects - for use in handlers
   const validateStep = (step: number) => {
     const newErrors: Record<string, string> = {};
-    
+
     switch (step) {
       case 1:
         if (!formData.job_title.trim()) {
@@ -96,7 +97,7 @@ const StepForm = () => {
       default:
         break;
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -130,10 +131,10 @@ const StepForm = () => {
       setTouched((prev) => ({ ...prev, job_description: true }));
       return;
     }
-    
+
     try {
       setIsSubmitting(true);
-      
+
       // Ensure role and skill_set are set correctly before submission
       const dataToSubmit = {
         ...formData,
@@ -141,15 +142,15 @@ const StepForm = () => {
         skill_set: formData.required_skills,
         is_unpaid: formData.is_unpaid
       };
-      
+
       const response = await api.post("/company/app/job-posting/", dataToSubmit);
       console.log("Job posted successfully:", response.data);
       setSubmitSuccess(true);
-      
+
       setTimeout(() => {
         router.push("/gigs");
       }, 2000);
-      
+
     } catch (error) {
       console.error("Error posting job:", error);
     } finally {
@@ -165,7 +166,7 @@ const StepForm = () => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => {
@@ -174,7 +175,7 @@ const StepForm = () => {
         return newErrors;
       });
     }
-    
+
     // Mark field as touched
     setTouched((prev) => ({ ...prev, [name]: true }));
   };
@@ -193,54 +194,7 @@ const StepForm = () => {
 
 
 
-  const StepProgressBar = () => {
-    const steps = [
-      { id: 1, name: '' },
-      { id: 2, name: '' },
-      { id: 3, name: '' }
-    ];
-
-    return (
-      <div className="w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto mb-4 sm:mb-6 md:mb-8">
-        <nav aria-label="Progress">
-          <ol className="flex items-center justify-center">
-            {steps.map((step, stepIdx) => (
-              <li key={step.id} className={`relative ${stepIdx !== steps.length - 1 ? 'pr-4 sm:pr-6 md:pr-8' : ''}`}>
-                {stepIdx !== steps.length - 1 && (
-                  <div className="absolute top-1/2 left-full w-4 sm:w-6 md:w-8 h-0.5 -translate-y-1/2" aria-hidden="true">
-                    <div 
-                      className={`h-0.5 w-full ${step.id < currentStep ? 'bg-purple-600' : 'bg-gray-200'}`}
-                    />
-                  </div>
-                )}
-                <div className="relative flex items-center justify-center">
-                  <span className="flex flex-shrink-0 items-center justify-center">
-                    <span 
-                      className={`flex h-6 w-6 sm:h-8 sm:w-8 md:h-9 md:w-9 items-center justify-center rounded-full text-xs sm:text-sm font-medium ${
-                        step.id < currentStep 
-                          ? 'bg-purple-600 text-white'
-                          : step.id === currentStep
-                          ? 'bg-purple-500 text-white ring-1 sm:ring-2 ring-purple-200'
-                          : 'bg-gray-200 text-gray-500'
-                      }`}
-                    >
-                      {step.id < currentStep ? (
-                        <svg className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        step.id
-                      )}
-                    </span>
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </nav>
-      </div>
-    );
-  };
+  // StepProgressBar removed as per new 3-column UI design
 
   if (submitSuccess) {
     return (
@@ -263,18 +217,12 @@ const StepForm = () => {
   }
 
   return (
-    <div className="flex  h-[calc(100vh-9rem)] overflow-y-auto md:pt-96 pt-5 flex-col md:justify-center items-center ">
-      <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-4xl">
-        <StepProgressBar />
-        
-        <div className="flex justify-center overflow-hidden relative">
-          <div 
-            className="flex transition-transform duration-500 ease-in-out w-full"
-            style={{ transform: `translateX(-${(currentStep - 1) * 100}%)` }}
-          >
+    <div className="flex h-auto lg:h-[calc(100vh-6rem)] overflow-y-auto pt-6 lg:pt-10 flex-col items-start w-full px-4 md:px-10 lg:px-20 xl:px-28">
+      <div className="relative w-full pb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start w-full">
             {/* Step 1: Role Information */}
-            <div className="w-full flex-shrink-0">
-              <div className="w-full max-w-xs sm:max-w-md mx-auto p-4 sm:p-5 md:p-6 bg-white rounded-lg shadow-md">
+            <div className="w-full">
+              <div className="w-full p-4 sm:p-5 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-gray-800">Add the Role</h2>
                 <div className="mb-3 sm:mb-4">
                   <p className="flex justify-between items-center text-xs sm:text-sm text-gray-600 mb-1">
@@ -284,11 +232,10 @@ const StepForm = () => {
                   <textarea
                     id="job_title"
                     name="job_title"
-                    className={`w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 resize-none text-sm sm:text-base ${
-                      errors.job_title && touched.job_title
+                    className={`w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 resize-none text-sm sm:text-base ${errors.job_title && touched.job_title
                         ? "border-red-500 focus:ring-red-500"
-                        : "focus:ring-purple-500"
-                    }`}
+                        : "focus:ring-[#7052FF]"
+                      }`}
                     placeholder="e.g., Web Designer, Software Engineer"
                     maxLength={120}
                     value={formData.job_title}
@@ -313,18 +260,17 @@ const StepForm = () => {
                     {["Remote", "Hybrid", "Onsite"].map((type) => (
                       <label
                         key={type}
-                        className={`flex items-center p-2 sm:p-3 border rounded-lg sm:rounded-xl cursor-pointer ${
-                          formData.work_type === type 
-                            ? "border-purple-500 bg-purple-50" 
+                        className={`flex items-center p-2 sm:p-3 border rounded-lg sm:rounded-xl cursor-pointer transition-colors duration-200 ${formData.work_type === type
+                            ? "border-[#7052FF] bg-[#7052FF] text-white"
                             : errors.work_type && touched.work_type
-                            ? "border-red-500"
-                            : "border-gray-200 hover:bg-gray-50"
-                        }`}
+                              ? "border-red-500"
+                              : "border-gray-200 hover:bg-gray-50"
+                          }`}
                       >
                         <input
                           type="radio"
                           name="work_type"
-                          className="form-radio text-purple-500 mr-1 sm:mr-2 w-3 h-3 sm:w-4 sm:h-4"
+                          className="form-radio text-white focus:ring-white mr-1 sm:mr-2 w-3 h-3 sm:w-4 sm:h-4"
                           checked={formData.work_type === type}
                           onChange={() => {
                             setFormData({ ...formData, work_type: type });
@@ -339,7 +285,7 @@ const StepForm = () => {
                           }}
                           onBlur={() => handleBlur('work_type')}
                         />
-                        <span className="text-xs sm:text-sm text-gray-700">{type}</span>
+                        <span className={`text-xs sm:text-sm font-medium ${formData.work_type === type ? 'text-white' : 'text-gray-700'}`}>{type}</span>
                       </label>
                     ))}
                   </div>
@@ -359,18 +305,17 @@ const StepForm = () => {
                     {["Freelance", "Collaboration", "Internship", "Contract", "Full Time", "Part Time"].map((type) => (
                       <label
                         key={type}
-                        className={`flex items-center p-2 sm:p-3 border rounded-lg sm:rounded-xl cursor-pointer ${
-                          formData.job_type === type 
-                            ? "border-purple-500 bg-purple-50" 
+                        className={`flex items-center p-2 sm:p-3 border rounded-lg sm:rounded-xl cursor-pointer transition-colors duration-200 ${formData.job_type === type
+                            ? "border-[#7052FF] bg-[#7052FF] text-white"
                             : errors.job_type && touched.job_type
-                            ? "border-red-500"
-                            : "border-gray-200 hover:bg-gray-50"
-                        }`}
+                              ? "border-red-500"
+                              : "border-gray-200 hover:bg-gray-50"
+                          }`}
                       >
                         <input
                           type="radio"
                           name="job_type"
-                          className="form-radio text-purple-500 mr-1 sm:mr-2 w-3 h-3 sm:w-4 sm:h-4"
+                          className="form-radio text-white focus:ring-white mr-1 sm:mr-2 w-3 h-3 sm:w-4 sm:h-4"
                           checked={formData.job_type === type}
                           onChange={() => {
                             setFormData({ ...formData, job_type: type });
@@ -385,7 +330,7 @@ const StepForm = () => {
                           }}
                           onBlur={() => handleBlur('job_type')}
                         />
-                        <span className="text-xs sm:text-sm text-gray-700">{type}</span>
+                        <span className={`text-xs sm:text-sm font-medium ${formData.job_type === type ? 'text-white' : 'text-gray-700'}`}>{type}</span>
                       </label>
                     ))}
                   </div>
@@ -406,7 +351,7 @@ const StepForm = () => {
                       <input
                         type="checkbox"
                         name="is_unpaid"
-                        className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        className="w-4 h-4 text-[#7052FF] border-gray-300 rounded focus:ring-[#7052FF]"
                         checked={formData.is_unpaid}
                         onChange={(e) => setFormData({ ...formData, is_unpaid: e.target.checked, salary_range: e.target.checked ? "" : formData.salary_range })}
                       />
@@ -421,10 +366,10 @@ const StepForm = () => {
                           <div className="absolute inset-y-0 left-0 flex items-center pl-2 sm:pl-3 pointer-events-none">
                             <span className="text-gray-500 text-sm sm:text-base">₹</span>
                           </div>
-                          <input 
+                          <input
                             type="text"
                             name="salary_range"
-                            className="w-full pl-6 sm:pl-8 p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
+                            className="w-full pl-6 sm:pl-8 p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7052FF] text-sm sm:text-base"
                             placeholder="e.g., 20000-40000"
                             value={formData.salary_range}
                             onChange={handleInputChange}
@@ -436,11 +381,10 @@ const StepForm = () => {
                 </div>
 
                 <button
-                  className={`w-full mt-4 sm:mt-6 py-2 sm:py-3 px-4 rounded-lg transition-colors text-sm sm:text-base ${
-                    isValidStep(1)
-                      ? "bg-purple-600 text-white hover:bg-purple-700"
+                  className={`w-full mt-4 sm:mt-6 py-2 sm:py-3 px-4 rounded-lg transition-colors text-sm sm:text-base ${isValidStep(1)
+                      ? "bg-[#7052FF] text-white hover:bg-[#5849C9]"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
+                    }`}
                   onClick={nextStep}
                   disabled={!isValidStep(1)}
                 >
@@ -450,24 +394,88 @@ const StepForm = () => {
             </div>
 
             {/* Step 2: Skills and Requirements */}
-            <div className="w-full flex-shrink-0">
-              <div className="w-full max-w-xs sm:max-w-md mx-auto p-4 sm:p-5 md:p-6 bg-white rounded-lg shadow-md">
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-gray-800">Add Skills</h2>
+            <div className={`w-full transition-all duration-500 ${currentStep < 2 ? 'opacity-40 blur-[3px] pointer-events-none select-none' : ''}`}>
+              <div className="w-full p-4 sm:p-5 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+                {/* Skills Added Section */}
+                <div className="mb-6">
+                  <h3 
+                    className="text-gray-900 mb-4"
+                    style={{ fontFamily: "Poppins, sans-serif", fontWeight: 500, fontSize: "16px", lineHeight: "100%", textAlign: "left" }}
+                  >
+                    Skills Added
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.required_skills.split(',').map(s => s.trim()).filter(Boolean).map((skill, idx) => (
+                      <div key={idx} className="flex items-center bg-[#F4F7FF] text-[#7052FF] px-3 py-1.5 rounded-full text-sm font-medium border border-[#EBE8FF]">
+                        {skill}
+                        <button 
+                          type="button"
+                          className="ml-2 text-[#7052FF] hover:text-[#5849C9] focus:outline-none bg-white rounded-full p-0.5 shadow-sm border border-gray-100 flex items-center justify-center w-4 h-4"
+                          onClick={() => {
+                            const skills = formData.required_skills.split(',').map(s => s.trim()).filter(Boolean);
+                            const newSkills = skills.filter((_, i) => i !== idx);
+                            setFormData({ ...formData, required_skills: newSkills.join(', ') });
+                          }}
+                        >
+                          <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Skills Recommended Section */}
+                <div className="mb-6">
+                  <h3 
+                    className="text-gray-900 mb-4"
+                    style={{ fontFamily: "Poppins, sans-serif", fontWeight: 500, fontSize: "16px", lineHeight: "100%", textAlign: "left" }}
+                  >
+                    Skills Recommended
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {["React", "Node.js", "TypeScript", "Tailwind CSS", "Figma"].map((skill, idx) => (
+                      <button 
+                        key={idx} 
+                        type="button"
+                        className="flex items-center bg-white text-gray-600 px-3 py-1.5 rounded-full text-sm font-medium border border-gray-300 hover:border-[#7052FF] hover:text-[#7052FF] transition-all group"
+                        onClick={() => {
+                          const currentSkills = formData.required_skills.split(',').map(s => s.trim()).filter(Boolean);
+                          if (!currentSkills.includes(skill)) {
+                            const newSkills = currentSkills.length > 0 ? `${formData.required_skills}, ${skill}` : skill;
+                            setFormData({ ...formData, required_skills: newSkills });
+                          }
+                        }}
+                      >
+                        {skill}
+                        <div className="ml-2 bg-gray-100 text-gray-500 rounded-full flex items-center justify-center w-4 h-4 border border-gray-200 group-hover:bg-[#F4F7FF] group-hover:text-[#7052FF] transition-colors">
+                           <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path></svg>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Add Skills Input */}
+                <h3 
+                  className="text-gray-900 mb-2"
+                  style={{ fontFamily: "Poppins, sans-serif", fontWeight: 500, fontSize: "16px", lineHeight: "100%", textAlign: "left" }}
+                >
+                  Add Skills
+                </h3>
                 <div className="mb-3 sm:mb-4">
-                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Skills you are looking for</p>
-                  <textarea
+                  <p className="text-xs sm:text-sm text-gray-500 mb-2">Mention the skill set you are looking for</p>
+                  <input
+                    type="text"
                     name="required_skills"
-                    className={`w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 resize-none text-sm sm:text-base ${
-                      errors.required_skills && touched.required_skills
+                    className={`w-full p-2 sm:p-3 border rounded-xl focus:outline-none focus:ring-2 text-sm sm:text-base ${errors.required_skills && touched.required_skills
                         ? "border-red-500 focus:ring-red-500"
-                        : "focus:ring-purple-500"
-                    }`}
-                    placeholder="e.g., Python, React, UI/UX Design (separate with commas)"
+                        : "border-gray-200 focus:ring-[#7052FF]"
+                      }`}
+                    placeholder="Search Skills"
                     value={formData.required_skills}
                     onChange={handleInputChange}
                     onBlur={() => handleBlur('required_skills')}
-                    rows={3}
-                  ></textarea>
+                  />
                   {errors.required_skills && touched.required_skills && (
                     <p className="mt-1 text-xs text-red-600 flex items-center">
                       <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -483,7 +491,7 @@ const StepForm = () => {
                   <input
                     name="location"
                     type="text"
-                    className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
+                    className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7052FF] text-sm sm:text-base"
                     placeholder="e.g., Mumbai, Delhi, Remote"
                     value={formData.location}
                     onChange={handleInputChange}
@@ -494,7 +502,7 @@ const StepForm = () => {
                   <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-700">Experience Required</h3>
                   <select
                     name="experience"
-                    className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-sm sm:text-base"
+                    className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7052FF] bg-white text-sm sm:text-base"
                     value={formData.experience}
                     onChange={handleInputChange}
                   >
@@ -514,11 +522,10 @@ const StepForm = () => {
                     <FaLongArrowAltLeft className="mr-1 sm:mr-2 w-3 h-3 sm:w-4 sm:h-4" /> Back
                   </button>
                   <button
-                    className={`flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg transition-colors flex items-center justify-center text-sm sm:text-base ${
-                      isValidStep(2)
-                        ? "bg-purple-600 text-white hover:bg-purple-700"
+                    className={`flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg transition-colors flex items-center justify-center text-sm sm:text-base ${isValidStep(2)
+                        ? "bg-[#7052FF] text-white hover:bg-[#5849C9]"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
+                      }`}
                     onClick={nextStep}
                     disabled={!isValidStep(2)}
                   >
@@ -529,24 +536,23 @@ const StepForm = () => {
             </div>
 
             {/* Step 3: Description */}
-            <div className="w-full flex-shrink-0">
-              <div className="w-full max-w-xs sm:max-w-md mx-auto p-4 sm:p-5 md:p-6 bg-white rounded-lg shadow-md">
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-gray-800">Add Description</h2>
-                <div className="mb-3 sm:mb-4">
-                  <p className="flex justify-between items-center text-xs sm:text-sm text-gray-600 mb-1">
-                    Job Description
-                    <span className="text-xs text-gray-500">{formData.job_description.length}/1200</span>
+            <div className={`w-full transition-all duration-500 ${currentStep < 3 ? 'opacity-40 blur-[3px] pointer-events-none select-none' : ''}`}>
+              <div className="w-full p-4 sm:p-5 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+                <h2 className="text-xl font-bold mb-1 text-gray-900">Add Description</h2>
+                <div className="mb-6">
+                  <p className="flex justify-between items-center text-sm text-gray-500 mb-2 font-medium">
+                    Provide the Description for your project
+                    <span className="text-xs text-gray-400 font-normal">{formData.job_description.length}/1200</span>
                   </p>
                   <textarea
                     name="job_description"
-                    className={`w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 resize-none text-sm sm:text-base ${
-                      errors.job_description && touched.job_description
+                    className={`w-full p-4 border rounded-2xl focus:outline-none focus:ring-2 resize-none text-base placeholder-gray-300 transition-all ${errors.job_description && touched.job_description
                         ? "border-red-500 focus:ring-red-500"
-                        : "focus:ring-purple-500"
-                    }`}
-                    placeholder="Describe the job position, responsibilities, and requirements"
+                        : "border-gray-200 focus:ring-[#7052FF]"
+                      }`}
+                    placeholder="Type here"
                     maxLength={1200}
-                    rows={5}
+                    rows={8}
                     value={formData.job_description}
                     onChange={handleInputChange}
                     onBlur={() => handleBlur('job_description')}
@@ -561,43 +567,90 @@ const StepForm = () => {
                   )}
                 </div>
 
-                <div className="mt-4 sm:mt-6">
-                  <p className="flex justify-between items-center text-xs sm:text-sm text-gray-600 mb-1">
-                    About the Role (Optional)
-                    <span className="text-xs text-gray-500">{formData.about_role.length}/500</span>
-                  </p>
-                  <textarea
-                    name="about_role"
-                    className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm sm:text-base"
-                    placeholder="Additional details about the role, team, and work environment"
-                    maxLength={500}
-                    rows={4}
-                    value={formData.about_role}
-                    onChange={handleInputChange}
-                  ></textarea>
+                {/* AI Generation Block */}
+                <div className="bg-[#F4F7FF] rounded-2xl p-4 mb-8 border border-[#EBE8FF] min-h-[80px] flex items-center">
+                  {!isGenerating ? (
+                    <div className="flex items-center justify-between w-full">
+                      <p className="text-sm text-gray-600 leading-tight pr-4">
+                        Generate a gig description <br /> using growth AI
+                      </p>
+                      <button 
+                        type="button"
+                        className="bg-white text-[#7052FF] border border-[#7052FF] px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#F4F7FF] transition-colors whitespace-nowrap"
+                        onClick={() => {
+                          setIsGenerating(true);
+                          // Simulate generation delay
+                          setTimeout(() => {
+                            setIsGenerating(false);
+                            // Populate description with sample text
+                            if (!formData.job_description) {
+                              setFormData(prev => ({
+                                ...prev,
+                                job_description: `Role Overview:\nWe are looking for a dedicated Professional to join our growing team. You will be responsible for handling key project tasks and collaborating with cross-functional teams.\n\nKey Responsibilities:\n- Implement core features and maintain high-quality code.\n- Participate in design reviews and technical discussions.\n- Optimize performance and ensure scalability.\n\nRequirements:\n- Strong knowledge of industry-standard tools.\n- Excellent communication and teamwork skills.\n- Proven experience in similar roles.`
+                              }));
+                            }
+                          }, 3000);
+                        }}
+                      >
+                        Auto generate
+                      </button>
+                    </div>
+                  ) : (
+                    <p 
+                      className="text-gray-500 animate-pulse w-full text-center"
+                      style={{ 
+                        fontFamily: "'Poppins', sans-serif", 
+                        fontWeight: 400, 
+                        fontSize: '12px', 
+                        lineHeight: '100%',
+                        letterSpacing: '0px'
+                      }}
+                    >
+                      Hold on few seconds, I’m thinking description.....
+                    </p>
+                  )}
                 </div>
 
-                <div className="flex justify-between mt-4 sm:mt-6 space-x-2 sm:space-x-4">
-                  <button
-                    onClick={prevStep}
-                    className="flex-1 bg-gray-200 text-gray-700 py-2 sm:py-3 px-2 sm:px-4 rounded-lg hover:bg-gray-300 transition-colors flex items-center justify-center text-sm sm:text-base"
+                {/* Include these section */}
+                <div className="mb-8">
+                  <h3 
+                    className="text-gray-500 mb-4"
+                    style={{ fontFamily: "'Poppins', sans-serif", fontSize: '12px', fontWeight: 500, lineHeight: '100%' }}
                   >
-                    <FaLongArrowAltLeft className="mr-1 sm:mr-2 w-3 h-3 sm:w-4 sm:h-4" /> Back
-                  </button>
+                    Include these in your description
+                  </h3>
+                  <ul className="space-y-4">
+                    {[
+                      "Roles and responsibilities",
+                      "Qualifications or pre-requisites",
+                      "Perks of joining (if any)"
+                    ].map((item, idx) => (
+                      <li 
+                        key={idx} 
+                        className="flex items-center text-[#64748B]"
+                        style={{ fontFamily: "'Poppins', sans-serif", fontSize: '12px', fontWeight: 500, lineHeight: '100%' }}
+                      >
+                        <div className="mr-3 text-[#7052FF]">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L13.8 8.2H20L15 12L16.8 18.2L12 14.4L7.2 18.2L9 12L4 8.2H10.2L12 2Z" fill="currentColor"/>
+                          </svg>
+                        </div>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mt-8">
                   <button
-                    className={`flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg transition-colors flex items-center justify-center text-sm sm:text-base ${
-                      isValidStep(3) && !isSubmitting
-                        ? "bg-purple-600 text-white hover:bg-purple-700"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
+                    className={`w-full py-4 px-4 rounded-2xl transition-all text-lg font-bold shadow-lg ${isValidStep(3) && !isSubmitting
+                        ? "bg-[#7052FF] text-white hover:bg-[#5849C9] shadow-[#7052FF]/30"
+                        : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+                      }`}
                     onClick={handleSubmit}
                     disabled={!isValidStep(3) || isSubmitting}
                   >
-                    {isSubmitting ? "Posting..." : (
-                      <>
-                        Post Job <FaCheckCircle className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4" />
-                      </>
-                    )}
+                    {isSubmitting ? "Posting..." : "Post"}
                   </button>
                 </div>
               </div>
@@ -605,7 +658,6 @@ const StepForm = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
