@@ -57,7 +57,7 @@ const NavBar: React.FC = () => {
           {buttonInfo && (
             <Button
               onClick={() => router.push(buttonInfo.route)}
-              className="border bg-white hover:bg-[#7052FF] hover:text-white border-[#7052FF] text-[#7052FF] px-4 py-2 text-sm font-semibold"
+              className="rounded-full border bg-white hover:bg-[#7052FF] hover:text-white border-[#7052FF] text-[#7052FF] px-6 py-2 text-sm font-semibold transition-all shadow-sm"
             >
               <LuPlus className="mr-2" />
               {buttonInfo.label}

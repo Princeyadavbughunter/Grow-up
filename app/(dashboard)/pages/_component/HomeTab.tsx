@@ -52,52 +52,42 @@ const HomeTab: React.FC<HomeTabProps> = ({ pageId }) => {
   }
 
   return (
-    <div className='flex flex-col px-4 md:px-10 lg:px-20'>
-      <div className="rounded-xl bg-slate-50 text-gray-600 border p-4 mb-5">
-        <p>{pageDescription}</p>
-        {pageDescription.length > 200 && (
-          <button className="text-[#7052FF] mt-2">See more</button>
+    <div className='flex flex-col gap-10 w-full'>
+      {/* Description Box */}
+      <div className="rounded-2xl bg-[#F8FAFB] text-gray-700 p-8 leading-relaxed relative overflow-hidden">
+        <p className="text-base">
+          {pageDescription}
+          {pageDescription.length > 300 && '...'}
+        </p>
+        {pageDescription.length > 300 && (
+          <button className="text-gray-900 font-bold mt-2 hover:underline inline-flex items-center">
+            See more
+          </button>
         )}
       </div>
 
-      <div className="rounded-xl border p-4 mb-5">
-        <div className="mb-3">
-          <p className="font-medium text-gray-700">Website</p>
-          <p className='text-[#7052FF] break-all truncate max-w-full' title={website !== 'Not provided' ? website : ''}>
-            {website}
+      {/* Info Card (Website & Phone) */}
+      <div className="rounded-[32px] border border-gray-100 p-8 space-y-6 bg-white shadow-sm w-full">
+        <div className="space-y-1">
+          <p className="text-sm font-bold text-gray-900">Website</p>
+          <a
+            href={website.startsWith('http') ? website : `https://${website}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#7052FF] font-medium hover:underline block truncate"
+          >
+            {website === 'Not provided' ? 'ptai.in' : website}
+          </a>
+        </div>
+        
+        <div className="space-y-1">
+          <p className="text-sm font-bold text-gray-900">Phone</p>
+          <p className="text-[#7052FF] font-medium">
+            8800569545
           </p>
         </div>
       </div>
 
-      <div>
-        <h2 className="text-xl font-bold mb-4">Recent Posts</h2>
-        {pagePosts.length === 0 ? (
-          <p className="text-gray-500">No posts yet</p>
-        ) : (
-          pagePosts.map((post) => (
-            <div key={post.id} className="border rounded-xl p-4 mb-4 bg-white shadow-sm">
-              <div className="mb-4">
-                <h3 className="font-bold text-xl text-gray-900 mb-3 leading-tight">{post.title}</h3>
-                <div className="border-l-4 border-gray-200 pl-4">
-                  <p className="text-gray-700 text-base leading-relaxed">{post.content}</p>
-                </div>
-              </div>
-              {post.images && post.images.length > 0 && (
-                <div className="mb-4">
-                  <img 
-                    src={post.images[0].file} 
-                    alt="Post image" 
-                    className="w-full h-auto object-cover rounded-lg border"
-                  />
-                </div>
-              )}
-              <div className="text-sm text-gray-500 pt-2 border-t border-gray-100">
-                Posted {formatTimeAgo(post.created_at)}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
     </div>
   )
 }

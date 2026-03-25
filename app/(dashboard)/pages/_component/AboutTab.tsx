@@ -39,8 +39,8 @@ const AboutTab: React.FC<AboutTabProps> = ({ pageDetails }) => {
   }
 
   return (
-    <div className="space-y-4 px-2 sm:px-4 md:px-6"> {/* Adjust padding based on screen size */}
-      <div className="rounded-xl text-gray-600 border p-4 md:p-6"> {/* Adjust padding */}
+    <div className="space-y-6 w-full"> 
+      <div className="rounded-2xl text-gray-700 bg-[#F8FAFB] p-8 leading-relaxed">
         <p className='font-semibold text-lg mb-3'>Overview</p>
         <p>{overview}</p>
         {overview.length > 200 && (

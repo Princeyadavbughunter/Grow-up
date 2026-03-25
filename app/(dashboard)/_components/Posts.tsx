@@ -362,7 +362,7 @@ const Posts = ({ posts: propPosts, isPageAdmin }: PostsProps = {}) => {
 
   if (error) {
     return (
-      <div className="px-0 py-4 h-[calc(100vh-18rem)] overflow-y-auto scrollbar-hide">
+      <div className="px-0 py-4">
         <EmptyState
           variant="error"
           title="Unable to load posts"
@@ -375,7 +375,7 @@ const Posts = ({ posts: propPosts, isPageAdmin }: PostsProps = {}) => {
 
   if (!posts || posts.length === 0) {
     return (
-      <div className="px-0 py-4 h-[calc(100vh-18rem)] overflow-y-auto scrollbar-hide">
+      <div className="px-0 py-4">
         <EmptyState
           icon={<FileText className="w-6 h-6 text-gray-400" />}
           title="No posts yet"
@@ -396,7 +396,7 @@ const Posts = ({ posts: propPosts, isPageAdmin }: PostsProps = {}) => {
   }
 
   return (
-    <div className="px-0 py-4 h-[calc(100vh-18rem)] overflow-y-auto scrollbar-hide">
+    <div className="px-0 py-4">
       {posts.map((post) => (
         <PostCard
           key={post.id}

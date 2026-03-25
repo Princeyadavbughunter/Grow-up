@@ -47,7 +47,7 @@ const PostTab: React.FC<PostTabProps> = ({ pageId, pageName, pageProfilePicture,
   }
 
   return (
-    <div className='flex flex-col justify-center w-full'>
+    <div className='w-full'>
       <Posts posts={pagePosts} isPageAdmin={isAdmin} />
     </div>
   )
