@@ -57,13 +57,11 @@ export function EventComments({ comments, onAddReply, onUserClick }: EventCommen
         return (
           <div 
             key={comment.id} 
-            className="relative"
+            className="relative mb-3 mt-1"
             style={{ paddingLeft: `${paddingLeft}px` }}
           >
-            <div className={`group bg-white rounded-xl hover:shadow-lg transition-all duration-300 border-2 ${
-              isReply ? 'border-gray-100' : 'border-gray-200'
-            } hover:border-purple-200`}>
-              <div className="p-3 sm:p-4">
+            <div className="group bg-white transition-all duration-300">
+              <div className="py-2">
                 <div className="flex items-start gap-3">
                   <Avatar 
                     className="h-8 w-8 sm:h-10 sm:w-10 ring-2 ring-gray-100 group-hover:ring-purple-200 shadow-sm cursor-pointer transition-all duration-200 flex-shrink-0"
