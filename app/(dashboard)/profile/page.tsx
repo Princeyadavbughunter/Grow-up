@@ -7,7 +7,7 @@ const Page = () => {
   const {profileData} = useAuth();
 
   return (
-    <div className="flex flex-col md:h-[calc(100vh-10rem)] h-[calc(100vh-8rem)] overflow-y-scroll justify-between px-4 sm:px-8 md:px-16 lg:px-32 xl:px-40 mx-auto max-w-7xl">
+    <div className="flex flex-col md:h-[calc(100vh-10rem)] h-[calc(100vh-8rem)] overflow-y-scroll justify-between px-4 sm:px-8 md:px-16 lg:px-28 mx-auto w-full">
       {!profileData ? (
         <div className="text-center py-10">Loading...</div>
       ) : (

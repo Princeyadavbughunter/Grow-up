@@ -104,48 +104,75 @@ const Clubs = () => {
     };
 
     return (
-        <div>
-            <div>
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">Clubs you may like</h3>
-                    <Link href="/clubs" className="text-sm text-purple-600">
+        <div className="font-poppins">
+            <div className="my-8">
+                <div className="flex flex-col items-center mb-6">
+                    <h3 className="text-[16px] font-semibold leading-[100%] text-center">Clubs you may like</h3>
+                    <Link href="/clubs" className="text-[11px] text-[#7052FF] mt-2 border-b border-[#7052FF]">
                         View all
                     </Link>
                 </div>
+                
                 {/* Mobile: Horizontal scrollable container */}
                 <div className="block lg:hidden">
                     <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
                         {clubs && clubs.length > 0 ? (
                             clubs.map((club) => (
-                                <ClubCard
-                                    key={club.id}
-                                    club={club}
-                                    onJoin={handleJoin}
-                                    isMobile={true}
-                                />
+                                <div key={club.id} className="bg-[#F9FAFF] border border-gray-100 rounded-xl p-3 w-64 flex-shrink-0 min-h-[100px] flex items-center gap-3">
+                                    <div className="flex-shrink-0">
+                                        <FaLaptopCode color='#7052FF' size={32} />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="text-xs font-semibold truncate">{club.name}</h4>
+                                        <p className="text-[10px] text-gray-500">{club.participants_count} members</p>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleJoin(club.id);
+                                            }}
+                                            className="text-[10px] font-semibold text-[#7052FF] hover:bg-[#7052FF] hover:text-white px-3 py-1 border border-[#7052FF] rounded-full transition-colors mt-1"
+                                        >
+                                            Join
+                                        </button>
+                                    </div>
+                                </div>
                             ))
                         ) : (
-                            <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4 text-gray-500 text-center w-full">
-                                No clubs available to join. Explore more or check back later.
+                            <div className="bg-[#F9FAFF] border border-gray-100 rounded-xl p-4 text-gray-400 text-center text-xs w-full">
+                                No clubs available to join.
                             </div>
                         )}
                     </div>
                 </div>
 
                 {/* Desktop: Vertical stack */}
-                <div className="hidden lg:block space-y-4">
+                <div className="hidden lg:block space-y-3">
                     {clubs && clubs.length > 0 ? (
                         clubs.map((club) => (
-                            <ClubCard
-                                key={club.id}
-                                club={club}
-                                onJoin={handleJoin}
-                                isMobile={false}
-                            />
+                            <div key={club.id} className="bg-[#F9FAFF] border border-gray-100 rounded-xl p-3 flex items-center justify-between transition-all duration-200 hover:shadow-sm">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex-shrink-0">
+                                        <FaLaptopCode color='#7052FF' size={32} />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="text-xs font-semibold truncate text-gray-900">{club.name}</h4>
+                                        <p className="text-[10px] text-gray-500">{club.participants_count} members</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleJoin(club.id);
+                                    }}
+                                    className="text-[10px] font-semibold text-[#7052FF] hover:bg-[#7052FF] hover:text-white px-4 py-1 border border-[#7052FF] rounded-full transition-colors whitespace-nowrap"
+                                >
+                                    Join
+                                </button>
+                            </div>
                         ))
                     ) : (
-                        <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4 text-gray-500 text-center">
-                            No clubs available to join. Explore more or check back later.
+                        <div className="bg-[#F9FAFF] border border-gray-100 rounded-xl p-4 text-gray-400 text-center text-xs">
+                            No clubs available to join.
                         </div>
                     )}
                 </div>

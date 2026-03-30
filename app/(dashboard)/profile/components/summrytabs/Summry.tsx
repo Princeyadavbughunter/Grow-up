@@ -12,8 +12,10 @@ import OtherSimilerPorfile from './OtherSimilerPorfile'
 import Clubs from './Clubs'
 import Posts from './Posts'
 import Portfolios from './Portfolios'
+import ApplicationTracker from './ApplicationTracker'
 import MyExperience from './MyExperience'
 import MyEducation from './MyEducation'
+import Myskills from './Myskills'
 import MyApplications from './MyApplications'
 
 // Use the same interface as in AuthContext
@@ -52,7 +54,7 @@ interface FreelancerProfile {
     medium_account: string | null;
     soft_skills: string;
     position: string;
-    user: string; 
+    user: string;
     work_experience: any[];
     facebook_account?: string | null;
     linkedin_account?: string | null;
@@ -93,7 +95,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
 
         try {
             const formDataToSend = new FormData();
-            
+
             // Add text fields
             Object.entries(formData).forEach(([key, value]) => {
                 formDataToSend.append(key, value as string);
@@ -106,7 +108,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                     },
                 });
             }
-            
+
             await refreshProfile();
             setIsEditing(false);
             setIsEditingSkills(false);
@@ -122,7 +124,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
             bio: profileData?.bio || "",
             skills: profileData?.skills || "",
         };
-        
+
         setFormData(resetFormData);
         setIsEditing(true);
     };
@@ -132,7 +134,7 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
             bio: profileData?.bio || "",
             skills: profileData?.skills || "",
         };
-        
+
         setFormData(resetFormData);
         setIsEditingSkills(true);
     };
@@ -155,47 +157,55 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                 ))}
             </div>
 
-            <div className="flex justify-between flex-col md:flex-row gap-10">
-                <div className='md:w-1/2'>
+            <div className="flex justify-between flex-col md:flex-row gap-8 lg:gap-16 mt-6">
+                {/* NEW LEFT COLUMN (Application Tracker) */}
+                <div className="md:w-[40%]">
+                    <ApplicationTracker />
+                </div>
+
+                {/* OLD LEFT / NEW RIGHT COLUMN (Profile Details) */}
+                <div className='md:w-[60%] flex-1'>
                     {activeJobTypeTab === "About" && (
-                    <div className='flex flex-col'>
-                        <div>
-                            <p className='flex items-center py-4 font-semibold gap-5'>
-                                Summary 
-                                <CiEdit 
-                                    className="cursor-pointer hover:text-[#7052FF] transition-colors" 
-                                    onClick={openEditModal}
-                                />
-                            </p>
-                            <div className="bg-[#F6F8FF] shadow-sm rounded-lg p-4">
-                                <p>My Journey</p>
+                        <div className='flex flex-col'>
+                            <div>
+                                <p className='flex items-center py-4 font-medium gap-5'>
+                                    Summary
+                                    <CiEdit
+                                        className="cursor-pointer hover:text-[#7052FF] transition-colors text-lg"
+                                        onClick={openEditModal}
+                                    />
+                                </p>
+                                <div className="bg-[#F6F8FF] p-4 rounded-xl">
+                                    <p className="font-medium mb-1">My Journey</p>
 
-                                <div className='py-2'>
-                                    <p className="flex flex-wrap gap-2 font-semibold">
-                                        {skillsArray.length > 0 ? (
-                                            skillsArray.map((skill, index) => (
-                                                <button key={index} className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
-                                                    {skill}
-                                                </button>
-                                            ))
-                                        ) : null}
-                                    </p>
+                                    <div className='py-2'>
+                                        <p className="flex flex-wrap gap-2">
+                                            {skillsArray.length > 0 ? (
+                                                skillsArray.map((skill, index) => (
+                                                    <span key={index} className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm bg-white text-gray-700">
+                                                        {skill}
+                                                    </span>
+                                                ))
+                                            ) : null}
+                                        </p>
+                                    </div>
+
+                                    <p className='text-[#6A737D] text-sm leading-relaxed'>{profileData?.bio || 'No bio available'}</p>
                                 </div>
-
-                                <p className='text-[#6A737D]'>{profileData?.bio || 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the Lorem Ipsum is simply dummy text of the printing and typesetting industry.'}</p>
                             </div>
+                            <MyExperience />
+                            <MyEducation profileData={profileData} />
+                            <Myskills profileData={profileData} />
+                            <Portfolios profileData={profileData} />
                         </div>
-                        <MyExperience />
-                        <MyEducation profileData={profileData} />
-                    </div>
                     )}
                     {activeJobTypeTab === "Skills" && (
                         <div className="my-8">
                             <div className="flex items-center gap-4 mb-4">
                                 <h2 className="text-lg font-bold">My Skills</h2>
                                 <div className="flex items-center gap-2">
-                                    <IoMdAdd 
-                                        className="text-xl cursor-pointer hover:text-[#7052FF] transition-colors" 
+                                    <IoMdAdd
+                                        className="text-xl cursor-pointer hover:text-[#7052FF] transition-colors"
                                         onClick={openEditSkillsModal}
                                     />
                                 </div>
@@ -226,11 +236,6 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
 
                     {activeJobTypeTab === "Applications" && <MyApplications profileId={profileData?.id} isOwnProfile={true} />}
                 </div>
-
-                <div className="md:w-1/2">
-                    <OtherSimilerPorfile freelancerId={profileData?.id} />
-                    <Clubs />
-                </div>
             </div>
 
             {/* Edit Summary Modal */}
@@ -243,22 +248,22 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                         <div className="grid gap-4 py-4">
                             <div className="flex flex-col space-y-1.5">
                                 <Label htmlFor="bio">Bio</Label>
-                                <Textarea 
-                                    id="bio" 
-                                    name="bio" 
-                                    value={formData.bio} 
+                                <Textarea
+                                    id="bio"
+                                    name="bio"
+                                    value={formData.bio}
                                     onChange={handleInputChange}
                                     rows={4}
                                     placeholder="Tell us about yourself and your journey..."
                                 />
                             </div>
-                            
+
                             <div className="flex flex-col space-y-1.5">
                                 <Label htmlFor="skills">Skills (comma-separated)</Label>
-                                <Input 
-                                    id="skills" 
-                                    name="skills" 
-                                    value={formData.skills} 
+                                <Input
+                                    id="skills"
+                                    name="skills"
+                                    value={formData.skills}
                                     onChange={handleInputChange}
                                     placeholder="React, Node.js, JavaScript, Python..."
                                 />
@@ -268,16 +273,16 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                             </div>
                         </div>
                         <DialogFooter className="flex flex-col sm:flex-row gap-2">
-                            <Button 
-                                type="button" 
-                                variant="outline" 
+                            <Button
+                                type="button"
+                                variant="outline"
                                 onClick={() => setIsEditing(false)}
                                 className="w-full sm:w-auto"
                             >
                                 Cancel
                             </Button>
-                            <Button 
-                                type="submit" 
+                            <Button
+                                type="submit"
                                 disabled={isSubmitting}
                                 className="bg-[#7052FF] hover:bg-[#5a42cc] w-full sm:w-auto"
                             >
@@ -298,10 +303,10 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                         <div className="grid gap-4 py-4">
                             <div className="flex flex-col space-y-1.5">
                                 <Label htmlFor="skills">Skills (comma-separated)</Label>
-                                <Input 
-                                    id="skills" 
-                                    name="skills" 
-                                    value={formData.skills} 
+                                <Input
+                                    id="skills"
+                                    name="skills"
+                                    value={formData.skills}
                                     onChange={handleInputChange}
                                     placeholder="React, Node.js, JavaScript, Python, Flutter..."
                                 />
@@ -311,16 +316,16 @@ const Summry: React.FC<SummryProps> = ({ profileData }) => {
                             </div>
                         </div>
                         <DialogFooter className="flex flex-col sm:flex-row gap-2">
-                            <Button 
-                                type="button" 
-                                variant="outline" 
+                            <Button
+                                type="button"
+                                variant="outline"
                                 onClick={() => setIsEditingSkills(false)}
                                 className="w-full sm:w-auto"
                             >
                                 Cancel
                             </Button>
-                            <Button 
-                                type="submit" 
+                            <Button
+                                type="submit"
                                 disabled={isSubmitting}
                                 className="bg-[#7052FF] hover:bg-[#5a42cc] w-full sm:w-auto"
                             >

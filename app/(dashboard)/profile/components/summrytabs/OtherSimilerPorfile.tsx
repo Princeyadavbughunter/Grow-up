@@ -112,67 +112,51 @@ const OtherSimilarProfile: React.FC<OtherSimilarProfileProps> = ({ freelancerId 
     }
 
     return (
-        <div className="max-w-full overflow-hidden">
+        <div className="max-w-full overflow-hidden font-poppins">
                 <div className="my-8 w-full">
-                    <h3 className="text-lg font-semibold mb-4">Other similar profiles</h3>
-                    <div className="grid gap-4 w-full">
+                    <h3 className="text-[16px] font-semibold mb-6 text-center leading-[100%]">Other similar profiles</h3>
+                    <div className="grid gap-3 w-full">
                         {similarProfiles.length > 0 ? (
                             similarProfiles.map((profile) => (
                                 <div
                                     key={profile.id}
-                                    className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200 w-full cursor-pointer"
+                                    className="bg-[#F9FAFF] border border-gray-100 rounded-xl p-4 transition-all duration-200 w-full cursor-pointer hover:shadow-sm"
                                     onClick={() => handleProfileClick(profile.id)}
                                 >
-                                    <div className="flex items-start gap-4 max-w-full">
+                                    <div className="flex items-center gap-3 max-w-full">
                                         {profile.img ? (
                                             <img
                                                 src={profile.img}
                                                 alt={profile.name}
-                                                className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                                                className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                                             />
                                         ) : (
-                                            <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                                                <FaUser className="text-gray-500 text-xl" />
+                                            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                                                <FaUser className="text-gray-500 text-sm" />
                                             </div>
                                         )}
                                         <div className="flex flex-col flex-1 min-w-0 max-w-full overflow-hidden">
-                                            <p className="text-sm text-gray-600 truncate max-w-full">{profile.name}</p>
-                                            <p className="text-sm text-gray-600 mt-2 overflow-hidden" 
-                                               style={{
-                                                   display: '-webkit-box',
-                                                   WebkitLineClamp: 2,
-                                                   WebkitBoxOrient: 'vertical',
-                                                   textOverflow: 'ellipsis'
-                                               }}>
-                                               {profile.location}
-                                            </p>
-                                            <p className="text-sm text-gray-600 mt-2 overflow-hidden" 
-                                               style={{
-                                                   display: '-webkit-box',
-                                                   WebkitLineClamp: 2,
-                                                   WebkitBoxOrient: 'vertical',
-                                                   textOverflow: 'ellipsis'
-                                               }}>
-                                               {profile.summary}
-                                            </p>
-                                            {profile.followerCount > 0 && (
-                                                <p className="text-sm text-gray-500 mt-1 truncate">{profile.followerCount} followers</p>
-                                            )}
-                                            <div className="flex items-center mt-4">
+                                            <p className="text-sm font-medium text-gray-900 truncate">{profile.name}</p>
+                                            <p className="text-[11px] text-gray-500 truncate mt-0.5">{profile.location}</p>
+                                            
+                                            <div className="flex items-center justify-between mt-2">
+                                                {profile.followerCount > 0 ? (
+                                                     <p className="text-[10px] text-gray-400 truncate">{profile.followerCount} followers</p>
+                                                ) : <div />}
+                                                
                                                 <button 
                                                     onClick={(e) => {
                                                         e.stopPropagation()
                                                         handleConnect(profile.id)
                                                     }}
                                                     disabled={profile.requestSent}
-                                                    className={`flex items-center gap-2 text-sm font-medium px-4 py-2 border rounded-full transition-colors whitespace-nowrap ${
+                                                    className={`text-[10px] font-semibold px-3 py-1 border rounded-full transition-colors whitespace-nowrap ${
                                                         profile.requestSent 
-                                                            ? "border-gray-300 text-gray-400 bg-gray-50 cursor-not-allowed" 
-                                                            : "border-blue-500 text-blue-500 hover:bg-blue-50"
+                                                            ? "border-gray-200 text-gray-400 bg-gray-100 cursor-not-allowed" 
+                                                            : "border-[#7052FF] text-[#7052FF] hover:bg-[#7052FF] hover:text-white"
                                                     }`}
                                                 >
-                                                    <FaUserPlus className="text-sm flex-shrink-0" />
-                                                    {profile.requestSent ? "Request Sent" : "Connect"}
+                                                    {profile.requestSent ? "Sent" : "Connect"}
                                                 </button>
                                             </div>
                                         </div>
@@ -181,7 +165,7 @@ const OtherSimilarProfile: React.FC<OtherSimilarProfileProps> = ({ freelancerId 
                             ))
                         ) : (
                             <div className="text-center py-8">
-                                <p className="text-gray-500">No similar profiles found.</p>
+                                <p className="text-gray-500 text-sm">No similar profiles found.</p>
                             </div>
                         )}
                     </div>

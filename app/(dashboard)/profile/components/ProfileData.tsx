@@ -16,6 +16,12 @@ import {
 import { FiUser } from "react-icons/fi";
 import { TiSocialFacebook, TiSocialTwitter } from "react-icons/ti";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ImUsers } from "react-icons/im";
 import { FaMessage } from "react-icons/fa6";
 import {
@@ -336,7 +342,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
     if (profileImageFile) {
       const maxSize = 5 * 1024 * 1024; // 5MB
       const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-      
+
       if (profileImageFile.size > maxSize) {
         newErrors.profile_picture = "Profile picture must be less than 5MB";
       }
@@ -433,7 +439,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
       // Validate file
       const maxSize = 5 * 1024 * 1024; // 5MB
       const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-      
+
       if (file.size > maxSize) {
         setErrors((prev) => ({
           ...prev,
@@ -441,7 +447,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
         }));
         return;
       }
-      
+
       // Explicitly block SVG files for security
       if (file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')) {
         setErrors((prev) => ({
@@ -450,7 +456,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
         }));
         return;
       }
-      
+
       if (!allowedTypes.includes(file.type)) {
         setErrors((prev) => ({
           ...prev,
@@ -640,7 +646,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric chars with hyphens
       .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
-    
+
     // Include full ID for backend compatibility
     return `${namePart}-${id}`;
   };
@@ -830,11 +836,10 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                   <Label>Profile Picture</Label>
                   <div className="flex flex-col sm:flex-row items-center gap-4">
                     <div
-                      className={`w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed ${
-                        errors.profile_picture
-                          ? "border-red-500"
-                          : "border-gray-300"
-                      } flex items-center justify-center cursor-pointer hover:border-[#7052FF] transition-colors overflow-hidden`}
+                      className={`w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed ${errors.profile_picture
+                        ? "border-red-500"
+                        : "border-gray-300"
+                        } flex items-center justify-center cursor-pointer hover:border-[#7052FF] transition-colors overflow-hidden`}
                       onClick={() => fileInputRef.current?.click()}
                     >
                       {profileImagePreview ? (
@@ -1066,7 +1071,7 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                           onBlur={handleBlur}
                           className={
                             errors.instagram_account &&
-                            touched.instagram_account
+                              touched.instagram_account
                               ? "border-red-500"
                               : ""
                           }
@@ -1153,165 +1158,147 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   } = profileData;
   const skillsArray = skills ? skills.split(",") : [];
   const fullName = `${first_name} ${last_name}`;
-  const location = `${address ? address + ", " : ""}${city ? city + ", " : ""}${
-    state || ""
-  }`;
+  const location = `${address ? address + ", " : ""}${city ? city + ", " : ""}${state || ""
+    }`;
   const profileImageUrl = profileImagePreview || profile_picture;
 
   return (
-    <div className="py-4">
-      {/* Profile Header - Responsive */}
-      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 py-6">
-        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-gray-300 flex-shrink-0 flex items-center justify-center bg-gray-100">
-          {profileImageUrl ? (
-            <img
-              src={profileImageUrl}
-              alt="Profile"
-              className="w-full h-full rounded-full object-cover"
-            />
-          ) : (
-            <FiUser className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" />
-          )}
+    <div
+      className="flex flex-col bg-white py-2 font-poppins"
+      style={{ width: "100%", maxWidth: "450px", minHeight: "300px", gap: "16px" }}
+    >
+      {/* Top Row: Photo + Basic Info + Actions */}
+      <div className="flex flex-row items-center sm:items-start gap-4">
+        {/* Photo */}
+        <div className="flex-shrink-0">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-[#7052FF]/10 flex items-center justify-center bg-gray-50 overflow-hidden shadow-inner">
+            {profileImageUrl ? (
+              <img
+                src={profileImageUrl}
+                alt="Profile"
+                className="w-full h-full object-cover text-xs"
+              />
+            ) : (
+              <FiUser className="w-10 h-10 text-gray-300" />
+            )}
+          </div>
         </div>
-        <div className="flex-1 text-center sm:text-left">
-          <div className="flex flex-row justify-center sm:justify-start sm:items-center gap-2 sm:gap-4 mb-2">
-            <h3 className="font-medium text-xl sm:text-2xl">{fullName}</h3>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={openEditModal}
-                className="text-gray-500 hover:text-gray-700 transition-colors self-center sm:self-auto"
-                aria-label="Edit profile"
-              >
-                <FaPencilAlt size={16} />
-              </button>
-              <button
-                onClick={handleShareProfile}
-                className="text-[#7052FF] hover:text-[#5a42cc] transition-colors self-center sm:self-auto relative"
-                aria-label="Share profile"
-              >
-                <FaShareAlt size={16} />
-              </button>
+
+        {/* Basic Info: Name, Bio, Location */}
+        <div className="flex-1 min-w-0 flex flex-col gap-2">
+          <div className="flex flex-row items-center justify-between gap-3">
+            <h3 className="font-bold text-xl text-gray-900 leading-tight truncate">
+              {fullName}
+            </h3>
+
+            {/* Three-Dot Menu */}
+            <div className="flex-shrink-0">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="h-15 w-15 text-gray-400 hover:text-[#7052FF] transition-colors rounded-full flex items-center justify-center hover:bg-gray-50 focus:outline-none">
+                    <HiDotsVertical size={26} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-white border border-gray-100 shadow-xl rounded-xl p-1.5 min-w-[160px] z-50">
+                  <DropdownMenuItem
+                    onClick={openEditModal}
+                    className="flex items-center gap-2 cursor-pointer hover:bg-[#F6F8FF] focus:bg-[#F6F8FF] rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors"
+                  >
+                    <FaPencilAlt size={12} className="text-[#979797]" />
+                    Edit Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleShareProfile}
+                    className="flex items-center gap-2 cursor-pointer hover:bg-[#F6F8FF] focus:bg-[#F6F8FF] rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors"
+                  >
+                    <FaShareAlt size={12} className="text-[#979797]" />
+                    Share Profile
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
-          {shareSuccess && (
-            <div className="text-green-600 text-sm mb-2 animate-fade-in">
-              ✓ Profile link copied to clipboard!
-            </div>
-          )}
 
-          <p className="text-gray-600 text-sm sm:text-base mb-2">{bio}</p>
-
-          <p className="text-gray-500 text-sm sm:text-base flex items-center justify-center sm:justify-start gap-1">
-            <IoLocationSharp className="flex-shrink-0 text-base sm:text-lg" /> {location}
+          <p className="text-gray-600 text-xs leading-relaxed line-clamp-2">
+            {bio || "No bio added yet."}
+          </p>
+          <p className="text-gray-400 text-xs flex items-center gap-1">
+            <IoLocationSharp className="flex-shrink-0 text-sm text-[#7052FF]/60" />{" "}
+            {location}
           </p>
         </div>
       </div>
 
-      {/* Skills Section - Responsive */}
-      <div className="mb-6">
-        <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-4">
+      {/* Lower Rows: Aligned to Left Edge */}
+      <div className="flex flex-col gap-4">
+        {/* Skills: Dynamic Wrap */}
+        <div className="flex flex-wrap gap-2">
           {skillsArray.length > 0 ? (
             skillsArray.map((skill, index) => (
               <span
                 key={index}
-                className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border bg-gray-50"
+                className="flex items-center justify-center min-w-[85px] h-[25px] font-medium rounded-[22px] px-2 py-1 text-[11px] border border-[#6A737D] bg-white text-[#6A737D] whitespace-nowrap"
               >
                 {skill.trim()}
               </span>
             ))
           ) : (
-            <span className="text-gray-500 text-sm">No skills added yet</span>
+            <span className="text-[10px] text-gray-300 italic">No skills listed</span>
           )}
         </div>
-      </div>
 
-      {/* Social Links Section - Responsive */}
-      <div className="mb-6">
-        <div className="flex justify-center sm:justify-start gap-4">
+        {/* Social Links */}
+        <div className="flex flex-row gap-4">
           {profileData.linkedin_account && (
-            <a
-              href={profileData.linkedin_account}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaLinkedin
-                size={28}
-                className="text-blue-600 hover:text-blue-800 transition-colors"
-              />
+            <a href={profileData.linkedin_account} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center">
+              <FaLinkedin size={32} className="text-[#979797] hover:text-[#7052FF] transition-colors" />
             </a>
           )}
           {profileData.twitter_account && (
-            <a
-              href={profileData.twitter_account}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <TiSocialTwitter
-                size={32}
-                className="text-blue-400 hover:text-blue-600 transition-colors"
-              />
+            <a href={profileData.twitter_account} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center">
+              <TiSocialTwitter size={34} className="text-[#979797] hover:text-[#7052FF] transition-colors" />
             </a>
           )}
           {profileData.instagram_account && (
-            <a
-              href={profileData.instagram_account}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaInstagramSquare
-                size={28}
-                className="text-pink-600 hover:text-pink-800 transition-colors"
-              />
+            <a href={profileData.instagram_account} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center">
+              <FaInstagramSquare size={30} className="text-[#979797] hover:text-[#7052FF] transition-colors" />
             </a>
           )}
           {profileData.facebook_account && (
-            <a
-              href={profileData.facebook_account}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <TiSocialFacebook
-                size={28}
-                className="text-blue-800 hover:text-blue-900 transition-colors"
-              />
+            <a href={profileData.facebook_account} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center">
+              <TiSocialFacebook size={32} className="text-[#979797] hover:text-[#7052FF] transition-colors" />
             </a>
           )}
         </div>
-      </div>
 
-      {/* Action Buttons - Responsive */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start">
-        <div className="flex gap-3 flex-wrap justify-center sm:justify-start">
-          <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
-            <ImUsers /> {followerCount || 0} Followers
-          </Button>
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-2 mt-2">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[#7052FF] text-white text-[11px] font-semibold rounded-lg hover:bg-[#5a42cc] transition-all shadow-sm">
+            <ImUsers size={12} /> {followerCount || 0} Followers
+          </button>
           {connectionCount > 0 && (
-            <Button className="bg-green-600 hover:bg-green-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
-              <ImUsers /> {connectionCount} Connections
-            </Button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 text-white text-[11px] font-semibold rounded-lg hover:bg-green-600 transition-all shadow-sm">
+              <ImUsers size={12} /> {connectionCount} Connect
+            </button>
           )}
-         
-        </div>
-        {resume && (
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3">
-            <Button
+          {resume && (
+            <button
               onClick={downloadResume}
-              className="bg-[#7052FF] hover:bg-[#5a42cc] text-white flex items-center gap-2"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-[11px] font-semibold rounded-lg hover:bg-gray-200 transition-all border border-gray-200"
             >
-              <FaDownload size={14} />
-              Download Resume
-            </Button>
-          </div>
-        )}
-        {/* Logout Button */}
-        <Button
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-          className="bg-[#7052FF] hover:bg-[#5a42d4] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto"
-        >
-          <FaSignOutAlt size={14} />
-          {isLoggingOut ? "Signing Out..." : "Sign Out"}
-        </Button>
+              <FaDownload size={10} />
+              Resume
+            </button>
+          )}
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-500 text-[11px] font-semibold rounded-lg hover:bg-red-100 transition-all border border-red-100"
+          >
+            <FaSignOutAlt size={10} />
+            {isLoggingOut ? "..." : "Logout"}
+          </button>
+        </div>
       </div>
 
       {/* Edit Modal */}
@@ -1395,11 +1382,10 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                 <Label>Profile Picture</Label>
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                   <div
-                    className={`w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed ${
-                      errors.profile_picture
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    } flex items-center justify-center cursor-pointer hover:border-[#7052FF] transition-colors overflow-hidden`}
+                    className={`w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed ${errors.profile_picture
+                      ? "border-red-500"
+                      : "border-gray-300"
+                      } flex items-center justify-center cursor-pointer hover:border-[#7052FF] transition-colors overflow-hidden`}
                     onClick={() => fileInputRef.current?.click()}
                   >
                     {profileImagePreview ? (
@@ -1711,8 +1697,8 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
                 {isSubmitting
                   ? "Saving..."
                   : profileData
-                  ? "Save Changes"
-                  : "Create Profile"}
+                    ? "Save Changes"
+                    : "Create Profile"}
               </Button>
             </DialogFooter>
           </form>

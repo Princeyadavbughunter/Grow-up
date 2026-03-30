@@ -28,7 +28,7 @@ interface WorkExperience {
 }
 
 const MyExperience: React.FC = () => {
-  
+
   const [experiences, setExperiences] = useState<WorkExperience[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -75,7 +75,7 @@ const MyExperience: React.FC = () => {
       setLoading(true);
       const response = await api.get('/freelancer/work-experience/');
 
-      const sortedExperiences = [...response.data].sort((a, b) => 
+      const sortedExperiences = [...response.data].sort((a, b) =>
         new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
       );
 
@@ -211,61 +211,70 @@ const MyExperience: React.FC = () => {
   return (
     <div>
       <div className="py-10">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">My Experience</h2>
-          <Button 
-            onClick={openAddModal} 
-            className="bg-[#7052FF] flex items-center gap-1"
+        <div className="flex items-center gap-3 mb-6">
+          <h2 className="text-xl font-bold text-gray-900">My Experience</h2>
+          <button
+            onClick={openAddModal}
+            className="w-[24px] h-[24px] flex items-center justify-center text-[#6A737D] hover:text-[#7052FF] transition-colors flex-shrink-0"
+            aria-label="Add experience"
           >
-            <IoMdAdd className="text-xl" /> Add Experience
-          </Button>
+            <IoMdAdd size={20} />
+          </button>
         </div>
 
         {loading ? (
-          <div className="text-center py-10">Loading experiences...</div>
+          <div className="text-center py-10 text-gray-400">Loading experiences...</div>
         ) : error ? (
-          <div className="text-center py-10 text-red-500">{error}</div>
+          <div className="text-center py-10 text-red-500 font-medium">{error}</div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-8">
             {experiences.length === 0 ? (
-              <div className="text-center py-6 text-gray-500 border border-dashed rounded-md p-10">
+              <div className="text-center py-12 text-gray-500 border border-dashed border-gray-200 rounded-2xl p-10 bg-gray-50/50">
                 <p className="mb-4">No work experience added yet.</p>
-                <Button onClick={openAddModal} className="bg-[#7052FF]">Add Your First Experience</Button>
+                <Button onClick={openAddModal} className="bg-[#7052FF] hover:bg-[#5a42cc] rounded-xl transition-all">
+                  Add Your First Experience
+                </Button>
               </div>
             ) : (
-              experiences.map((experience) => (
-                <div key={experience.id} className="flex gap-4 p-4 border rounded-md hover:shadow-md transition-shadow">
-                  <div className="h-12 w-12 bg-gray-200 flex items-center justify-center rounded text-lg font-bold">
+              experiences.map((experience, index) => (
+                <div key={experience.id} className={`flex gap-4 relative ${index !== experiences.length - 1 ? 'border-b border-gray-100 pb-8' : ''}`}>
+                  {/* Company Initial Circle */}
+                  <div className="h-12 w-12 bg-[#F6F8FF] border border-gray-100 flex items-center justify-center rounded-xl text-lg font-bold text-[#7052FF] flex-shrink-0">
                     {experience.company_name.charAt(0).toUpperCase()}
                   </div>
-                  <div className="flex-1">
+
+                  <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold text-lg">{experience.position}</h3>
-                        <p className="text-md">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-semibold text-lg text-gray-900 truncate">
+                          {experience.position}
+                        </h3>
+                        <p className="text-[15px] font-medium text-[#7052FF] mt-1">
                           {experience.company_name}
-                          {experience.job_location && ` - ${experience.job_location}`}
+                          {experience.job_location && <span className="text-gray-400 font-normal"> · {experience.job_location}</span>}
                         </p>
-                        <p className="text-sm text-gray-500">
-                          {formatDate(experience.start_date)} – {experience.currently_working ? 'Present' : formatDate(experience.end_date || '')} · {calculateDuration(experience.start_date, experience.end_date, experience.currently_working)}
+                        <p className="text-sm text-gray-400 mt-1 flex items-center gap-1.5">
+                          {formatDate(experience.start_date)} – {experience.currently_working ? 'Present' : formatDate(experience.end_date || '')}
+                          <span className="text-gray-200">•</span>
+                          <span className="text-gray-500">{calculateDuration(experience.start_date, experience.end_date, experience.currently_working)}</span>
                         </p>
-                        {experience.location && (
-                          <p className="text-sm text-gray-500">{experience.location}</p>
-                        )}
                       </div>
-                      <Button 
+
+                      <Button
                         onClick={() => openEditModal(experience)}
                         variant="ghost"
-                        className="text-gray-500 hover:text-gray-700 transition-colors h-8 w-8 p-0"
+                        size="icon"
+                        className="text-gray-400 hover:text-[#7052FF] hover:bg-[#F6F8FF] transition-all h-8 w-8 rounded-full"
                         aria-label="Edit experience"
                       >
                         <CiEdit className="text-xl" />
                       </Button>
                     </div>
+
                     {experience.description && (
-                      <p className="text-sm text-gray-600 mt-3 whitespace-pre-line">
+                      <div className="mt-4 text-[14px] text-gray-600 leading-relaxed max-w-2xl whitespace-pre-line">
                         {experience.description}
-                      </p>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -284,7 +293,7 @@ const MyExperience: React.FC = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 py-4">
-              
+
               {/* Inputs */}
               <div className="flex flex-col space-y-1.5">
                 <Label>Company Name*</Label>
@@ -314,12 +323,12 @@ const MyExperience: React.FC = () => {
 
                 <div className="flex flex-col space-y-1.5">
                   <Label>End Date</Label>
-                  <Input 
-                    type="date" 
-                    name="end_date" 
-                    value={formData.end_date} 
-                    onChange={handleInputChange} 
-                    disabled={formData.currently_working} 
+                  <Input
+                    type="date"
+                    name="end_date"
+                    value={formData.end_date}
+                    onChange={handleInputChange}
+                    disabled={formData.currently_working}
                   />
                 </div>
               </div>
@@ -343,9 +352,9 @@ const MyExperience: React.FC = () => {
             </div>
 
             <DialogFooter className="flex justify-between">
-              <Button 
-                type="button" 
-                variant="destructive" 
+              <Button
+                type="button"
+                variant="destructive"
                 onClick={() => selectedExperience && handleDelete(selectedExperience.id)}
                 disabled={isSubmitting}
               >
@@ -401,11 +410,11 @@ const MyExperience: React.FC = () => {
 
                 <div className="flex flex-col space-y-1.5">
                   <Label>End Date</Label>
-                  <Input 
-                    type="date" 
-                    name="end_date" 
-                    value={formData.end_date} 
-                    onChange={handleInputChange} 
+                  <Input
+                    type="date"
+                    name="end_date"
+                    value={formData.end_date}
+                    onChange={handleInputChange}
                     disabled={formData.currently_working}
                   />
                 </div>

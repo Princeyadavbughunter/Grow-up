@@ -123,25 +123,29 @@ const Myskills: React.FC<MyskillsProps> = ({ profileData }) => {
     return (
         <div>
             {/* My Skills */}
-            <div className="mb-8">
-                <div className="flex items-center gap-4 mb-4">
-                    <h2 className="text-lg font-bold">My Skills</h2>
-                    <div className="flex items-center gap-2">
-                        <IoMdAdd 
-                            className="text-xl cursor-pointer hover:text-[#7052FF] transition-colors" 
-                            onClick={openEditModal}
-                        />
-                    </div>
+            <div className="py-10">
+                <div className="flex items-center gap-3 mb-6">
+                    <h2 className="text-xl font-bold text-gray-900">My Skills</h2>
+                    <button 
+                        onClick={openEditModal} 
+                        className="w-[24px] h-[24px] flex items-center justify-center text-[#6A737D] hover:text-[#7052FF] transition-colors flex-shrink-0"
+                        aria-label="Add skills"
+                    >
+                        <IoMdAdd size={20} />
+                    </button>
                 </div>
                 
                 {skillsArray.length > 0 || softSkillsArray.length > 0 ? (
-                    <>
+                    <div className="space-y-6">
                         {skillsArray.length > 0 && (
                             <div>
-                                <h3 className="font-semibold text-gray-600">Technical Skills</h3>
-                                <div className="flex flex-wrap gap-2 mt-2 border-b py-2">
+                                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Technical Skills</h3>
+                                <div className="flex flex-wrap gap-[7.16px]">
                                     {skillsArray.map((skill) => (
-                                        <span key={skill} className="px-3 py-1 text-xs font-medium border rounded-full bg-[#E4DEFF]">
+                                        <span 
+                                            key={skill} 
+                                            className="inline-flex items-center justify-center min-w-[115px] h-[32px] text-xs font-medium bg-[#E4DEFF] text-black rounded-[14.33px] px-[8.6px] py-[1.43px]"
+                                        >
                                             {skill}
                                         </span>
                                     ))}
@@ -151,20 +155,23 @@ const Myskills: React.FC<MyskillsProps> = ({ profileData }) => {
                         
                         {softSkillsArray.length > 0 && (
                             <div>
-                                <h3 className="font-semibold text-gray-600">Soft Skills</h3>
-                                <div className="flex flex-wrap gap-2 mt-2 border-b py-2">
+                                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Soft Skills</h3>
+                                <div className="flex flex-wrap gap-[7.16px]">
                                     {softSkillsArray.map((skill) => (
-                                        <span key={skill} className="px-3 py-1 text-xs font-medium border rounded-full bg-[#E4DEFF]">
+                                        <span 
+                                            key={skill} 
+                                            className="inline-flex items-center justify-center min-w-[115px] h-[32px] text-xs font-medium bg-[#E4DEFF] text-black rounded-[14.33px] px-[8.6px] py-[1.43px]"
+                                        >
                                             {skill}
                                         </span>
                                     ))}
                                 </div>
                             </div>
                         )}
-                    </>
+                    </div>
                 ) : (
-                    <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4 text-gray-500 text-center">
-                        No skills added. Click the + icon to add some.
+                    <div className="text-center py-12 text-gray-500 border border-dashed border-gray-200 rounded-2xl p-10 bg-gray-50/50">
+                        <p className="text-sm">No skills added. Click the + icon to add some.</p>
                     </div>
                 )}
             </div>

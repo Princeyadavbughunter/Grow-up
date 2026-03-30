@@ -67,11 +67,15 @@ body {
     @apply border-border;
   }
   body {
+    font-family: var(--font-poppins), Arial, Helvetica, sans-serif;
     @apply bg-background text-foreground;
   }
 }
 
 @layer utilities {
+  .font-poppins {
+    font-family: var(--font-poppins), sans-serif;
+  }
   .scrollbar-hide {
     -ms-overflow-style: none !important;
     scrollbar-width: none !important;

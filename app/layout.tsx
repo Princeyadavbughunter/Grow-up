@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Work_Sans } from "next/font/google";
+import { Geist, Geist_Mono, Work_Sans, Poppins } from "next/font/google";
 import Script from "next/script";  // <-- import Script
 import "./globals.css";
 
@@ -16,6 +16,12 @@ const geistMono = Geist_Mono({
 const workSans = Work_Sans({
   variable: "--font-work-sans",
   subsets: ["latin"],
+});
+
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const viewport: Viewport = {
@@ -62,7 +68,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${workSans.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${workSans.variable} ${poppins.variable} font-poppins antialiased text-gray-900`}
       >
         {children}
       </body>
