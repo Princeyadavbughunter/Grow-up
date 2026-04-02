@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useEffect, useState } from "react";
@@ -83,6 +82,7 @@ interface NetworkUser {
   summary?: string;
   followerCount?: number;
   requestSent?: boolean;
+  requestId?: string;
 }
 
 export default function NetworkPage() {
@@ -111,11 +111,11 @@ export default function NetworkPage() {
       setLoading(true);
       setError(null);
 
-      // Get followers and requests data
+      // Get followers and requests data with pagination for public lists
       const [followersResponse, connectionsResponse, freelancersResponse] = await Promise.all([
         api.get("/freelancer/follow-request/"),
         api.get("/freelancer/my-connections-followers/"),
-        api.get("/freelancer/freelancer-profile/")
+        api.get("/freelancer/freelancer-profile/?page=1&page_size=20")
       ]);
 
       const pendingRequestsData: any = followersResponse.data.results || followersResponse.data.pending_follow_requests || [];
@@ -162,18 +162,6 @@ export default function NetworkPage() {
         })
       );
 
-      // Process following requests (people you are following - pending) - we might not have this from this API
-      const processedFollowingRequests = (
-        connectionsData.following_requests || []
-      ).map((following: any) => ({
-        id: following.freelancer_id || following.profile_id || following.freelancer_profile || following.id || following.user_id,
-        name: getFullName(following),
-        location: getLocation(following),
-        imageUrl: getAvatar(following),
-        isOnline: false,
-        summary: getSummary(following),
-      }));
-
       // Process following approved (people you are following - approved)
       const processedFollowingApproved = (
         connectionsData.following || connectionsData.following_approved || []
@@ -186,17 +174,8 @@ export default function NetworkPage() {
         summary: getSummary(following),
       }));
 
-      // Create sets for efficient lookups
-      const followerIds = new Set(processedFollowers.map((f) => f.id));
+      // Create set for efficient lookups
       const followingIds = new Set(processedFollowingApproved.map((f) => f.id));
-
-      // Debug logging
-      console.log("API Response Data:", {
-        approved_followers: processedFollowers.length || 0,
-        following_approved: processedFollowingApproved.length || 0,
-        processedFollowers: processedFollowers.length,
-        processedFollowingApproved: processedFollowingApproved.length,
-      });
 
       // Categorize users
       // Followers: ALL people who follow you (includes one-way and mutual)
@@ -210,22 +189,14 @@ export default function NetworkPage() {
         followingIds.has(user.id)
       );
 
-      // Debug logging
-      console.log("Categorized Data:", {
-        followers: allFollowers.length,
-        following: allFollowing.length,
-        connections: mutualConnections.length,
-      });
-
       // Set the categorized data
       setFollowers(allFollowers);
       setConnections(mutualConnections);
       setFollowing(allFollowing);
 
-      // Combine followers, following requests, and following approved into My Network
+      // Combine followers and following approved into My Network
       const combinedNetwork = [
         ...processedFollowers,
-        ...processedFollowingRequests,
         ...processedFollowingApproved,
       ].filter(
         (user, index, self) => index === self.findIndex((u) => u.id === user.id)
@@ -243,8 +214,6 @@ export default function NetworkPage() {
         summary: getSummary(request),
         requestId: request.request_id || request.id || "no-req-id",
       }));
-
-      console.log(processedRequests);
 
       // Process other freelancers (exclude already connected ones)
       const connectedIds = new Set(combinedNetwork.map((f) => f.id));
@@ -308,17 +277,18 @@ export default function NetworkPage() {
         setNearNetwork(processedFreelancers);
       }
 
-      // Cache all profile data in sessionStorage for quick access on profile page
+      // Cache all profile data in sessionStorage for quick access (with 5-min expiry)
+      const timestamp = Date.now();
       const allUsers = [
         ...processedFollowers,
         ...processedFollowingApproved,
         ...processedRequests,
         ...processedFreelancers
       ];
-      const cache: Record<string, any> = {};
+      const cacheData: Record<string, any> = {};
       allUsers.forEach((user) => {
         if (user.id) {
-          cache[user.id] = {
+          cacheData[user.id] = {
             id: user.id,
             username: user.name,
             first_name: user.name?.split(' ')[0] || '',
@@ -330,8 +300,12 @@ export default function NetworkPage() {
           };
         }
       });
+      
       try {
-        sessionStorage.setItem('network_profile_cache', JSON.stringify(cache));
+        sessionStorage.setItem('network_profile_cache', JSON.stringify({
+          data: cacheData,
+          expiry: timestamp + (5 * 60 * 1000) // 5 minutes from now
+        }));
       } catch(e) { /* ignore storage errors */ }
 
     } catch (error) {

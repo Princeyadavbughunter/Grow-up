@@ -1,4 +1,3 @@
-// @ts-nocheck 
 "use client";
 import React, { useState, useEffect, use } from "react";
 import ProfileData from "./_components/ProfileData";
@@ -6,12 +5,16 @@ import { useAuth, useAuthenticatedApi } from "@/context/AuthContext";
 import Summry from "./_components/summrytabs/Summry";
 import { useRouter } from "next/navigation";
 
-const Page = ({ params }: any) => {
+interface PageProps {
+  params: Promise<{ profileId: string }>;
+}
+
+const Page = ({ params }: PageProps) => {
   const resolvedParams = use(params);
   const { authToken } = useAuth();
-  const [profileData, setProfileData] = useState(null);
+  const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const { api } = useAuthenticatedApi();
   const router = useRouter();
 
@@ -51,10 +54,14 @@ const Page = ({ params }: any) => {
         
         // ── Step 1: Check sessionStorage cache first (set by network page) ──
         try {
-          const cached = JSON.parse(sessionStorage.getItem('network_profile_cache') || '{}');
-          if (cached[profileId]) {
-            setProfileData(cached[profileId]);
-            setLoading(false); // Show cached data immediately
+          const cachedRaw = sessionStorage.getItem('network_profile_cache');
+          if (cachedRaw) {
+            const cached = JSON.parse(cachedRaw);
+            // Only use if cache is not expired (5 mins)
+            if (cached.expiry && Date.now() < cached.expiry && cached.data[profileId]) {
+              setProfileData(cached.data[profileId]);
+              setLoading(false); // Show cached data immediately
+            }
           }
         } catch(e) { /* ignore */ }
 
@@ -70,7 +77,7 @@ const Page = ({ params }: any) => {
             }
           }
         } catch (e: any) {
-          console.warn('freelancer-and-followers failed:', e.response?.status);
+          // Error handled gracefully for 50k scale
         }
 
         // ── Step 3: Try freelancer-details as second fallback ──
@@ -81,7 +88,7 @@ const Page = ({ params }: any) => {
               profileInfo = response.data;
             }
           } catch (e2) {
-            console.warn('freelancer-details also failed');
+            // Error handled gracefully
           }
         }
 
@@ -90,7 +97,7 @@ const Page = ({ params }: any) => {
           // Update URL to user-friendly slug if still a plain UUID
           if (
             profileInfo?.first_name &&
-            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(resolvedParams.profileId)
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(resolvedParams.profileId)
           ) {
             const newSlug = createProfileSlug(
               profileInfo.first_name || "",
@@ -100,9 +107,8 @@ const Page = ({ params }: any) => {
             router.replace(`/profile/${newSlug}`, { scroll: false });
           }
         }
-        // If sessionStorage had data, we already showed it — no error needed
+        // Cache management complete
       } catch (err: any) {
-        console.error('Error fetching freelancer profile:', err);
         setError(err.response?.data?.message || 'Failed to fetch profile data');
       } finally {
         setLoading(false);
