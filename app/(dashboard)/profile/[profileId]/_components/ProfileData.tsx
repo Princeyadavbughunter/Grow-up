@@ -101,9 +101,12 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
   const { first_name, last_name, bio, profile_picture, address, city, state, skills } = profileData;
   const skillsArray = skills ? skills.split(',') : [];
-  const fullName = `${first_name} ${last_name}`;
+  // Support multiple name formats from API
+  const fullName = (first_name && last_name)
+    ? `${first_name} ${last_name}`.trim()
+    : (profileData as any).username || (profileData as any).name || first_name || 'Unknown User';
   const location = `${address ? address + ', ' : ''}${city ? city + ', ' : ''}${state || ''}`;
-  const profileImageUrl = profile_picture;
+  const profileImageUrl = profile_picture || (profileData as any).profile_image;
 
   const handleFollowAction = async () => {
     if (isLoading) return;
@@ -202,150 +205,121 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   };
 
   return (
-    <div className="py-4">
-      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 py-6">
-        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-gray-300 flex-shrink-0 flex items-center justify-center bg-gray-100">
-          {profileImageUrl ? (
-            <img
-              src={profileImageUrl}
-              alt="Profile"
-              className="w-full h-full rounded-full object-cover"
-            />
-          ) : (
-            <FiUser className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" />
-          )}
+    <div
+      className="flex flex-col bg-white py-2 font-poppins"
+      style={{ width: "100%", maxWidth: "450px", minHeight: "300px", gap: "16px" }}
+    >
+      <div className="flex flex-row items-center sm:items-start gap-4">
+        <div className="flex-shrink-0">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-[#7052FF]/10 flex items-center justify-center bg-gray-50 overflow-hidden shadow-inner">
+            {profileImageUrl ? (
+              <img
+                src={profileImageUrl}
+                alt="Profile"
+                className="w-full h-full object-cover text-xs"
+              />
+            ) : (
+              <FiUser className="w-10 h-10 text-gray-300" />
+            )}
+          </div>
         </div>
-        <div className="flex-1 text-center sm:text-left">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
-            <div className="flex items-center justify-center sm:justify-start gap-2">
-              <h3 className="font-medium text-xl sm:text-2xl">{fullName}</h3>
-              <button
-                onClick={handleShareProfile}
-                className="text-[#7052FF] hover:text-[#5a42cc] transition-colors"
-                aria-label="Share profile"
-              >
-                <FaShareAlt size={16} />
-              </button>
-            </div>
+        <div className="flex-1 min-w-0 flex flex-col gap-2">
+          <div className="flex flex-row items-center justify-between gap-3">
+            <h3 className="font-bold text-xl text-gray-900 leading-tight truncate">
+              {fullName}
+            </h3>
+            <button
+              onClick={handleShareProfile}
+              className="text-[#979797] hover:text-[#7052FF] transition-colors flex-shrink-0"
+              aria-label="Share profile"
+            >
+              <FaShareAlt size={22} />
+            </button>
           </div>
           {shareSuccess && (
-            <div className="text-green-600 text-sm mb-2 animate-fade-in">
-              ✓ Profile link copied to clipboard!
+            <div className="text-green-600 text-[10px] animate-fade-in">
+              ✓ Link copied!
             </div>
-            )}
-          {bio && (
-            <p className="text-gray-600 text-sm sm:text-base mb-2">
-              {bio}
-            </p>
           )}
+          <p className="text-gray-600 text-xs leading-relaxed line-clamp-2">
+            {bio || "No bio added yet."}
+          </p>
           {location && (
-            <p className="text-gray-500 text-sm sm:text-base flex items-center justify-center sm:justify-start gap-1">
-              <IoLocationSharp /> {location}
+            <p className="text-gray-400 text-xs flex items-center gap-1">
+              <IoLocationSharp className="flex-shrink-0 text-sm text-[#7052FF]/60" />{" "}
+              {location}
             </p>
           )}
         </div>
       </div>
 
-      <div className="mb-6">
-        <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-4">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap gap-2">
           {skillsArray.length > 0 ? (
-            skillsArray.map((skill, index) => (
-              <span key={index} className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border bg-gray-50">
+            Array.from(new Set(skillsArray)).map((skill, index) => (
+              <span
+                key={`${skill}-${index}`}
+                className="flex items-center justify-center min-w-[85px] h-[25px] font-medium rounded-[22px] px-2 py-1 text-[11px] border border-[#6A737D] bg-white text-[#6A737D] whitespace-nowrap"
+              >
                 {skill.trim()}
               </span>
             ))
           ) : (
-            <span className="text-gray-500 text-sm">No skills added yet</span>
+            <span className="text-[10px] text-gray-300 italic">No skills listed</span>
           )}
         </div>
-      </div>
 
-      <div className="mb-6">
-        <div className="flex justify-center sm:justify-start gap-4">
+        <div className="flex flex-row gap-4">
           {profileData.linkedin_account && (
-            <a href={profileData.linkedin_account} target="_blank" rel="noopener noreferrer">
-              <FaLinkedin size={28} className="text-blue-600 hover:text-blue-800 transition-colors" />
+            <a href={profileData.linkedin_account} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center">
+              <FaLinkedin size={32} className="text-[#979797] hover:text-[#7052FF] transition-colors" />
             </a>
           )}
           {profileData.twitter_account && (
-            <a href={profileData.twitter_account} target="_blank" rel="noopener noreferrer">
-              <TiSocialTwitter size={32} className="text-blue-400 hover:text-blue-600 transition-colors" />
+            <a href={profileData.twitter_account} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center">
+              <TiSocialTwitter size={34} className="text-[#979797] hover:text-[#7052FF] transition-colors" />
             </a>
           )}
           {profileData.instagram_account && (
-            <a href={profileData.instagram_account} target="_blank" rel="noopener noreferrer">
-              <FaInstagramSquare size={28} className="text-pink-600 hover:text-pink-800 transition-colors" />
+            <a href={profileData.instagram_account} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center">
+              <FaInstagramSquare size={30} className="text-[#979797] hover:text-[#7052FF] transition-colors" />
             </a>
           )}
           {profileData.facebook_account && (
-            <a href={profileData.facebook_account} target="_blank" rel="noopener noreferrer">
-              <TiSocialFacebook size={28} className="text-blue-800 hover:text-blue-900 transition-colors" />
+            <a href={profileData.facebook_account} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center">
+              <TiSocialFacebook size={32} className="text-[#979797] hover:text-[#7052FF] transition-colors" />
             </a>
           )}
         </div>
-      </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start">
-        {userProfileData?.id !== profileData.id && (
-          isFollowing ? (
-            <div className="flex flex-row gap-3">
-              <Button
-                onClick={handleFollowAction}
-                disabled={isLoading}
-                className="bg-gray-600 hover:bg-gray-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto transition-colors disabled:opacity-50"
-              >
-                <FaUserCheck />
-                {isLoading ? "Loading..." : "Unfollow"}
-              </Button>
-              <Button
-                onClick={handleOpenInbox}
-                className="bg-green-600 hover:bg-green-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto transition-colors"
-              >
-                <BsChatDots /> Open Inbox
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <div className="flex gap-3 flex-wrap">
-                <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
-                  <ImUsers /> {followerCount || 0} Followers
-                </Button>
-                {connectionCount > 0 && (
-                  <Button className="bg-green-600 hover:bg-green-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
-                    <ImUsers /> {connectionCount} Connections
-                  </Button>
-                )}
-                <Button
-                  onClick={handleShareProfile}
-                  className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto"
-                >
-                  <FaShareAlt /> Share
-                </Button>
-              </div>
-              <Button
-                onClick={handleFollowAction}
-                disabled={isLoading}
-                className={`${followButtonContent.className} font-medium flex items-center gap-2 px-4 py-2 rounded w-full sm:w-auto transition-colors disabled:opacity-50`}
-              >
-                {followButtonContent.icon}
-                {isLoading ? "Loading..." : followButtonContent.text}
-              </Button>
-            </div>
-          )
-        )}
-        {userProfileData?.id === profileData.id && (
-          <div className="flex gap-3 flex-wrap">
-            <Button className="bg-[#7052FF] hover:bg-[#5a42cc] text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
-              <ImUsers /> {followerCount || 0} Followers
-            </Button>
-            {connectionCount > 0 && (
-              <Button className="bg-green-600 hover:bg-green-700 text-white font-medium flex items-center gap-2 px-4 py-2 rounded w-auto">
-                <ImUsers /> {connectionCount} Connections
-              </Button>
-            )}
-           
-          </div>
-        )}
+        <div className="flex flex-wrap gap-2 mt-2">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[#7052FF] text-white text-[11px] font-semibold rounded-lg hover:bg-[#5a42cc] transition-all shadow-sm">
+            <ImUsers size={12} /> {followerCount || 0} Followers
+          </button>
+          {connectionCount > 0 && (
+            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 text-white text-[11px] font-semibold rounded-lg hover:bg-green-600 transition-all shadow-sm">
+              <ImUsers size={12} /> {connectionCount} Connect
+            </button>
+          )}
+          {userProfileData?.id !== profileData.id && (
+            <button
+              onClick={handleFollowAction}
+              disabled={isLoading}
+              className={`flex items-center gap-1.5 px-3 py-1.5 ${followRequestSent ? 'bg-yellow-500' : 'bg-[#7052FF]'} text-white text-[11px] font-semibold rounded-lg hover:opacity-90 transition-all shadow-sm disabled:opacity-50`}
+            >
+              {followRequestSent ? <FaClock size={12} /> : <FaUserPlus size={12} />}
+              {isLoading ? "..." : (followRequestSent ? "Requested" : "Follow")}
+            </button>
+          )}
+          {isFollowing && (
+            <button
+              onClick={handleOpenInbox}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 text-white text-[11px] font-semibold rounded-lg hover:bg-green-600 transition-all shadow-sm"
+            >
+              <BsChatDots size={12} /> Inbox
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

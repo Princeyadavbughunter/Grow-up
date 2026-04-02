@@ -88,12 +88,13 @@ interface ProfileDataProps {
 }
 
 interface ProfileFormData {
+  full_name: string; // Virtual field for UI
   first_name: string;
   last_name: string;
-  bio: string;
-  address: string;
-  city: string;
-  state: string;
+  title: string;      // Tagline
+  bio: string;        // Summary
+  location: string;
+  university_name: string;
   skills: string;
   facebook_account: string;
   linkedin_account: string;
@@ -177,12 +178,13 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   }, [profileData?.id, apiCaller, isAuthenticated, authToken]);
 
   const initialFormData: ProfileFormData = {
+    full_name: `${profileData?.first_name || ""} ${profileData?.last_name || ""}`.trim(),
     first_name: profileData?.first_name || "",
     last_name: profileData?.last_name || "",
+    title: profileData?.title || "",
     bio: profileData?.bio || "",
-    address: profileData?.address || "",
-    city: profileData?.city || "",
-    state: profileData?.state || "",
+    location: profileData?.location || profileData?.address || "",
+    university_name: profileData?.university_name || "",
     skills: profileData?.skills || "",
     facebook_account: profileData?.facebook_account || "",
     linkedin_account: profileData?.linkedin_account || "",
@@ -251,25 +253,32 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
   const validateField = (name: string, value: any): string | undefined => {
     switch (name) {
+      case "full_name":
+        if (!value.trim()) return "Full name is required";
+        if (value.trim().split(" ").length < 2) return "Please enter both first and last name";
+        return undefined;
+
       case "first_name":
         if (!value.trim()) return "First name is required";
-        if (value.trim().length < 2)
-          return "First name must be at least 2 characters";
-        if (!/^[a-zA-Z\s'-]+$/.test(value))
-          return "First name can only contain letters, spaces, hyphens, and apostrophes";
         return undefined;
 
       case "last_name":
         if (!value.trim()) return "Last name is required";
-        if (value.trim().length < 2)
-          return "Last name must be at least 2 characters";
-        if (!/^[a-zA-Z\s'-]+$/.test(value))
-          return "Last name can only contain letters, spaces, hyphens, and apostrophes";
         return undefined;
 
       case "bio":
-        if (value && value.length > 500)
-          return "Bio must be less than 500 characters";
+        if (value && value.length > 1000)
+          return "Summary must be less than 1000 characters";
+        return undefined;
+
+      case "title":
+        if (value && value.length > 100)
+          return "Tagline must be less than 100 characters";
+        return undefined;
+
+      case "location":
+        if (value && value.length > 100)
+          return "Location must be less than 100 characters";
         return undefined;
 
       case "address":
@@ -374,15 +383,28 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
   ) => {
     const { name, value } = e.target;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (name === "full_name") {
+      const parts = value.trim().split(" ");
+      const firstName = parts[0] || "";
+      const lastName = parts.slice(1).join(" ") || "";
+
+      setFormData((prev) => ({
+        ...prev,
+        full_name: value,
+        first_name: firstName,
+        last_name: lastName,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
 
     // Mark field as touched
     setTouched((prev) => ({ ...prev, [name]: true }));
 
-    // Validate field on change (real-time validation)
+    // Validate field on change
     if (touched[name]) {
       const error = validateField(name, value);
       setErrors((prev) => ({
@@ -534,6 +556,8 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
       // Add text fields with formatted URLs
       Object.entries(formData).forEach(([key, value]) => {
+        if (key === "full_name") return; // Skip virtual field
+
         if (
           [
             "linkedin_account",
@@ -602,12 +626,13 @@ const ProfileData: React.FC<ProfileDataProps> = ({ profileData }) => {
 
   const openEditModal = () => {
     const resetFormData: ProfileFormData = {
+      full_name: `${profileData?.first_name || ""} ${profileData?.last_name || ""}`.trim(),
       first_name: profileData?.first_name || "",
       last_name: profileData?.last_name || "",
+      title: profileData?.title || "",
       bio: profileData?.bio || "",
-      address: profileData?.address || "",
-      city: profileData?.city || "",
-      state: profileData?.state || "",
+      location: profileData?.location || profileData?.address || "",
+      university_name: profileData?.university_name || "",
       skills: profileData?.skills || "",
       facebook_account: profileData?.facebook_account || "",
       linkedin_account: profileData?.linkedin_account || "",

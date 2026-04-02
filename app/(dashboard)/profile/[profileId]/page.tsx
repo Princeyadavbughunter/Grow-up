@@ -21,16 +21,16 @@ const Page = ({ params }: any) => {
     if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)) {
       return slug;
     }
-    
+
     // For slugs like "john-doe-4f1bd207-7af0-4d60-8b91-4ace1feb91df"
     // Extract UUID pattern from the end (last 5 segments separated by hyphens)
     const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     const match = slug.match(uuidPattern);
-    
+
     if (match) {
       return match[0];
     }
-    
+
     // If no UUID found, return the slug as-is (backward compatibility)
     return slug;
   };
@@ -48,23 +48,59 @@ const Page = ({ params }: any) => {
       try {
         setLoading(true);
         const profileId = extractIdFromSlug(resolvedParams.profileId);
-        const response = await api.get(`/freelancer/freelancer-details/?id=${profileId}`);
-        if (response.data) {
-          console.log(response.data);
-          setProfileData(response.data);
-          
-          // Update URL to user-friendly format if it's a plain UUID
-          if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(resolvedParams.profileId)) {
+        
+        // ── Step 1: Check sessionStorage cache first (set by network page) ──
+        try {
+          const cached = JSON.parse(sessionStorage.getItem('network_profile_cache') || '{}');
+          if (cached[profileId]) {
+            setProfileData(cached[profileId]);
+            setLoading(false); // Show cached data immediately
+          }
+        } catch(e) { /* ignore */ }
+
+        // ── Step 2: Try API for richer profile data ──
+        let profileInfo: any = null;
+        try {
+          const response = await api.get(`/freelancer/freelancer-and-followers/?id=${profileId}`);
+          if (response.data) {
+            const raw = response.data.freelancer || response.data;
+            // Only use if it has actual profile fields (not just connection stats)
+            if (raw && (raw.first_name || raw.username || raw.bio)) {
+              profileInfo = raw;
+            }
+          }
+        } catch (e: any) {
+          console.warn('freelancer-and-followers failed:', e.response?.status);
+        }
+
+        // ── Step 3: Try freelancer-details as second fallback ──
+        if (!profileInfo) {
+          try {
+            const response = await api.get(`/freelancer/freelancer-details/?id=${profileId}`);
+            if (response.data && (response.data.first_name || response.data.username)) {
+              profileInfo = response.data;
+            }
+          } catch (e2) {
+            console.warn('freelancer-details also failed');
+          }
+        }
+
+        if (profileInfo) {
+          setProfileData(profileInfo);
+          // Update URL to user-friendly slug if still a plain UUID
+          if (
+            profileInfo?.first_name &&
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(resolvedParams.profileId)
+          ) {
             const newSlug = createProfileSlug(
-              response.data.first_name,
-              response.data.last_name,
-              response.data.id
+              profileInfo.first_name || "",
+              profileInfo.last_name || "",
+              profileInfo.id || profileId
             );
             router.replace(`/profile/${newSlug}`, { scroll: false });
           }
-        } else {
-          setError('No profile data found');
         }
+        // If sessionStorage had data, we already showed it — no error needed
       } catch (err: any) {
         console.error('Error fetching freelancer profile:', err);
         setError(err.response?.data?.message || 'Failed to fetch profile data');

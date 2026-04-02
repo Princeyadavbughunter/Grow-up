@@ -91,6 +91,7 @@ export default function NetworkPage() {
   const [nearNetwork, setNearNetwork] = useState<NetworkUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showConnectionsBanner, setShowConnectionsBanner] = useState<boolean>(true);
 
   // Separate states for followers, connections, and following
   const [followers, setFollowers] = useState<NetworkUser[]>([]);
@@ -111,49 +112,78 @@ export default function NetworkPage() {
       setError(null);
 
       // Get followers and requests data
-      const followersResponse = await api.get("/freelancer/follow-request/");
-      const followersData: RequestsResponse = followersResponse.data;
+      const [followersResponse, connectionsResponse, freelancersResponse] = await Promise.all([
+        api.get("/freelancer/follow-request/"),
+        api.get("/freelancer/my-connections-followers/"),
+        api.get("/freelancer/freelancer-profile/")
+      ]);
 
-      // Get all freelancers
-      const freelancersResponse = await api.get(
-        "/freelancer/freelancer-profile/"
-      );
-      const freelancersData: Freelancer[] = freelancersResponse.data;
+      const pendingRequestsData: any = followersResponse.data.results || followersResponse.data.pending_follow_requests || [];
+      const connectionsData: any = connectionsResponse.data || {};
+      const freelancersData: any = freelancersResponse.data;
+
+      const getFullName = (obj: any) => {
+        if (!obj) return "User";
+        if (obj.name) return obj.name;
+        if (obj.username) return obj.username;
+        if (obj.freelancer_username) return obj.freelancer_username;
+        if (obj.follower_username) return obj.follower_username;
+        if (obj.first_name || obj.last_name) return `${obj.first_name || ""} ${obj.last_name || ""}`.trim();
+        if (obj.freelancer_first_name || obj.freelancer_last_name) return `${obj.freelancer_first_name || ""} ${obj.freelancer_last_name || ""}`.trim();
+        if (obj.follower_first_name || obj.follower_last_name) return `${obj.follower_first_name || ""} ${obj.follower_last_name || ""}`.trim();
+        if (obj.from_user?.name) return obj.from_user.name;
+        return "User";
+      };
+
+      const getAvatar = (obj: any) => {
+        if (!obj) return "";
+        return obj.profile_picture || obj.profile_image || obj.image || obj.freelancer_image || obj.follower_image || obj.freelancer_profile_picture || obj.follower_profile_picture || obj.from_user?.profile_picture || "";
+      };
+
+      const getLocation = (obj: any) => {
+        if (!obj) return "Unknown";
+        return obj.address || obj.location || obj.freelancer_address || obj.follower_address || obj.freelancer_location || obj.follower_location || obj.from_user?.location || "Unknown";
+      };
+
+      const getSummary = (obj: any) => {
+        if (!obj) return "";
+        return obj.title || obj.bio || obj.summary || obj.freelancer_bio || obj.follower_bio || obj.freelancer_summary || obj.follower_summary || obj.from_user?.title || "";
+      };
 
       // Process approved followers (people who follow you)
-      const processedFollowers = (followersData.approved_followers || []).map(
-        (follower: Follower) => ({
-          id: follower.profile_id,
-          name: follower.follower_username || "User",
-          location: follower.follower_address || "Unknown",
-          imageUrl: follower.freelancer_image,
+      const processedFollowers = (connectionsData.followers || []).map(
+        (follower: any) => ({
+          id: follower.freelancer_id || follower.profile_id || follower.freelancer_profile || follower.id || follower.user_id,
+          name: getFullName(follower),
+          location: getLocation(follower),
+          imageUrl: getAvatar(follower),
           isOnline: false,
-          summary: follower.follower_bio,
+          summary: getSummary(follower),
         })
       );
 
-      // Process following requests (people you are following - pending)
+      // Process following requests (people you are following - pending) - we might not have this from this API
       const processedFollowingRequests = (
-        followersData.following_requests || []
-      ).map((following: FollowingRequest) => ({
-        id: following.freelancer_id,
-        name: following.freelancer_username,
-        location: following.freelancer_address,
-        imageUrl: following.freelancer_image,
+        connectionsData.following_requests || []
+      ).map((following: any) => ({
+        id: following.freelancer_id || following.profile_id || following.freelancer_profile || following.id || following.user_id,
+        name: getFullName(following),
+        location: getLocation(following),
+        imageUrl: getAvatar(following),
         isOnline: false,
-        summary: following.freelancer_bio,
+        summary: getSummary(following),
       }));
 
       // Process following approved (people you are following - approved)
       const processedFollowingApproved = (
-        followersData.following_approved || []
-      ).map((following: FollowingApproved) => ({
-        id: following.freelancer_id,
-        name: following.freelancer_username,
-        location: following.freelancer_address,
-        imageUrl: following.freelancer_image,
+        connectionsData.following || connectionsData.following_approved || []
+      ).map((following: any) => ({
+        id: following.freelancer_id || following.profile_id || following.freelancer_profile || following.id || following.user_id,
+        name: getFullName(following),
+        location: getLocation(following),
+        imageUrl: getAvatar(following),
         isOnline: false,
-        summary: following.freelancer_bio,
+        summary: getSummary(following),
       }));
 
       // Create sets for efficient lookups
@@ -162,8 +192,8 @@ export default function NetworkPage() {
 
       // Debug logging
       console.log("API Response Data:", {
-        approved_followers: followersData.approved_followers?.length || 0,
-        following_approved: followersData.following_approved?.length || 0,
+        approved_followers: processedFollowers.length || 0,
+        following_approved: processedFollowingApproved.length || 0,
         processedFollowers: processedFollowers.length,
         processedFollowingApproved: processedFollowingApproved.length,
       });
@@ -201,17 +231,17 @@ export default function NetworkPage() {
         (user, index, self) => index === self.findIndex((u) => u.id === user.id)
       );
 
-      // Process pending follow requests
+      // Process pending follow requests with resilient fallbacks
       const processedRequests = (
-        followersData.pending_follow_requests || []
-      ).map((request: FollowRequest) => ({
-        id: request.freelancer_id,
-        name: request.follower_username,
-        location: request.follower_address,
-        imageUrl: request.freelancer_image,
+        pendingRequestsData
+      ).map((request: any) => ({
+        id: request.freelancer_id || request.profile_id || request.freelancer_profile || request.id || request.from_user?.id || request.user_id || "unknown",
+        name: getFullName(request),
+        location: getLocation(request),
+        imageUrl: getAvatar(request),
         isOnline: false,
-        summary: request.follower_bio,
-        requestId: request.request_id,
+        summary: getSummary(request),
+        requestId: request.request_id || request.id || "no-req-id",
       }));
 
       console.log(processedRequests);
@@ -227,9 +257,8 @@ export default function NetworkPage() {
         .map((freelancer: Freelancer) => ({
           id: freelancer.id,
           name:
-            `${freelancer.first_name || ""} ${
-              freelancer.last_name || ""
-            }`.trim() || "User",
+            `${freelancer.first_name || ""} ${freelancer.last_name || ""
+              }`.trim() || "User",
           location:
             [freelancer.city, freelancer.state].filter(Boolean).join(", ") ||
             "Unknown",
@@ -278,6 +307,33 @@ export default function NetworkPage() {
       } else {
         setNearNetwork(processedFreelancers);
       }
+
+      // Cache all profile data in sessionStorage for quick access on profile page
+      const allUsers = [
+        ...processedFollowers,
+        ...processedFollowingApproved,
+        ...processedRequests,
+        ...processedFreelancers
+      ];
+      const cache: Record<string, any> = {};
+      allUsers.forEach((user) => {
+        if (user.id) {
+          cache[user.id] = {
+            id: user.id,
+            username: user.name,
+            first_name: user.name?.split(' ')[0] || '',
+            last_name: user.name?.split(' ').slice(1).join(' ') || '',
+            bio: user.summary || '',
+            profile_picture: user.imageUrl || '',
+            profile_image: user.imageUrl || '',
+            address: user.location !== 'Unknown' ? user.location : '',
+          };
+        }
+      });
+      try {
+        sessionStorage.setItem('network_profile_cache', JSON.stringify(cache));
+      } catch(e) { /* ignore storage errors */ }
+
     } catch (error) {
       console.error("Error fetching network data:", error);
       setError("Failed to load network data. Please try again.");
@@ -294,17 +350,18 @@ export default function NetworkPage() {
 
   const handleAcceptRequest = async (requestId: string) => {
     try {
-      await api.patch(
-        `/freelancer/follow/?request_id=${requestId}&action=accept`
-      );
+      // Backend expects query params, NOT body - confirmed working
+      await api.patch(`/freelancer/follow/?request_id=${requestId}&action=accept`);
 
-      // Remove from invites
+      // Remove from invites immediately
       setInvites((prevInvites) =>
         prevInvites.filter((invite) => invite.requestId !== requestId)
       );
 
-      // Refresh followers list
-      await fetchNetworkData();
+      // Refresh followers list after short delay for backend sync
+      setTimeout(async () => {
+        await fetchNetworkData();
+      }, 800);
     } catch (error) {
       console.error("Error accepting follow request:", error);
       setError("Failed to accept request. Please try again.");
@@ -313,9 +370,8 @@ export default function NetworkPage() {
 
   const handleRejectRequest = async (requestId: string) => {
     try {
-      await api.patch(
-        `/freelancer/follow/?request_id=${requestId}&action=reject`
-      );
+      // Backend expects query params, NOT body - confirmed working
+      await api.patch(`/freelancer/follow/?request_id=${requestId}&action=reject`);
 
       setInvites((prevInvites) =>
         prevInvites.filter((invite) => invite.requestId !== requestId)
@@ -410,26 +466,57 @@ export default function NetworkPage() {
   const activeTabData = getActiveTabData();
 
   return (
-    <div className="flex flex-col h-[calc(100vh-10rem)] md:h-full overflow-y-scroll md:overflow-y-hidden lg:flex-row gap-4 p-4">
-      <div className="w-full lg:w-1/3 bg-white border border-gray-200 shadow-sm p-5 lg:h-auto lg:overflow-y-auto rounded-xl">
-        {/* Tab Navigation */}
+    <div className="flex flex-col lg:flex-row gap-12 lg:gap-[100px] xl:gap-[180px] p-4 lg:px-28 w-full h-[calc(100vh-5rem)] md:h-[calc(100vh-10rem)] overflow-y-auto hide-scrollbar pb-32">
+      <div className="w-full lg:w-[320px] xl:w-[380px] flex-shrink-0 bg-white border border-gray-100 shadow-sm p-6 h-fit rounded-xl hide-scrollbar">
+        {/* Network Header */}
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-[17px] font-bold text-gray-900">My network</h2>
+          <button className="p-1.5 hover:bg-gray-100 rounded-full text-gray-400">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+          </button>
+        </div>
 
-        <div className="mb-5 flex gap-2 md:gap-1 border-b border-gray-200 overflow-x-auto hide-scrollbar">
+        {/* Info Banner */}
+        {showConnectionsBanner && (
+          <div className="bg-[#eceaff] rounded-xl p-4 mb-6 relative">
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowConnectionsBanner(false); }}
+              className="absolute top-3 right-3 text-[#7052FF] hover:text-purple-800"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="flex items-center gap-2 mb-2 text-[#7052FF]">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="font-semibold text-xs tracking-wide">What are Connections?</h3>
+            </div>
+            <p className="text-[11px] text-gray-700 leading-relaxed max-w-[95%]">
+              Connections are how you build your professional network on GrowUp Buddy. Connect with people you want to collaborate, learn, or grow with — based on shared interests and intent.
+            </p>
+          </div>
+        )}
+
+        {/* Tab Navigation - Tucked away minimal */}
+        <div className="mb-4 flex gap-2 md:gap-1 border-b border-gray-100 overflow-x-auto hide-scrollbar">
           <button
             onClick={() => setActiveTab("followers")}
-            className={`px-4 md:px-3 py-3 md:py-2.5 font-semibold text-sm md:text-xs transition-all relative flex items-center gap-2 md:gap-1.5 whitespace-nowrap flex-shrink-0 ${
-              activeTab === "followers"
-                ? "text-[#7052FF]"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
+            className={`px-4 md:px-3 py-3 md:py-2.5 font-semibold text-sm md:text-xs transition-all relative flex items-center gap-2 md:gap-1.5 whitespace-nowrap flex-shrink-0 ${activeTab === "followers"
+              ? "text-[#7052FF]"
+              : "text-gray-600 hover:text-gray-900"
+              }`}
           >
             <span>Followers</span>
             <span
-              className={`px-2 py-0.5 rounded-full text-xs font-bold min-w-[1.5rem] text-center ${
-                activeTab === "followers"
-                  ? "bg-[#7052FF] text-white"
-                  : "bg-gray-200 text-gray-600"
-              }`}
+              className={`px-2 py-0.5 rounded-full text-xs font-bold min-w-[1.5rem] text-center ${activeTab === "followers"
+                ? "bg-[#7052FF] text-white"
+                : "bg-gray-200 text-gray-600"
+                }`}
             >
               {followers.length}
             </span>
@@ -439,19 +526,17 @@ export default function NetworkPage() {
           </button>
           <button
             onClick={() => setActiveTab("connections")}
-            className={`px-4 md:px-3 py-3 md:py-2.5 font-semibold text-sm md:text-xs transition-all relative flex items-center gap-2 md:gap-1.5 whitespace-nowrap flex-shrink-0 ${
-              activeTab === "connections"
-                ? "text-[#7052FF]"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
+            className={`px-4 md:px-3 py-3 md:py-2.5 font-semibold text-sm md:text-xs transition-all relative flex items-center gap-2 md:gap-1.5 whitespace-nowrap flex-shrink-0 ${activeTab === "connections"
+              ? "text-[#7052FF]"
+              : "text-gray-600 hover:text-gray-900"
+              }`}
           >
             <span>Connections</span>
             <span
-              className={`px-2 py-0.5 rounded-full text-xs font-bold min-w-[1.5rem] text-center ${
-                activeTab === "connections"
-                  ? "bg-[#7052FF] text-white"
-                  : "bg-gray-200 text-gray-600"
-              }`}
+              className={`px-2 py-0.5 rounded-full text-xs font-bold min-w-[1.5rem] text-center ${activeTab === "connections"
+                ? "bg-[#7052FF] text-white"
+                : "bg-gray-200 text-gray-600"
+                }`}
             >
               {connections.length}
             </span>
@@ -461,19 +546,17 @@ export default function NetworkPage() {
           </button>
           <button
             onClick={() => setActiveTab("following")}
-            className={`px-4 md:px-3 py-3 md:py-2.5 font-semibold text-sm md:text-xs transition-all relative flex items-center gap-2 md:gap-1.5 whitespace-nowrap flex-shrink-0 ${
-              activeTab === "following"
-                ? "text-[#7052FF]"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
+            className={`px-4 md:px-3 py-3 md:py-2.5 font-semibold text-sm md:text-xs transition-all relative flex items-center gap-2 md:gap-1.5 whitespace-nowrap flex-shrink-0 ${activeTab === "following"
+              ? "text-[#7052FF]"
+              : "text-gray-600 hover:text-gray-900"
+              }`}
           >
             <span>Following</span>
             <span
-              className={`px-2 py-0.5 rounded-full text-xs font-bold min-w-[1.5rem] text-center ${
-                activeTab === "following"
-                  ? "bg-[#7052FF] text-white"
-                  : "bg-gray-200 text-gray-600"
-              }`}
+              className={`px-2 py-0.5 rounded-full text-xs font-bold min-w-[1.5rem] text-center ${activeTab === "following"
+                ? "bg-[#7052FF] text-white"
+                : "bg-gray-200 text-gray-600"
+                }`}
             >
               {following.length}
             </span>
@@ -484,7 +567,7 @@ export default function NetworkPage() {
         </div>
 
         {/* Network Section with Tab Content */}
-        <div className="max-h-[calc(100vh-20rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pr-1">
+        <div className="max-h-[500px] overflow-y-auto scrollbar-none pr-1">
           {activeTabData.length > 0 ? (
             <div className="space-y-0.5">
               {activeTabData.map((connection) => (
@@ -516,45 +599,57 @@ export default function NetworkPage() {
         </div>
       </div>
 
-      <div className="w-full lg:w-2/3 p-4 lg:min-h-screen scrollbar-[1px] rounded-lg">
-        <NetworkSection title="Invites" showAll={invites.length > 4}>
-          <div className="max-h-[240px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300">
+      <div className="w-full lg:w-[1000px] flex-shrink-0 ml-auto py-4 rounded-lg hide-scrollbar">
+        <NetworkSection title="Invites">
+          <div className="max-h-[350px] overflow-y-auto pr-2 scrollbar-none flex flex-col gap-[20px]">
             {invites.length > 0 ? (
               invites.map((invite) => (
                 <NetworkCard
                   key={invite.requestId}
                   {...invite}
                   showAccept
+                  variant="invite"
                   onAccept={() => handleAcceptRequest(invite.requestId)}
                   onReject={() => handleRejectRequest(invite.requestId)}
                 />
               ))
             ) : (
-              <p className="text-gray-500">No pending invites.</p>
+              <p className="text-gray-500 text-sm pl-2">No pending invites.</p>
             )}
           </div>
+          {invites.length > 4 && (
+            <div className="flex items-center justify-center mt-6">
+              <div className="h-[1px] bg-gray-100 flex-grow"></div>
+              <button className="px-4 text-[#7052FF] text-sm font-semibold hover:underline">
+                See all
+              </button>
+              <div className="h-[1px] bg-gray-100 flex-grow"></div>
+            </div>
+          )}
         </NetworkSection>
 
-        <NetworkSection title="Near My Network">
-          <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300">
-            <div className="space-y-6">
-              {nearNetwork.length > 0 ? (
-                nearNetwork.map((connection) => (
-                  <div key={connection.id} className="p-4 border rounded-lg">
+        <div className="mt-8">
+          <NetworkSection title="Near My Network">
+            <div className="flex-1 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {nearNetwork.length > 0 ? (
+                  nearNetwork.map((connection) => (
                     <NetworkCard
+                      key={connection.id}
                       {...connection}
+                      variant="grid"
                       showFollow={!connection.requestSent}
                       onFollow={() => handleFollowUser(connection.id)}
                       onCancelRequest={() => handleCancelRequest(connection.id)}
                     />
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500">No freelancers found.</p>
-              )}
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-sm">No freelancers found.</p>
+                )}
+              </div>
             </div>
-          </div>
-        </NetworkSection>
+          </NetworkSection>
+        </div>
       </div>
     </div>
   );

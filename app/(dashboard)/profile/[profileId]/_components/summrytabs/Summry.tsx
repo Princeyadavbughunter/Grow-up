@@ -8,6 +8,9 @@ import MyExperience from './MyExperience'
 import MyEducation from './MyEducation'
 import Clubs from '../../../components/summrytabs/Clubs'
 import MyApplications from '../../../components/summrytabs/MyApplications'
+import Myskills from './Myskills'
+import { useAuth } from '@/context/AuthContext'
+
 
 
 interface FreelancerProfile {
@@ -60,6 +63,13 @@ interface SummryProps {
 
 const Summry: React.FC<SummryProps> = ({ profileData, profileId }) => {
     const [activeJobTypeTab, setActiveJobTypeTab] = useState<string>("About");
+    const { profileData: currentUser } = useAuth();
+    
+    // Check if this profile belongs to the currently logged-in user
+    const isOwnProfile = !!(currentUser?.id && profileData?.id && 
+      (currentUser.id === profileData.id || 
+       currentUser.id === (profileData as any).user ||
+       String(currentUser.id) === String(profileData.id)));
 
     const skillsArray = profileData?.skills ? profileData.skills.split(',').map(skill => skill.trim()) : [];
 
@@ -79,58 +89,36 @@ const Summry: React.FC<SummryProps> = ({ profileData, profileId }) => {
                 ))}
             </div>
 
-            <div className="flex justify-between flex-col md:flex-row gap-10">
-                <div className='md:w-1/2'>
+            <div className="flex justify-between flex-col md:flex-row gap-8 lg:gap-16 mt-6">
+                <div className='md:w-[60%] flex-1'>
                     {activeJobTypeTab === "About" && (
                     <div className='flex flex-col'>
                         <div>
-                            <p className='flex items-center py-4 font-semibold gap-5'>Summary </p>
-                            <div className="bg-[#F6F8FF] shadow-sm rounded-lg p-4">
-                                <p>My Journey</p>
+                            <p className='flex items-center py-4 font-medium gap-5'>Summary </p>
+                            <div className="bg-[#F6F8FF] p-4 rounded-xl">
+                                <p className="font-medium mb-1">My Journey</p>
 
                                 <div className='py-2'>
-                                    <p className="flex flex-wrap gap-2 font-semibold">
+                                    <div className="flex flex-wrap gap-2">
                                         {skillsArray.length > 0 ? (
-                                            skillsArray.map((skill, index) => (
-                                                <button key={index} className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm border">
+                                            Array.from(new Set(skillsArray)).map((skill, index) => (
+                                                <span key={`${skill}-${index}`} className="font-medium rounded-full px-3 py-1 text-xs sm:text-sm bg-white text-gray-700">
                                                     {skill}
-                                                </button>
+                                                </span>
                                             ))
                                         ) : null}
-                                    </p>
-                                </div>
-
-                                <p className='text-[#6A737D]'>{profileData?.bio || 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the Lorem Ipsum is simply dummy text of the printing and typesetting industry.'}</p>
-                            </div>
-                        </div>
-                        <MyExperience id={profileData?.id} />
-                        <MyEducation profileData={profileData} />
-                    </div>
-                    )}
-                    {activeJobTypeTab === "Skills" && (
-                        <div className="my-8">
-                            <div className="flex items-center gap-4 mb-4">
-                                <h2 className="text-lg font-bold">My Skills</h2>
-                            </div>
-
-                            {skillsArray.length > 0 ? (
-                                <div>
-                                    <h3 className="font-semibold text-gray-600">Skills</h3>
-                                    <div className="flex flex-wrap gap-2 mt-2 border-b py-2">
-                                        {skillsArray.map((skill) => (
-                                            <span key={skill} className="px-3 py-1 text-xs font-medium border rounded-full bg-[#E4DEFF]">
-                                                {skill}
-                                            </span>
-                                        ))}
                                     </div>
                                 </div>
-                            ) : (
-                                <div className="bg-[#F6F8FF] shadow-sm rounded-xl p-4 text-gray-500 text-center">
-                                    No skills added. Click to add some.
-                                </div>
-                            )}
+
+                                <p className='text-[#6A737D] text-sm leading-relaxed'>{profileData?.bio || 'No bio available'}</p>
+                            </div>
                         </div>
+                        <MyExperience id={profileData?.id} workExperiences={profileData?.work_experience || profileData?.work_experiences} isOwnProfile={isOwnProfile} />
+                        <MyEducation profileData={profileData} />
+                        <Myskills profileData={profileData} />
+                    </div>
                     )}
+                    {activeJobTypeTab === "Skills" && <Myskills profileData={profileData} />}
 
                     {activeJobTypeTab === "Porfolio" && <Portfolios profileData={profileData} />}
 
